@@ -35,36 +35,38 @@ export function SessionHistory() {
   const workCount = todaySessions.filter(s => s.type === "work").length;
 
   return (
-    <Panel variant="primary" size="md" className="w-full shadow-xl shadow-neon-yellow/20">
+    <Panel variant="primary" size="md" className="shadow-xl shadow-neon-yellow/20">
       <CornerDecoration position="top-left" color="yellow" size="md" />
       <CornerDecoration position="bottom-right" color="yellow" size="md" />
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-6 mb-10 sm:mb-12 md:mb-14">
-        <h3 className="text-xl sm:text-2xl md:text-3xl font-black uppercase text-text-dim tracking-widest">📊 TODAY'S LOG</h3>
-        <div className="px-5 sm:px-6 md:px-7 py-2.5 sm:py-3 md:py-3.5 bg-dark-bg border-2 border-neon-yellow text-neon-yellow font-black text-lg sm:text-xl md:text-2xl rounded-lg shadow-md shadow-neon-yellow/30 whitespace-nowrap">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10">
+        <h3 className="text-2xl sm:text-3xl font-black uppercase text-text-dim tracking-widest">📊 TODAY'S LOG</h3>
+        <div className="px-6 py-3 bg-dark-bg border-2 border-neon-yellow text-neon-yellow font-black text-xl sm:text-2xl rounded-lg shadow-md shadow-neon-yellow/30 whitespace-nowrap">
           {Math.round(totalWorkToday / 60)}h {totalWorkToday % 60}m
         </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row justify-center items-center gap-8 sm:gap-12 md:gap-16 mb-10 sm:mb-12 md:mb-14 pb-8 sm:pb-10 md:pb-12 border-b-2 border-gray-700">
+      {/* Stats */}
+      <div className="flex flex-col sm:flex-row justify-center items-center gap-8 sm:gap-12 mb-10 pb-8 sm:pb-10 border-b-2 border-gray-700">
         <div className="text-center">
-          <div className="text-5xl sm:text-6xl md:text-7xl font-black text-neon-yellow drop-shadow-lg">{workCount}</div>
-          <div className="text-xs sm:text-sm md:text-base font-black text-text-dim mt-2 sm:mt-3 md:mt-4 uppercase tracking-wider">Focus Sessions</div>
+          <div className="text-6xl sm:text-7xl font-black text-neon-yellow drop-shadow-lg">{workCount}</div>
+          <div className="text-sm font-black text-text-dim mt-3 uppercase tracking-wider">Focus Sessions</div>
         </div>
-        <div className="hidden sm:block w-0.5 h-12 sm:h-16 bg-gradient-to-b from-transparent via-gray-700 to-transparent" />
+        <div className="hidden sm:block w-0.5 h-16 bg-gradient-to-b from-transparent via-gray-700 to-transparent" />
         <div className="text-center">
-          <div className="text-5xl sm:text-6xl md:text-7xl font-black text-neon-green drop-shadow-lg">{todaySessions.filter(s => s.type !== "work").length}</div>
-          <div className="text-xs sm:text-sm md:text-base font-black text-text-dim mt-2 sm:mt-3 md:mt-4 uppercase tracking-wider">Rest Sessions</div>
+          <div className="text-6xl sm:text-7xl font-black text-neon-green drop-shadow-lg">{todaySessions.filter(s => s.type !== "work").length}</div>
+          <div className="text-sm font-black text-text-dim mt-3 uppercase tracking-wider">Rest Sessions</div>
         </div>
       </div>
 
-      <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2 sm:gap-2.5 md:gap-3 mb-8 sm:mb-10 md:mb-12">
+      {/* Session Grid */}
+      <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2 sm:gap-2.5 mb-8">
         {todaySessions.length > 0 ? (
           todaySessions.slice(0, 40).map((session, idx) => (
             <div 
               key={session.id || idx} 
-              className={`aspect-square rounded-lg sm:rounded-xl flex items-center justify-center text-xs sm:text-sm md:text-base font-bold transition-all duration-200 hover:scale-110 sm:hover:scale-125 ${
+              className={`aspect-square rounded-lg sm:rounded-xl flex items-center justify-center text-sm sm:text-base font-bold transition-all duration-200 hover:scale-110 ${
                 session.type === "work" 
                   ? "bg-neon-cyan text-dark-bg shadow-md shadow-neon-cyan/50" 
                   : "bg-neon-green text-dark-bg shadow-md shadow-neon-green/50"
@@ -74,17 +76,18 @@ export function SessionHistory() {
             </div>
           ))
         ) : (
-          <div className="col-span-4 sm:col-span-6 md:col-span-8 lg:col-span-10 text-center py-8 sm:py-12 md:py-14 text-base sm:text-lg md:text-xl text-text-dim font-black tracking-wider">▮▮ NO DATA - START FOCUSING! ▮▮</div>
+          <div className="col-span-4 sm:col-span-6 md:col-span-8 lg:col-span-10 text-center py-12 text-lg text-text-dim font-black tracking-wider">▮▮ NO DATA - START FOCUSING! ▮▮</div>
         )}
       </div>
 
+      {/* Clear Button */}
       {todaySessions.length > 0 && (
         <button 
           onClick={clearSessions} 
-          className="w-full flex items-center justify-center gap-2 sm:gap-3 py-4 sm:py-5 md:py-6 text-xs sm:text-sm md:text-base text-text-dim hover:text-neon-pink font-black uppercase tracking-widest border-t-2 border-gray-700 hover:border-neon-pink hover:bg-neon-pink/5 transition-all rounded-b-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neon-yellow"
+          className="w-full flex items-center justify-center gap-3 py-5 text-sm text-text-dim hover:text-neon-pink font-black uppercase tracking-widest border-t-2 border-gray-700 hover:border-neon-pink hover:bg-neon-pink/5 transition-all rounded-b-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neon-yellow"
           aria-label="Clear all sessions"
         >
-          <Trash2 className="w-4 sm:w-5 h-4 sm:h-5" /> 
+          <Trash2 className="w-5 h-5" /> 
           <span>CLEAR DATA</span>
         </button>
       )}

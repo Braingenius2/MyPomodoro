@@ -17,6 +17,18 @@ const DEFAULT_SETTINGS: Settings = {
   longBreakInterval: 4,
 };
 
+const SETTING_FIELDS = [
+  { label: "Focus Time (minutes)", color: "cyan" as const, min: 5, max: 60, key: "workDuration" as const },
+  { label: "Short Rest (minutes)", color: "green" as const, min: 1, max: 15, key: "shortBreakDuration" as const },
+  { label: "Long Break (minutes)", color: "pink" as const, min: 10, max: 45, key: "longBreakDuration" as const },
+  { label: "Long Break Every (sessions)", color: "yellow" as const, min: 2, max: 8, key: "longBreakInterval" as const },
+];
+
+const TOGGLE_FIELDS = [
+  { key: "autoStartBreaks" as const, label: "Auto Start Rest", color: "green" as const },
+  { key: "autoStartPomodoros" as const, label: "Auto Start Focus", color: "cyan" as const },
+];
+
 export function SettingsPanel() {
   const { settings, updateSettings } = useTimerStore();
   const [isOpen, setIsOpen] = useState(false);
@@ -51,89 +63,78 @@ export function SettingsPanel() {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-3 sm:p-4 md:p-6">
-      <Panel variant="secondary" size="md" className="w-full max-w-sm sm:max-w-md md:max-w-lg shadow-2xl shadow-neon-pink/40">
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <Panel variant="secondary" size="md" className="w-full max-w-md shadow-2xl shadow-neon-pink/40">
         <CornerDecoration position="top-left" color="pink" size="lg" />
         <CornerDecoration position="bottom-right" color="pink" size="lg" />
 
-        <div className="flex justify-between items-center gap-4 mb-10 sm:mb-12">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-neon-pink uppercase tracking-widest">⚙ OPTIONS</h2>
+        {/* Header */}
+        <div className="flex justify-between items-center gap-4 mb-10">
+          <h2 className="text-3xl sm:text-4xl font-black text-neon-pink uppercase tracking-widest">⚙ OPTIONS</h2>
           <button 
             onClick={handleCancel} 
             className="p-2 hover:bg-neon-pink/20 rounded-lg transition-colors focus-visible:outline-2 focus-visible:outline-neon-pink"
             aria-label="Close settings"
           >
-            <X className="w-5 sm:w-6 h-5 sm:h-6 text-neon-pink" />
+            <X className="w-6 h-6 text-neon-pink" />
           </button>
         </div>
 
-        <div className="space-y-6 sm:space-y-8">
-          <div>
-            <label className="block text-sm sm:text-base font-bold text-neon-cyan mb-3 sm:mb-4 uppercase tracking-wider">Focus Time (minutes)</label>
-            <div className="flex items-center gap-4 sm:gap-6">
-              <div className="flex-1"><RangeInput min={5} max={60} value={localSettings.workDuration} onChange={(e) => setLocalSettings({...localSettings, workDuration: parseInt(e.target.value)})} color="cyan" /></div>
-              <span className="w-16 sm:w-20 text-center font-black text-xl sm:text-2xl text-neon-cyan bg-dark-bg py-2 rounded-lg border-2 border-neon-cyan shadow-md shadow-neon-cyan/30">{localSettings.workDuration}</span>
+        {/* Settings Fields */}
+        <div className="space-y-8">
+          {SETTING_FIELDS.map(({ label, color, min, max, key }) => (
+            <div key={key}>
+              <label className={`block text-base font-bold mb-4 uppercase tracking-wider text-neon-${color}`}>
+                {label}
+              </label>
+              <div className="flex items-center gap-6">
+                <div className="flex-1">
+                  <RangeInput 
+                    min={min} 
+                    max={max} 
+                    value={localSettings[key]} 
+                    onChange={(e) => setLocalSettings({...localSettings, [key]: parseInt(e.target.value)})} 
+                    color={color}
+                  />
+                </div>
+                <span className={`w-20 text-center font-black text-2xl text-neon-${color} bg-dark-bg py-2 rounded-lg border-2 border-neon-${color} shadow-md`}>
+                  {localSettings[key]}
+                </span>
+              </div>
             </div>
-          </div>
-
-          <div>
-            <label className="block text-sm sm:text-base font-bold text-neon-green mb-3 sm:mb-4 uppercase tracking-wider">Short Rest (minutes)</label>
-            <div className="flex items-center gap-4 sm:gap-6">
-              <div className="flex-1"><RangeInput min={1} max={15} value={localSettings.shortBreakDuration} onChange={(e) => setLocalSettings({...localSettings, shortBreakDuration: parseInt(e.target.value)})} color="green" /></div>
-              <span className="w-16 sm:w-20 text-center font-black text-xl sm:text-2xl text-neon-green bg-dark-bg py-2 rounded-lg border-2 border-neon-green shadow-md shadow-neon-green/30">{localSettings.shortBreakDuration}</span>
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm sm:text-base font-bold text-neon-pink mb-3 sm:mb-4 uppercase tracking-wider">Long Break (minutes)</label>
-            <div className="flex items-center gap-4 sm:gap-6">
-              <div className="flex-1"><RangeInput min={10} max={45} value={localSettings.longBreakDuration} onChange={(e) => setLocalSettings({...localSettings, longBreakDuration: parseInt(e.target.value)})} color="pink" /></div>
-              <span className="w-16 sm:w-20 text-center font-black text-xl sm:text-2xl text-neon-pink bg-dark-bg py-2 rounded-lg border-2 border-neon-pink shadow-md shadow-neon-pink/30">{localSettings.longBreakDuration}</span>
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm sm:text-base font-bold text-neon-yellow mb-3 sm:mb-4 uppercase tracking-wider">Long Break Every (sessions)</label>
-            <div className="flex items-center gap-4 sm:gap-6">
-              <div className="flex-1"><RangeInput min={2} max={8} value={localSettings.longBreakInterval} onChange={(e) => setLocalSettings({...localSettings, longBreakInterval: parseInt(e.target.value)})} color="yellow" /></div>
-              <span className="w-16 sm:w-20 text-center font-black text-xl sm:text-2xl text-neon-yellow bg-dark-bg py-2 rounded-lg border-2 border-neon-yellow shadow-md shadow-neon-yellow/30">{localSettings.longBreakInterval}</span>
-            </div>
-          </div>
-
-        <div className="flex flex-col gap-3 sm:gap-4 pt-6 sm:pt-8 border-t-2 border-gray-700">
-          <label className="flex items-center gap-3 sm:gap-4 cursor-pointer group">
-            <input 
-              type="checkbox" 
-              checked={localSettings.autoStartBreaks} 
-              onChange={(e) => setLocalSettings({...localSettings, autoStartBreaks: e.target.checked})} 
-              className="w-5 sm:w-6 h-5 sm:h-6 accent-neon-green cursor-pointer" 
-            />
-            <span className="font-bold text-sm sm:text-base text-neon-green uppercase tracking-wide group-hover:text-neon-green/80 transition-colors">Auto Start Rest</span>
-          </label>
-          <label className="flex items-center gap-3 sm:gap-4 cursor-pointer group">
-            <input 
-              type="checkbox" 
-              checked={localSettings.autoStartPomodoros} 
-              onChange={(e) => setLocalSettings({...localSettings, autoStartPomodoros: e.target.checked})} 
-              className="w-5 sm:w-6 h-5 sm:h-6 accent-neon-cyan cursor-pointer" 
-            />
-            <span className="font-bold text-sm sm:text-base text-neon-cyan uppercase tracking-wide group-hover:text-neon-cyan/80 transition-colors">Auto Start Focus</span>
-            </label>
-          </div>
+          ))}
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-10 sm:mt-12 md:mt-14">
+        {/* Toggle Options */}
+        <div className="flex flex-col gap-4 pt-8 border-t-2 border-gray-700">
+          {TOGGLE_FIELDS.map(({ key, label, color }) => (
+            <label key={key} className="flex items-center gap-4 cursor-pointer group">
+              <input 
+                type="checkbox" 
+                checked={localSettings[key]}
+                onChange={(e) => setLocalSettings({...localSettings, [key]: e.target.checked})} 
+                className={`w-6 h-6 accent-neon-${color} cursor-pointer`}
+              />
+              <span className={`font-bold text-base text-neon-${color} uppercase tracking-wide group-hover:opacity-80 transition-opacity`}>
+                {label}
+              </span>
+            </label>
+          ))}
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-4 mt-12">
           <Button 
             variant="control" 
             colorScheme="pink" 
             onClick={handleSave} 
-            className="flex-1 py-3 sm:py-4 font-black uppercase tracking-wider"
+            className="flex-1 py-4 font-black uppercase tracking-wider"
           >
             SAVE
           </Button>
           <button 
             onClick={handleCancel} 
-            className="flex-1 px-6 py-3 sm:py-4 bg-dark-panel text-text-dim font-black uppercase tracking-wider rounded-xl border-2 border-gray-700 hover:border-text-dim hover:bg-dark-panel/80 transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neon-pink"
+            className="flex-1 px-6 py-4 bg-dark-panel text-text-dim font-black uppercase tracking-wider rounded-xl border-2 border-gray-700 hover:border-text-dim hover:bg-dark-panel/80 transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neon-pink"
           >
             CANCEL
           </button>
