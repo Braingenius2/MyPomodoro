@@ -22,16 +22,19 @@ export const useSessionStore = create<SessionState>((set) => ({
   initialized: false,
 
   addSession: (session) =>
-    set((state) => ({
-      sessions: [
-        {
-          ...session,
-          id: Math.random().toString(36).substring(2, 9),
-          completedAt: new Date().toISOString(),
-        },
-        ...state.sessions,
-      ].slice(0, 100),
-    })),
+    set((state) => {
+      const currentSessions = Array.isArray(state.sessions) ? state.sessions : [];
+      return {
+        sessions: [
+          {
+            ...session,
+            id: Math.random().toString(36).substring(2, 9),
+            completedAt: new Date().toISOString(),
+          },
+          ...currentSessions,
+        ].slice(0, 100),
+      };
+    }),
 
   clearSessions: () => set({ sessions: [] }),
 
@@ -42,7 +45,7 @@ export const useSessionStore = create<SessionState>((set) => ({
       const saved = localStorage.getItem("pomodoro-sessions");
       if (saved) {
         const parsed = JSON.parse(saved);
-        set({ sessions: parsed, initialized: true });
+        set({ sessions: Array.isArray(parsed) ? parsed : [], initialized: true });
       } else {
         set({ initialized: true });
       }

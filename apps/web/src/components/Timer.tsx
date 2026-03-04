@@ -5,7 +5,10 @@ import { useTimerStore, formatTime } from "@/store/timerStore";
 import { useSessionStore } from "@/store/sessionStore";
 import { SettingsPanel } from "@/components/SettingsPanel";
 import { SessionHistory } from "@/components/SessionHistory";
-import { Play, Pause, RotateCcw } from "lucide-react";
+import { Button } from "@/components/ui/Button";
+import { Panel } from "@/components/ui/Panel";
+import { CornerDecoration } from "@/components/ui/CornerDecoration";
+import { Play, Pause, RotateCcw, Zap, Coffee, Moon } from "lucide-react";
 
 export type TimerMode = "work" | "shortBreak" | "longBreak";
 
@@ -44,126 +47,144 @@ export function Timer() {
 
   useEffect(() => {
     if (!isRunning || timeLeft <= 0) return;
-
-    const interval = setInterval(() => {
-      tick();
-    }, 1000);
-
+    const interval = setInterval(() => tick(), 1000);
     return () => clearInterval(interval);
   }, [isRunning, tick, timeLeft]);
 
   useEffect(() => {
     if (!ready) return;
     if (timeLeft === 0 && mode === "work") {
-      addSession({
-        type: mode,
-        duration: settings.workDuration,
-      });
+      addSession({ type: mode, duration: settings.workDuration });
     }
   }, [ready, timeLeft, mode, settings, addSession]);
 
-  const modeConfig: Record<TimerMode, { label: string; gradient: string; shadow: string }> = {
-    work: { 
-      label: "Focus Time", 
-      gradient: "from-red-500 via-rose-500 to-orange-500",
-      shadow: "shadow-red-500/30"
-    },
-    shortBreak: { 
-      label: "Short Break", 
-      gradient: "from-green-400 via-emerald-500 to-teal-500",
-      shadow: "shadow-green-500/30"
-    },
-    longBreak: { 
-      label: "Long Break", 
-      gradient: "from-blue-400 via-indigo-500 to-purple-500",
-      shadow: "shadow-blue-500/30"
-    },
+  const modeConfig: Record<TimerMode, { label: string; icon: React.ReactNode; color: "cyan" | "green" | "pink" }> = {
+    work: { label: "FOCUS", icon: <Zap className="w-6 h-6" />, color: "cyan" },
+    shortBreak: { label: "REST", icon: <Coffee className="w-6 h-6" />, color: "green" },
+    longBreak: { label: "BREAK", icon: <Moon className="w-6 h-6" />, color: "pink" },
   };
+
+  const totalDuration = mode === "work" ? settings.workDuration * 60 : mode === "shortBreak" ? settings.shortBreakDuration * 60 : settings.longBreakDuration * 60;
+  const progress = ((totalDuration - timeLeft) / totalDuration) * 100;
+  const progressColor = { work: "#00f5ff", shortBreak: "#00ff88", longBreak: "#ff00aa" }[mode];
 
   if (!ready) {
     return (
-      <div className="flex flex-col items-center gap-8">
-        <div className="flex gap-3">
-          {(["work", "shortBreak", "longBreak"] as TimerMode[]).map((m) => (
-            <div
-              key={m}
-              className="px-6 py-3 rounded-2xl bg-white/50 backdrop-blur-sm"
-            >
-              {modeConfig[m].label}
-            </div>
-          ))}
-        </div>
-        <div className="text-9xl font-bold text-white drop-shadow-lg">25:00</div>
-        <div className="flex gap-4">
-          <div className="px-10 py-4 bg-white/50 rounded-2xl text-xl font-bold">Start</div>
-          <div className="px-10 py-4 bg-white/50 rounded-2xl text-xl font-bold">Reset</div>
-        </div>
-        <div className="text-white/70">Sessions: 0</div>
+      <div className="w-screen h-screen flex items-center justify-center bg-dark-bg">
+        <Panel variant="primary" size="lg" className="w-[90vw] max-w-2xl text-center">
+          <div className="text-4xl text-neon-cyan font-black tracking-widest mb-12">INITIALIZING...</div>
+          <div className="flex justify-center gap-4">
+            <div className="w-4 h-4 bg-neon-cyan rounded animate-pulse" />
+            <div className="w-4 h-4 bg-neon-cyan rounded animate-pulse" style={{animationDelay: '0.2s'}} />
+            <div className="w-4 h-4 bg-neon-cyan rounded animate-pulse" style={{animationDelay: '0.4s'}} />
+          </div>
+        </Panel>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col items-center gap-8">
-      {/* Mode Selector */}
-      <div className="flex gap-3 p-2 bg-white/30 backdrop-blur-md rounded-2xl">
-        {(["work", "shortBreak", "longBreak"] as TimerMode[]).map((m) => (
-          <button
-            key={m}
-            onClick={() => setMode(m)}
-            className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
-              mode === m
-                ? `bg-gradient-to-r ${modeConfig[m].gradient} text-white shadow-lg ${modeConfig[m].shadow}`
-                : "text-white/70 hover:text-white hover:bg-white/20"
-            }`}
-          >
-            {modeConfig[m].label}
-          </button>
-        ))}
-      </div>
-
-      {/* Timer Display */}
-      <div className={`relative p-12 rounded-3xl bg-gradient-to-br ${modeConfig[mode].gradient} shadow-2xl ${modeConfig[mode].shadow} transform transition-all duration-500 ${isRunning ? 'scale-105' : 'scale-100'}`}>
-        <div className="absolute inset-0 bg-white/20 rounded-3xl" />
-        <div className="relative text-[7rem] font-black text-white drop-shadow-lg leading-none tracking-tight">
-          {formatTime(timeLeft)}
+    <div className="w-full max-w-4xl mx-auto px-3 sm:px-4 md:px-6 py-6 sm:py-10 md:py-16 flex flex-col items-center">
+      
+      {/* ═════════════════════════════════════════
+          HEADER SECTION
+          ═════════════════════════════════════════ */}
+      <div className="text-center mb-12 sm:mb-16">
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black uppercase text-text-primary mb-4">MY POMODORO</h1>
+          <div className="h-1.5 sm:h-2 w-48 sm:w-64 mx-auto bg-gradient-to-r from-neon-cyan via-neon-pink to-neon-yellow rounded-full" />
         </div>
-        {isRunning && (
-          <div className="absolute -top-2 -right-2 w-6 h-6 bg-white rounded-full animate-pulse shadow-lg" />
-        )}
-      </div>
 
-      {/* Controls */}
-      <div className="flex gap-4">
-        <button
-          onClick={isRunning ? pause : start}
-          className={`flex items-center gap-3 px-10 py-5 bg-gradient-to-r ${modeConfig[mode].gradient} text-white rounded-2xl text-xl font-bold hover:scale-105 active:scale-95 transition-all shadow-xl ${modeConfig[mode].shadow}`}
-        >
-          {isRunning ? <Pause className="w-7 h-7" /> : <Play className="w-7 h-7 ml-1" />}
-          {isRunning ? "Pause" : "Start"}
-        </button>
-        <button
-          onClick={reset}
-          className="flex items-center gap-2 px-8 py-5 bg-white/80 text-gray-700 rounded-2xl text-xl font-bold hover:bg-white hover:scale-105 active:scale-95 transition-all shadow-lg"
-        >
-          <RotateCcw className="w-6 h-6" />
-          Reset
-        </button>
-      </div>
+        {/* ═════════════════════════════════════════
+            MAIN TIMER PANEL
+            ═════════════════════════════════════════ */}
+        <Panel variant="primary" size="xl" className="w-full mb-12 sm:mb-16">
+          <CornerDecoration position="top-left" color="cyan" size="lg" />
+          <CornerDecoration position="bottom-right" color="cyan" size="lg" />
 
-      {/* Session Counter */}
-      <div className="flex items-center gap-3 px-6 py-3 bg-white/40 backdrop-blur-md rounded-full">
-        <span className="text-2xl">🍅</span>
-        <span className="text-xl font-bold text-white">
-          {sessionsCompleted} {sessionsCompleted === 1 ? 'session' : 'sessions'} completed
-        </span>
-      </div>
+          {/* Mode Selection Row */}
+          <div className="flex justify-center gap-3 sm:gap-4 mb-12">
+            {(["work", "shortBreak", "longBreak"] as TimerMode[]).map((m) => (
+              <Button 
+                key={m} 
+                variant="mode" 
+                colorScheme={modeConfig[m].color} 
+                isActive={mode === m} 
+                onClick={() => setMode(m)} 
+                className="px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base"
+              >
+                {modeConfig[m].icon}
+                <span className="ml-2 font-black">{modeConfig[m].label}</span>
+              </Button>
+            ))}
+          </div>
 
-      {/* Settings */}
-      <SettingsPanel />
+          {/* Progress Bar */}
+          <div className="h-3 sm:h-4 rounded-full bg-dark-panel border-2 border-gray-700 overflow-hidden mb-12 shadow-inner">
+            <div 
+              className="h-full rounded-full transition-all duration-1000" 
+              style={{ 
+                width: `${progress}%`, 
+                background: progressColor, 
+                boxShadow: `0 0 20px ${progressColor}` 
+              }} 
+            />
+          </div>
 
-      {/* History */}
-      <SessionHistory />
+          {/* Time Display Section */}
+          <div className="text-center mb-12 space-y-4">
+            <div className="text-7xl sm:text-8xl md:text-9xl lg:text-[10rem] font-black text-neon-cyan leading-none tabular-nums">
+              {formatTime(timeLeft)}
+            </div>
+            <div className="text-base sm:text-lg md:text-xl font-black tracking-widest text-text-dim uppercase">
+              {mode === "work" ? "FOCUS TIME" : mode === "shortBreak" ? "SHORT REST" : "LONG BREAK"}
+            </div>
+          </div>
+
+          {/* Status Indicator */}
+          <div className={`flex justify-center items-center gap-3 sm:gap-4 px-6 sm:px-8 py-3 sm:py-4 rounded-xl mb-12 transition-all ${isRunning ? "bg-neon-green/10 border-2 border-neon-green text-neon-green" : "border-2 border-text-dim text-text-dim"}`}>
+            <span className={`w-3 h-3 rounded-full ${isRunning ? "bg-neon-green animate-pulse" : "bg-text-dim"}`} />
+            <span className="font-black tracking-widest uppercase text-sm sm:text-base">{isRunning ? "▶ ACTIVE" : "⏸ PAUSED"}</span>
+          </div>
+
+          {/* Control Buttons */}
+          <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-6 mb-12">
+            <Button 
+              variant="control" 
+              colorScheme={modeConfig[mode].color} 
+              onClick={() => isRunning ? pause() : start()} 
+              className="px-8 sm:px-12 py-4 sm:py-5 text-base sm:text-lg flex items-center justify-center gap-2"
+            >
+              {isRunning ? <Pause className="w-5 h-5 sm:w-6 sm:h-6" /> : <Play className="w-5 h-5 sm:w-6 sm:h-6" />}
+              <span>{isRunning ? "PAUSE" : "START"}</span>
+            </Button>
+            <Button 
+              variant="control" 
+              colorScheme="cyan" 
+              onClick={reset} 
+              className="px-8 sm:px-10 py-4 sm:py-5 text-base sm:text-lg flex items-center justify-center gap-2"
+            >
+              <RotateCcw className="w-5 h-5 sm:w-6 sm:h-6" />
+              <span>RESET</span>
+            </Button>
+          </div>
+
+          {/* Completed Sessions Score */}
+          <div className="flex justify-center items-center gap-4 sm:gap-6 py-6 sm:py-8 px-4 border-t-2 border-b-2 border-gray-700 mb-8">
+            <span className="font-black tracking-widest text-text-dim uppercase text-xs sm:text-sm">Sessions</span>
+            <span className="text-5xl sm:text-6xl">🍅</span>
+            <span className="text-4xl sm:text-5xl font-black text-neon-yellow">{sessionsCompleted}</span>
+          </div>
+
+          {/* Settings Button */}
+          <div className="flex justify-center">
+            <SettingsPanel />
+          </div>
+        </Panel>
+
+        {/* ═════════════════════════════════════════
+            SESSION HISTORY PANEL
+            ═════════════════════════════════════════ */}
+        <SessionHistory />
     </div>
   );
 }
