@@ -1,26 +1,106 @@
 @import "tailwindcss";
 
 :root {
-  --background: #faf5ff;
-  --foreground: #1e1b4b;
+  --bg-dark: #0a0a12;
+  --bg-panel: #12121f;
+  --accent-cyan: #00f5ff;
+  --accent-pink: #ff00aa;
+  --accent-yellow: #ffdd00;
+  --accent-green: #00ff88;
+  --text-primary: #e0e0ff;
+  --text-dim: #6a6a8a;
+  --border-glow: rgba(0, 245, 255, 0.3);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0f0a1a;
-    --foreground: #f5f3ff;
-  }
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
 }
 
 body {
-  color: var(--foreground);
-  background: linear-gradient(135deg, #faf5ff 0%, #f0f9ff 50%, #fef3c7 100%);
-  min-height: 100vh;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg-dark);
+  font-family: 'Courier New', monospace;
+  color: var(--text-primary);
+  overflow-x: hidden;
 }
 
-@media (prefers-color-scheme: dark) {
-  body {
-    background: linear-gradient(135deg, #0f0a1a 0%, #1e1b4b 50%, #312e81 100%);
-  }
+/* Scanline effect */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.15),
+    rgba(0, 0, 0, 0.15) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+  z-index: 1000;
+}
+
+/* CRT glow */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.3) 100%);
+  pointer-events: none;
+  z-index: 999;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-dark);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--accent-cyan);
+  border-radius: 4px;
+}
+
+/* Glow text */
+.glow-cyan {
+  text-shadow: 0 0 10px var(--accent-cyan), 0 0 20px var(--accent-cyan), 0 0 40px var(--accent-cyan);
+}
+.glow-pink {
+  text-shadow: 0 0 10px var(--accent-pink), 0 0 20px var(--accent-pink);
+}
+.glow-yellow {
+  text-shadow: 0 0 10px var(--accent-yellow), 0 0 20px var(--accent-yellow);
+}
+
+/* Animations - used by Tailwind classes */
+
+/* Animations */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-pulse-fast {
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
 }

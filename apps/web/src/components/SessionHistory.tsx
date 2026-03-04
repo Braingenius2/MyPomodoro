@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useSessionStore } from "@/store/sessionStore";
+import { Panel } from "@/components/ui/Panel";
+import { CornerDecoration } from "@/components/ui/CornerDecoration";
 import { Trash2 } from "lucide-react";
 
 export function SessionHistory() {
@@ -10,22 +12,12 @@ export function SessionHistory() {
   const initialized = useSessionStore((state) => state.initialized);
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  useEffect(() => setMounted(true), []);
 
   const todayStats = useMemo(() => {
     const sessionList = Array.isArray(sessions) ? sessions : [];
-    const todaySessions = sessionList.filter((s) => {
-      const sessionDate = new Date(s.completedAt);
-      const today = new Date();
-      return sessionDate.toDateString() === today.toDateString();
-    });
-
-    const totalWorkToday = todaySessions
-      .filter((s) => s.type === "work")
-      .reduce((acc, s) => acc + s.duration, 0);
-
+    const todaySessions = sessionList.filter((s) => new Date(s.completedAt).toDateString() === new Date().toDateString());
+    const totalWorkToday = todaySessions.filter((s) => s.type === "work").reduce((acc, s) => acc + s.duration, 0);
     return { todaySessions, totalWorkToday };
   }, [sessions]);
 
@@ -33,75 +25,69 @@ export function SessionHistory() {
 
   if (!isReady) {
     return (
-      <div className="mt-6 w-full max-w-md">
-        <div className="bg-white/50 backdrop-blur-sm rounded-2xl p-5">
-          <div className="flex justify-between items-center mb-3">
-            <div className="h-5 bg-white/50 rounded w-32"></div>
-            <div className="h-5 bg-white/50 rounded w-20"></div>
-          </div>
-          <div className="h-12 bg-white/50 rounded w-full"></div>
-        </div>
-      </div>
+      <Panel variant="primary" size="md" className="w-full">
+        <div className="h-8 w-48 bg-gray-700 rounded animate-pulse" />
+      </Panel>
     );
   }
 
   const { todaySessions, totalWorkToday } = todayStats;
+  const workCount = todaySessions.filter(s => s.type === "work").length;
 
   return (
-    <div className="mt-6 w-full max-w-md">
-      <div className="bg-white/70 backdrop-blur-md rounded-3xl p-6 shadow-xl">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="font-bold text-lg text-gray-800">
-            ✨ Today&apos;s Progress
-          </h3>
-          <span className="px-4 py-1 bg-gradient-to-r from-rose-500 to-orange-500 text-white font-bold rounded-full text-sm">
-            {Math.round(totalWorkToday / 60)}h {totalWorkToday % 60}m
-          </span>
-        </div>
+    <Panel variant="primary" size="md" className="w-full shadow-xl shadow-neon-yellow/20">
+      <CornerDecoration position="top-left" color="yellow" size="md" />
+      <CornerDecoration position="bottom-right" color="yellow" size="md" />
 
-        {/* Tomato Visual */}
-        <div className="flex items-center justify-center mb-6">
-          <div className="relative">
-            <div className="text-[5rem] leading-none filter drop-shadow-lg animate-bounce-slow">
-              🍅
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-6 mb-10 sm:mb-12 md:mb-14">
+        <h3 className="text-xl sm:text-2xl md:text-3xl font-black uppercase text-text-dim tracking-widest">📊 TODAY'S LOG</h3>
+        <div className="px-5 sm:px-6 md:px-7 py-2.5 sm:py-3 md:py-3.5 bg-dark-bg border-2 border-neon-yellow text-neon-yellow font-black text-lg sm:text-xl md:text-2xl rounded-lg shadow-md shadow-neon-yellow/30 whitespace-nowrap">
+          {Math.round(totalWorkToday / 60)}h {totalWorkToday % 60}m
+        </div>
+      </div>
+
+      <div className="flex flex-col sm:flex-row justify-center items-center gap-8 sm:gap-12 md:gap-16 mb-10 sm:mb-12 md:mb-14 pb-8 sm:pb-10 md:pb-12 border-b-2 border-gray-700">
+        <div className="text-center">
+          <div className="text-5xl sm:text-6xl md:text-7xl font-black text-neon-yellow drop-shadow-lg">{workCount}</div>
+          <div className="text-xs sm:text-sm md:text-base font-black text-text-dim mt-2 sm:mt-3 md:mt-4 uppercase tracking-wider">Focus Sessions</div>
+        </div>
+        <div className="hidden sm:block w-0.5 h-12 sm:h-16 bg-gradient-to-b from-transparent via-gray-700 to-transparent" />
+        <div className="text-center">
+          <div className="text-5xl sm:text-6xl md:text-7xl font-black text-neon-green drop-shadow-lg">{todaySessions.filter(s => s.type !== "work").length}</div>
+          <div className="text-xs sm:text-sm md:text-base font-black text-text-dim mt-2 sm:mt-3 md:mt-4 uppercase tracking-wider">Rest Sessions</div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2 sm:gap-2.5 md:gap-3 mb-8 sm:mb-10 md:mb-12">
+        {todaySessions.length > 0 ? (
+          todaySessions.slice(0, 40).map((session, idx) => (
+            <div 
+              key={session.id || idx} 
+              className={`aspect-square rounded-lg sm:rounded-xl flex items-center justify-center text-xs sm:text-sm md:text-base font-bold transition-all duration-200 hover:scale-110 sm:hover:scale-125 ${
+                session.type === "work" 
+                  ? "bg-neon-cyan text-dark-bg shadow-md shadow-neon-cyan/50" 
+                  : "bg-neon-green text-dark-bg shadow-md shadow-neon-green/50"
+              }`}
+            >
+              {session.duration}
             </div>
-            <div className="absolute -top-1 -right-2 w-8 h-8 bg-gradient-to-r from-rose-500 to-red-500 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg">
-              {todaySessions.filter(s => s.type === "work").length}
-            </div>
-          </div>
-        </div>
-
-        {/* Session Dots */}
-        <div className="flex flex-wrap gap-2 mb-4 justify-center">
-          {todaySessions.length > 0 ? (
-            todaySessions.slice(0, 20).map((session, idx) => (
-              <div
-                key={session.id || idx}
-                className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shadow-md transform hover:scale-110 transition-transform cursor-default ${
-                  session.type === "work"
-                    ? "bg-gradient-to-br from-rose-400 to-red-500 text-white"
-                    : "bg-gradient-to-br from-emerald-400 to-teal-500 text-white"
-                }`}
-                title={`${session.type === "work" ? "Focus" : "Break"} - ${session.duration}min`}
-              >
-                {session.duration}
-              </div>
-            ))
-          ) : (
-            <p className="text-gray-500 text-sm">No sessions yet. Start focusing! 🎯</p>
-          )}
-        </div>
-
-        {todaySessions.length > 0 && (
-          <button
-            onClick={clearSessions}
-            className="w-full mt-2 flex items-center justify-center gap-2 py-2 text-gray-500 hover:text-red-500 transition-colors text-sm"
-          >
-            <Trash2 className="w-4 h-4" />
-            Clear history
-          </button>
+          ))
+        ) : (
+          <div className="col-span-4 sm:col-span-6 md:col-span-8 lg:col-span-10 text-center py-8 sm:py-12 md:py-14 text-base sm:text-lg md:text-xl text-text-dim font-black tracking-wider">▮▮ NO DATA - START FOCUSING! ▮▮</div>
         )}
       </div>
-    </div>
+
+      {todaySessions.length > 0 && (
+        <button 
+          onClick={clearSessions} 
+          className="w-full flex items-center justify-center gap-2 sm:gap-3 py-4 sm:py-5 md:py-6 text-xs sm:text-sm md:text-base text-text-dim hover:text-neon-pink font-black uppercase tracking-widest border-t-2 border-gray-700 hover:border-neon-pink hover:bg-neon-pink/5 transition-all rounded-b-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neon-yellow"
+          aria-label="Clear all sessions"
+        >
+          <Trash2 className="w-4 sm:w-5 h-4 sm:h-5" /> 
+          <span>CLEAR DATA</span>
+        </button>
+      )}
+    </Panel>
   );
 }
