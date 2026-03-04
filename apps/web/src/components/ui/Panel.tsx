@@ -2,30 +2,21 @@ import { forwardRef } from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
+const glowMap: Record<string, string> = {
+  cyan: "shadow-[0_0_30px_var(--accent-cyan),inset_0_0_30px_rgba(0,245,255,0.05)] hover:shadow-[0_0_50px_var(--accent-cyan),inset_0_0_30px_rgba(0,245,255,0.08)]",
+  pink: "shadow-[0_0_30px_rgba(255,0,170,0.4),inset_0_0_20px_rgba(255,0,170,0.05)] hover:shadow-[0_0_40px_rgba(255,0,170,0.5),inset_0_0_25px_rgba(255,0,170,0.1)]",
+};
+
 const panelVariants = cva(
   cn(
-    "relative",
-    "rounded-2xl sm:rounded-3xl",
-    "border-2",
-    "transition-all duration-200"
+    "relative rounded-2xl sm:rounded-3xl border-2",
+    "transition-shadow duration-300"
   ),
   {
     variants: {
       variant: {
-        primary: cn(
-          "bg-gradient-to-br from-dark-panel to-[#1a1a2e]",
-          "border-2 border-neon-cyan",
-          "shadow-[0_0_30px_var(--accent-cyan),inset_0_0_30px_rgba(0,245,255,0.05)]",
-          "hover:shadow-[0_0_50px_var(--accent-cyan),inset_0_0_30px_rgba(0,245,255,0.08)]",
-          "transition-shadow duration-300"
-        ),
-        secondary: cn(
-          "bg-gradient-to-br from-dark-panel to-[#1a1a2e]",
-          "border-2 border-neon-pink",
-          "shadow-[0_0_30px_rgba(255,0,170,0.4),inset_0_0_20px_rgba(255,0,170,0.05)]",
-          "hover:shadow-[0_0_40px_rgba(255,0,170,0.5),inset_0_0_25px_rgba(255,0,170,0.1)]",
-          "transition-shadow duration-300"
-        ),
+        primary: cn("bg-gradient-to-br from-dark-panel to-[#1a1a2e] border-neon-cyan", glowMap.cyan),
+        secondary: cn("bg-gradient-to-br from-dark-panel to-[#1a1a2e] border-neon-pink", glowMap.pink),
       },
       size: {
         sm: "p-4 sm:p-6",
