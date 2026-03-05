@@ -1,51 +1,53 @@
 import { forwardRef } from "react";
-import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
-const glowMap: Record<string, string> = {
-  cyan: "shadow-[0_0_30px_var(--accent-cyan),inset_0_0_30px_rgba(0,245,255,0.05)] hover:shadow-[0_0_50px_var(--accent-cyan),inset_0_0_30px_rgba(0,245,255,0.08)]",
-  pink: "shadow-[0_0_30px_rgba(255,0,170,0.4),inset_0_0_20px_rgba(255,0,170,0.05)] hover:shadow-[0_0_40px_rgba(255,0,170,0.5),inset_0_0_25px_rgba(255,0,170,0.1)]",
+interface PanelProps extends React.HTMLAttributes<HTMLDivElement> {
+  variant?: "primary" | "secondary" | "glass";
+  glow?: "cyan" | "pink" | "yellow" | "green";
+}
+
+const glowMap = {
+  cyan: "shadow-[0_0_40px_rgba(0,245,255,0.15),0_0_80px_rgba(0,245,255,0.05)]",
+  pink: "shadow-[0_0_40px_rgba(255,0,170,0.15),0_0_80px_rgba(255,0,170,0.05)]",
+  yellow: "shadow-[0_0_40px_rgba(255,221,0,0.15),0_0_80px_rgba(255,221,0,0.05)]",
+  green: "shadow-[0_0_40px_rgba(0,255,136,0.15),0_0_80px_rgba(0,255,136,0.05)]",
 };
 
-const panelVariants = cva(
-  cn(
-    "relative rounded-2xl sm:rounded-3xl border-2",
-    "transition-shadow duration-300"
-  ),
-  {
-    variants: {
-      variant: {
-        primary: cn("bg-gradient-to-br from-dark-panel to-[#1a1a2e] border-neon-cyan", glowMap.cyan),
-        secondary: cn("bg-gradient-to-br from-dark-panel to-[#1a1a2e] border-neon-pink", glowMap.pink),
-      },
-      size: {
-        sm: "p-4 sm:p-6",
-        md: "p-6 sm:p-8 md:p-10",
-        lg: "p-8 sm:p-10 md:p-12 lg:p-16",
-        xl: "p-10 sm:p-12 md:p-16 lg:p-20",
-      },
-    },
-    defaultVariants: {
-      variant: "primary",
-      size: "md",
-    },
-  }
-);
-
-export interface PanelProps
-  extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof panelVariants> {}
+const borderMap = {
+  cyan: "border-neon-cyan/30",
+  pink: "border-neon-pink/30",
+  yellow: "border-neon-yellow/30",
+  green: "border-neon-green/30",
+};
 
 const Panel = forwardRef<HTMLDivElement, PanelProps>(
-  ({ className, variant, size, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={cn(panelVariants({ variant, size }), className)}
-      {...props}
-    />
-  )
+  ({ className, variant = "primary", glow, children, ...props }, ref) => {
+    const baseStyles = "relative rounded-[2rem] transition-all duration-500";
+    
+    const variantStyles = {
+      primary: "bg-gradient-to-b from-dark-panel to-dark-surface border border-white/5",
+      secondary: "bg-gradient-to-b from-dark-surface to-dark-panel border border-white/5",
+      glass: "bg-dark-panel/50 backdrop-blur-xl border border-white/10",
+    };
+
+    return (
+      <div
+        ref={ref}
+        className={cn(
+          baseStyles,
+          variantStyles[variant],
+          glow && glowMap[glow],
+          glow && borderMap[glow],
+          className
+        )}
+        {...props}
+      >
+        {children}
+      </div>
+    );
+  }
 );
 
 Panel.displayName = "Panel";
 
-export { Panel, panelVariants };
+export { Panel };

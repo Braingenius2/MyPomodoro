@@ -7,7 +7,6 @@ import { SettingsPanel } from "@/components/SettingsPanel";
 import { SessionHistory } from "@/components/SessionHistory";
 import { Button } from "@/components/ui/Button";
 import { Panel } from "@/components/ui/Panel";
-import { CornerDecoration } from "@/components/ui/CornerDecoration";
 import { Play, Pause, RotateCcw, Zap, Coffee, Moon } from "lucide-react";
 
 export type TimerMode = "work" | "shortBreak" | "longBreak";
@@ -59,24 +58,31 @@ export function Timer() {
   }, [ready, timeLeft, mode, settings, addSession]);
 
   const modeConfig: Record<TimerMode, { label: string; icon: React.ReactNode; color: "cyan" | "green" | "pink" }> = {
-    work: { label: "FOCUS", icon: <Zap className="w-6 h-6" />, color: "cyan" },
-    shortBreak: { label: "REST", icon: <Coffee className="w-6 h-6" />, color: "green" },
-    longBreak: { label: "BREAK", icon: <Moon className="w-6 h-6" />, color: "pink" },
+    work: { label: "Focus", icon: <Zap className="w-5 h-5" />, color: "cyan" },
+    shortBreak: { label: "Rest", icon: <Coffee className="w-5 h-5" />, color: "green" },
+    longBreak: { label: "Break", icon: <Moon className="w-5 h-5" />, color: "pink" },
   };
 
   const totalDuration = mode === "work" ? settings.workDuration * 60 : mode === "shortBreak" ? settings.shortBreakDuration * 60 : settings.longBreakDuration * 60;
   const progress = ((totalDuration - timeLeft) / totalDuration) * 100;
-  const progressColor = { work: "#00f5ff", shortBreak: "#00ff88", longBreak: "#ff00aa" }[mode];
+  const strokeDashoffset = 283 - (283 * progress) / 100;
+  
+  const colorValues = {
+    work: "#00f5ff",
+    shortBreak: "#00ff88",
+    longBreak: "#ff00aa",
+  };
+  const progressColor = colorValues[mode];
 
   if (!ready) {
     return (
-      <div className="w-screen h-screen flex items-center justify-center bg-dark-bg">
-        <Panel variant="primary" size="lg" className="w-[90vw] max-w-2xl text-center">
-          <div className="text-4xl text-neon-cyan font-black tracking-widest mb-12">INITIALIZING...</div>
-          <div className="flex justify-center gap-4">
-            <div className="w-4 h-4 bg-neon-cyan rounded animate-pulse" />
-            <div className="w-4 h-4 bg-neon-cyan rounded animate-pulse" style={{animationDelay: '0.2s'}} />
-            <div className="w-4 h-4 bg-neon-cyan rounded animate-pulse" style={{animationDelay: '0.4s'}} />
+      <div className="w-full h-screen flex items-center justify-center bg-dark-bg">
+        <Panel className="w-full max-w-md p-12 text-center">
+          <div className="text-2xl text-neon-cyan font-black tracking-widest mb-8">INITIALIZING</div>
+          <div className="flex justify-center gap-3">
+            <div className="w-3 h-3 bg-neon-cyan rounded-full animate-pulse" />
+            <div className="w-3 h-3 bg-neon-cyan rounded-full animate-pulse" style={{animationDelay: '0.2s'}} />
+            <div className="w-3 h-3 bg-neon-cyan rounded-full animate-pulse" style={{animationDelay: '0.4s'}} />
           </div>
         </Panel>
       </div>
@@ -84,93 +90,120 @@ export function Timer() {
   }
 
   return (
-    <div className="max-w-2xl px-4 space-y-12 mx-auto">
+    <div className="w-full max-w-xl mx-auto px-6 py-12 space-y-10">
       {/* Header */}
-      <div className="text-center">
-        <h1 className="text-5xl sm:text-7xl font-black uppercase text-text-primary mb-4">MY POMODORO</h1>
-        <div className="h-1.5 w-56 sm:w-64 mx-auto bg-gradient-to-r from-neon-cyan via-neon-pink to-neon-yellow rounded-full" />
+      <div className="text-center space-y-3">
+        <h1 className="text-3xl sm:text-4xl font-black uppercase tracking-[0.2em] text-text-primary">
+          My Pomodoro
+        </h1>
+        <div className="h-px w-32 mx-auto bg-gradient-to-r from-transparent via-neon-cyan/50 to-transparent" />
       </div>
 
-      {/* Main Timer Panel */}
-      <Panel variant="primary" size="lg">
-        <CornerDecoration position="top-left" color="cyan" size="lg" />
-        <CornerDecoration position="bottom-right" color="cyan" size="lg" />
-
-        {/* Mode Selection */}
-        <div className="flex justify-center gap-4 mb-12">
+      {/* Main Timer */}
+      <Panel glow={modeConfig[mode].color} className="p-8 sm:p-12">
+        {/* Mode Tabs */}
+        <div className="flex justify-center gap-2 mb-10">
           {(["work", "shortBreak", "longBreak"] as TimerMode[]).map((m) => (
-            <Button 
-              key={m} 
-              variant="mode" 
-              colorScheme={modeConfig[m].color} 
-              isActive={mode === m} 
+            <button
+              key={m}
               onClick={() => setMode(m)}
+              className={`
+                flex items-center gap-2 px-5 py-2.5 rounded-full font-black text-xs uppercase tracking-wider
+                transition-all duration-300
+                ${mode === m 
+                  ? `bg-${modeConfig[m].color === 'cyan' ? 'neon-cyan' : modeConfig[m].color === 'green' ? 'neon-green' : 'neon-pink'} text-dark-bg shadow-[0_0_20px_rgba(0,245,255,0.4)]` 
+                  : 'bg-dark-surface text-text-dim hover:text-text-primary border border-white/5'}
+              `}
             >
               {modeConfig[m].icon}
-              <span className="ml-2 font-black text-sm sm:text-base">{modeConfig[m].label}</span>
-            </Button>
+              <span>{modeConfig[m].label}</span>
+            </button>
           ))}
         </div>
 
-        {/* Progress Bar */}
-        <div className="h-4 rounded-full bg-dark-panel border-2 border-gray-700 overflow-hidden mb-12 shadow-inner">
-          <div 
-            className="h-full rounded-full transition-all duration-1000" 
-            style={{ 
-              width: `${progress}%`, 
-              background: progressColor, 
-              boxShadow: `0 0 20px ${progressColor}` 
-            }} 
-          />
-        </div>
-
-        {/* Timer Display */}
-        <div className="text-center mb-12">
-          <div className="text-8xl sm:text-9xl font-black text-neon-cyan leading-none tabular-nums">
-            {formatTime(timeLeft)}
-          </div>
-          <div className="text-lg sm:text-xl font-black tracking-widest text-text-dim uppercase mt-4">
-            {mode === "work" ? "FOCUS TIME" : mode === "shortBreak" ? "SHORT REST" : "LONG BREAK"}
+        {/* Circular Timer */}
+        <div className="relative flex items-center justify-center mb-10">
+          <svg className="w-64 h-64 sm:w-72 sm:h-72 -rotate-90" viewBox="0 0 100 100">
+            {/* Background ring */}
+            <circle
+              cx="50"
+              cy="50"
+              r="45"
+              fill="none"
+              stroke="rgba(255,255,255,0.05)"
+              strokeWidth="3"
+            />
+            {/* Progress ring */}
+            <circle
+              cx="50"
+              cy="50"
+              r="45"
+              fill="none"
+              stroke={progressColor}
+              strokeWidth="3"
+              strokeLinecap="round"
+              strokeDasharray="283"
+              strokeDashoffset={strokeDashoffset}
+              className="transition-all duration-1000 ease-linear"
+              style={{
+                filter: `drop-shadow(0 0 8px ${progressColor})`,
+              }}
+            />
+          </svg>
+          
+          {/* Time Display */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <div 
+              className="text-6xl sm:text-7xl font-black tabular-nums tracking-tight"
+              style={{ color: progressColor, textShadow: `0 0 30px ${progressColor}` }}
+            >
+              {formatTime(timeLeft)}
+            </div>
+            <div className="text-xs font-black uppercase tracking-[0.3em] text-text-dim mt-2">
+              {mode === "work" ? "Focus Time" : mode === "shortBreak" ? "Short Rest" : "Long Break"}
+            </div>
           </div>
         </div>
 
         {/* Status */}
-        <div className={`flex justify-center items-center gap-3 px-6 py-3 rounded-xl mb-12 transition-all border-2 ${isRunning ? "bg-neon-green/10 border-neon-green text-neon-green" : "border-text-dim text-text-dim"}`}>
-          <span className={`w-3 h-3 rounded-full ${isRunning ? "bg-neon-green animate-pulse" : "bg-text-dim"}`} />
-          <span className="font-black text-sm sm:text-base uppercase tracking-widest">{isRunning ? "▶ ACTIVE" : "⏸ PAUSED"}</span>
+        <div className={`flex items-center justify-center gap-3 mb-10 ${isRunning ? 'text-neon-green' : 'text-text-dim'}`}>
+          <span className={`w-2 h-2 rounded-full ${isRunning ? 'bg-neon-green animate-pulse' : 'bg-text-dim'}`} />
+          <span className="text-xs font-black uppercase tracking-widest">
+            {isRunning ? "Running" : "Paused"}
+          </span>
         </div>
 
         {/* Controls */}
-        <div className="flex flex-col sm:flex-row justify-center gap-4 mb-12">
-          <Button 
-            variant="control" 
-            colorScheme={modeConfig[mode].color} 
+        <div className="flex justify-center gap-4">
+          <Button
+            variant="primary"
+            colorScheme={modeConfig[mode].color}
+            size="lg"
             onClick={() => isRunning ? pause() : start()}
-            className="flex items-center justify-center gap-2 px-8 sm:px-12 py-4"
+            className="min-w-[140px]"
           >
-            {isRunning ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6" />}
-            <span>{isRunning ? "PAUSE" : "START"}</span>
+            {isRunning ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
+            <span>{isRunning ? "Pause" : "Start"}</span>
           </Button>
-          <Button 
-            variant="control" 
-            colorScheme="cyan" 
+          <Button
+            variant="secondary"
+            colorScheme="cyan"
+            size="lg"
             onClick={reset}
-            className="flex items-center justify-center gap-2 px-8 sm:px-10 py-4"
           >
-            <RotateCcw className="w-6 h-6" />
-            <span>RESET</span>
+            <RotateCcw className="w-5 h-5" />
           </Button>
         </div>
 
-        {/* Sessions Count */}
-        <div className="flex justify-center items-center gap-4 py-6 px-4 border-t-2 border-b-2 border-gray-700 mb-8">
-          <span className="font-black text-text-dim uppercase text-sm tracking-widest">Sessions</span>
-          <span className="text-5xl">🍅</span>
-          <span className="text-4xl font-black text-neon-yellow">{sessionsCompleted}</span>
+        {/* Sessions Counter */}
+        <div className="flex items-center justify-center gap-4 mt-10 pt-8 border-t border-white/5">
+          <span className="text-xs font-black uppercase tracking-widest text-text-dim">Sessions</span>
+          <span className="text-3xl font-black text-neon-yellow">{sessionsCompleted}</span>
+          <span className="text-xl">🍅</span>
         </div>
 
         {/* Settings */}
-        <div className="flex justify-center">
+        <div className="flex justify-center mt-8">
           <SettingsPanel />
         </div>
       </Panel>
