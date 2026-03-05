@@ -3,7 +3,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useSessionStore } from "@/store/sessionStore";
 import { Panel } from "@/components/ui/Panel";
-import { CornerDecoration } from "@/components/ui/CornerDecoration";
 import { Trash2 } from "lucide-react";
 
 export function SessionHistory() {
@@ -25,70 +24,87 @@ export function SessionHistory() {
 
   if (!isReady) {
     return (
-      <Panel variant="primary" size="md" className="w-full">
-        <div className="h-8 w-48 bg-gray-700 rounded animate-pulse" />
+      <Panel className="p-8">
+        <div className="h-6 w-32 bg-white/10 rounded animate-pulse" />
       </Panel>
     );
   }
 
   const { todaySessions, totalWorkToday } = todayStats;
   const workCount = todaySessions.filter(s => s.type === "work").length;
+  const restCount = todaySessions.filter(s => s.type !== "work").length;
+
+  const hours = Math.floor(totalWorkToday / 60);
+  const minutes = totalWorkToday % 60;
 
   return (
-    <Panel variant="primary" size="md" className="shadow-xl shadow-neon-yellow/20">
-      <CornerDecoration position="top-left" color="yellow" size="md" />
-      <CornerDecoration position="bottom-right" color="yellow" size="md" />
-
+    <Panel glow="yellow" className="p-6 sm:p-8">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10">
-        <h3 className="text-2xl sm:text-3xl font-black uppercase text-text-dim tracking-widest">📊 TODAY'S LOG</h3>
-        <div className="px-6 py-3 bg-dark-bg border-2 border-neon-yellow text-neon-yellow font-black text-xl sm:text-2xl rounded-lg shadow-md shadow-neon-yellow/30 whitespace-nowrap">
-          {Math.round(totalWorkToday / 60)}h {totalWorkToday % 60}m
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+        <h3 className="text-sm font-black uppercase tracking-[0.2em] text-text-dim">
+          Today's Log
+        </h3>
+        <div className="px-4 py-2 bg-dark-bg rounded-full border border-neon-yellow/30">
+          <span className="text-lg font-black text-neon-yellow">
+            {hours > 0 && `${hours}h `}{minutes}m
+          </span>
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="flex flex-col sm:flex-row justify-center items-center gap-8 sm:gap-12 mb-10 pb-8 sm:pb-10 border-b-2 border-gray-700">
+      {/* Stats Row */}
+      <div className="flex justify-center items-center gap-8 sm:gap-12 mb-8">
         <div className="text-center">
-          <div className="text-6xl sm:text-7xl font-black text-neon-yellow drop-shadow-lg">{workCount}</div>
-          <div className="text-sm font-black text-text-dim mt-3 uppercase tracking-wider">Focus Sessions</div>
+          <div className="text-5xl sm:text-6xl font-black text-neon-cyan" style={{ textShadow: '0 0 20px rgba(0,245,255,0.5)' }}>
+            {workCount}
+          </div>
+          <div className="text-xs font-black uppercase tracking-wider text-text-dim mt-2">Focus</div>
         </div>
-        <div className="hidden sm:block w-0.5 h-16 bg-gradient-to-b from-transparent via-gray-700 to-transparent" />
+        <div className="w-px h-12 bg-white/10" />
         <div className="text-center">
-          <div className="text-6xl sm:text-7xl font-black text-neon-green drop-shadow-lg">{todaySessions.filter(s => s.type !== "work").length}</div>
-          <div className="text-sm font-black text-text-dim mt-3 uppercase tracking-wider">Rest Sessions</div>
+          <div className="text-5xl sm:text-6xl font-black text-neon-green" style={{ textShadow: '0 0 20px rgba(0,255,136,0.5)' }}>
+            {restCount}
+          </div>
+          <div className="text-xs font-black uppercase tracking-wider text-text-dim mt-2">Rest</div>
         </div>
       </div>
 
       {/* Session Grid */}
-      <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2 sm:gap-2.5 mb-8">
-        {todaySessions.length > 0 ? (
-          todaySessions.slice(0, 40).map((session, idx) => (
+      {todaySessions.length > 0 && (
+        <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-2 mb-6">
+          {todaySessions.slice(0, 30).map((session, idx) => (
             <div 
               key={session.id || idx} 
-              className={`aspect-square rounded-lg sm:rounded-xl flex items-center justify-center text-sm sm:text-base font-bold transition-all duration-200 hover:scale-110 ${
-                session.type === "work" 
-                  ? "bg-neon-cyan text-dark-bg shadow-md shadow-neon-cyan/50" 
-                  : "bg-neon-green text-dark-bg shadow-md shadow-neon-green/50"
-              }`}
+              className={`
+                aspect-square rounded-lg sm:rounded-xl flex items-center justify-center 
+                text-xs font-black transition-all duration-300 hover:scale-110 hover:z-10
+                ${session.type === "work" 
+                  ? "bg-neon-cyan text-dark-bg shadow-[0_0_10px_rgba(0,245,255,0.4)]" 
+                  : "bg-neon-green text-dark-bg shadow-[0_0_10px_rgba(0,255,136,0.4)]"
+                }
+              `}
+              title={`${session.duration} min - ${session.type}`}
             >
               {session.duration}
             </div>
-          ))
-        ) : (
-          <div className="col-span-4 sm:col-span-6 md:col-span-8 lg:col-span-10 text-center py-12 text-lg text-text-dim font-black tracking-wider">▮▮ NO DATA - START FOCUSING! ▮▮</div>
-        )}
-      </div>
+          ))}
+        </div>
+      )}
+
+      {todaySessions.length === 0 && (
+        <div className="text-center py-8 text-sm text-text-dim font-black tracking-wider">
+          No sessions yet. Start focusing!
+        </div>
+      )}
 
       {/* Clear Button */}
       {todaySessions.length > 0 && (
         <button 
           onClick={clearSessions} 
-          className="w-full flex items-center justify-center gap-3 py-5 text-sm text-text-dim hover:text-neon-pink font-black uppercase tracking-widest border-t-2 border-gray-700 hover:border-neon-pink hover:bg-neon-pink/5 transition-all rounded-b-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neon-yellow"
+          className="w-full flex items-center justify-center gap-2 py-4 text-xs font-black uppercase tracking-widest text-text-dim hover:text-neon-pink border-t border-white/5 hover:border-neon-pink/30 transition-all mt-4"
           aria-label="Clear all sessions"
         >
-          <Trash2 className="w-5 h-5" /> 
-          <span>CLEAR DATA</span>
+          <Trash2 className="w-4 h-4" /> 
+          <span>Clear Data</span>
         </button>
       )}
     </Panel>
