@@ -130,10 +130,22 @@ export const useTimerStore = create<TimerState>((set, get) => ({
       const saved = localStorage.getItem("pomodoro-timer");
       if (saved) {
         const parsed = JSON.parse(saved);
+        const validModes: TimerMode[] = ["work", "shortBreak", "longBreak"];
+        const mode: TimerMode = validModes.includes(parsed.mode) ? parsed.mode : "work";
+        const durations: Record<TimerMode, number> = {
+          work: (parsed.settings?.workDuration || DEFAULT_SETTINGS.workDuration) * 60,
+          shortBreak: (parsed.settings?.shortBreakDuration || DEFAULT_SETTINGS.shortBreakDuration) * 60,
+          longBreak: (parsed.settings?.longBreakDuration || DEFAULT_SETTINGS.longBreakDuration) * 60,
+        };
+        const timeLeft = parsed.timeLeft > 0 ? parsed.timeLeft : durations[mode];
+        
         set({
-          ...parsed,
-          initialized: true,
+          mode,
+          timeLeft,
           isRunning: false,
+          sessionsCompleted: parsed.sessionsCompleted || 0,
+          settings: parsed.settings || DEFAULT_SETTINGS,
+          initialized: true,
         });
       } else {
         set({ initialized: true });

@@ -24,7 +24,6 @@ export function Timer() {
   const pause = useTimerStore((s) => s.pause);
   const reset = useTimerStore((s) => s.reset);
   const setMode = useTimerStore((s) => s.setMode);
-  const tick = useTimerStore((s) => s.tick);
   const initTimer = useTimerStore((s) => s.initialize);
   const settings = useTimerStore((s) => s.settings);
 
@@ -46,9 +45,13 @@ export function Timer() {
 
   useEffect(() => {
     if (!isRunning || timeLeft <= 0) return;
-    const interval = setInterval(() => tick(), 1000);
+    
+    const interval = setInterval(() => {
+      useTimerStore.getState().tick();
+    }, 1000);
+    
     return () => clearInterval(interval);
-  }, [isRunning, tick, timeLeft]);
+  }, [isRunning, timeLeft]);
 
   useEffect(() => {
     if (!ready) return;
@@ -65,7 +68,6 @@ export function Timer() {
 
   const totalDuration = mode === "work" ? settings.workDuration * 60 : mode === "shortBreak" ? settings.shortBreakDuration * 60 : settings.longBreakDuration * 60;
   const progress = ((totalDuration - timeLeft) / totalDuration) * 100;
-  const strokeDashoffset = 283 - (283 * progress) / 100;
   
   const colorValues = {
     work: "#00f5ff",
@@ -90,7 +92,7 @@ export function Timer() {
   }
 
   return (
-    <div className="w-full max-w-xl mx-auto px-6 py-12 space-y-10">
+    <div className="w-full max-w-xl mx-auto px-6 py-16 space-y-10">
       {/* Header */}
       <div className="text-center space-y-3">
         <h1 className="text-3xl sm:text-4xl font-black uppercase tracking-[0.2em] text-text-primary">
@@ -123,27 +125,27 @@ export function Timer() {
 
         {/* Circular Timer */}
         <div className="relative flex items-center justify-center mb-10">
-          <svg className="w-64 h-64 sm:w-72 sm:h-72 -rotate-90" viewBox="0 0 100 100">
+          <svg className="w-64 h-64 sm:w-72 sm:h-72 -rotate-90" viewBox="0 0 120 120">
             {/* Background ring */}
             <circle
-              cx="50"
-              cy="50"
-              r="45"
+              cx="60"
+              cy="60"
+              r="50"
               fill="none"
               stroke="rgba(255,255,255,0.05)"
               strokeWidth="3"
             />
             {/* Progress ring */}
             <circle
-              cx="50"
-              cy="50"
-              r="45"
+              cx="60"
+              cy="60"
+              r="50"
               fill="none"
               stroke={progressColor}
               strokeWidth="3"
               strokeLinecap="round"
-              strokeDasharray="283"
-              strokeDashoffset={strokeDashoffset}
+              strokeDasharray="314"
+              strokeDashoffset={314 - (314 * progress) / 100}
               className="transition-all duration-1000 ease-linear"
               style={{
                 filter: `drop-shadow(0 0 8px ${progressColor})`,
