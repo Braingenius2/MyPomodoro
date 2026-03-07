@@ -14,6 +14,7 @@ export type TimerMode = "work" | "shortBreak" | "longBreak";
 export function Timer() {
   const [mounted, setMounted] = useState(false);
   const [ready, setReady] = useState(false);
+  const [prevTimeLeft, setPrevTimeLeft] = useState<number | null>(null);
 
   const mode = useTimerStore((s) => s.mode);
   const timeLeft = useTimerStore((s) => s.timeLeft);
@@ -44,21 +45,45 @@ export function Timer() {
   }, [mounted, initialized, sessionsInitialized]);
 
   useEffect(() => {
-    if (!isRunning || timeLeft <= 0) return;
+    if (!isRunning) return;
     
+    // Interval only depends on isRunning. tick() handles the rest.
     const interval = setInterval(() => {
       useTimerStore.getState().tick();
     }, 1000);
     
     return () => clearInterval(interval);
-  }, [isRunning, timeLeft]);
+  }, [isRunning]);
 
+  // Track timeLeft changes to detect transition to 0
   useEffect(() => {
-    if (!ready) return;
-    if (timeLeft === 0 && mode === "work") {
-      addSession({ type: mode, duration: settings.workDuration });
+    if (prevTimeLeft !== null && prevTimeLeft > 0 && timeLeft === 0) {
+      // Timer just completed - trigger notifications
+      try {
+        if (typeof window !== "undefined") {
+          const audio = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
+          audio.play().catch(() => {});
+          if ("Notification" in window && Notification.permission === "granted") {
+            new Notification("My Pomodoro", {
+              body: mode === "work" ? "Session completed! Take a break." : "Break is over! Time to focus."
+            });
+          }
+        }
+      } catch {}
+
+      if (mode === "work") {
+        addSession({ type: mode, duration: settings.workDuration });
+      }
     }
-  }, [ready, timeLeft, mode, settings, addSession]);
+    setPrevTimeLeft(timeLeft);
+  }, [timeLeft, prevTimeLeft, mode, settings, addSession, ready]);
+
+  // Request notification permission once mounted
+  useEffect(() => {
+    if (mounted && "Notification" in window && Notification.permission === "default") {
+      Notification.requestPermission();
+    }
+  }, [mounted]);
 
   const modeConfig: Record<TimerMode, { label: string; icon: React.ReactNode; color: "cyan" | "green" | "pink" }> = {
     work: { label: "Focus", icon: <Zap className="w-5 h-5" />, color: "cyan" },
@@ -78,8 +103,8 @@ export function Timer() {
 
   if (!ready) {
     return (
-      <div className="w-full h-screen flex items-center justify-center bg-dark-bg">
-        <Panel className="w-full max-w-md p-12 text-center">
+      <div className="w-full max-w-xl mx-auto px-6">
+        <Panel className="w-full p-12 text-center">
           <div className="text-2xl text-neon-cyan font-black tracking-widest mb-8">INITIALIZING</div>
           <div className="flex justify-center gap-3">
             <div className="w-3 h-3 bg-neon-cyan rounded-full animate-pulse" />
@@ -92,15 +117,7 @@ export function Timer() {
   }
 
   return (
-    <div className="w-full max-w-xl mx-auto px-6 py-16 space-y-10">
-      {/* Header */}
-      <div className="text-center space-y-3">
-        <h1 className="text-3xl sm:text-4xl font-black uppercase tracking-[0.2em] text-text-primary">
-          My Pomodoro
-        </h1>
-        <div className="h-px w-32 mx-auto bg-gradient-to-r from-transparent via-neon-cyan/50 to-transparent" />
-      </div>
-
+    <div className="w-full max-w-xl mx-auto px-6 space-y-10">
       {/* Main Timer */}
       <Panel glow={modeConfig[mode].color} className="p-8 sm:p-12">
         {/* Mode Tabs */}
