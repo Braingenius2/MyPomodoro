@@ -110,17 +110,23 @@ export const useTimerStore = create<TimerState>((set, get) => ({
   },
 
   updateSettings: (newSettings: Partial<Settings>) => {
-    const { settings, mode } = get();
+    const { settings, mode, isRunning } = get();
     const updated = { ...settings, ...newSettings };
-    const durations = {
-      work: updated.workDuration * 60,
-      shortBreak: updated.shortBreakDuration * 60,
-      longBreak: updated.longBreakDuration * 60,
-    };
-    set({
-      settings: updated,
-      timeLeft: durations[mode],
-    });
+    
+    // Only update time if not running, to avoid resetting an active session
+    if (!isRunning) {
+      const durations = {
+        work: updated.workDuration * 60,
+        shortBreak: updated.shortBreakDuration * 60,
+        longBreak: updated.longBreakDuration * 60,
+      };
+      set({
+        settings: updated,
+        timeLeft: durations[mode],
+      });
+    } else {
+      set({ settings: updated });
+    }
   },
 
   initialize: () => {
@@ -159,13 +165,17 @@ export const useTimerStore = create<TimerState>((set, get) => ({
 if (typeof window !== "undefined") {
   useTimerStore.subscribe((state) => {
     if (state.initialized) {
-      localStorage.setItem("pomodoro-timer", JSON.stringify({
-        mode: state.mode,
-        timeLeft: state.timeLeft,
-        isRunning: false,
-        sessionsCompleted: state.sessionsCompleted,
-        settings: state.settings,
-      }));
+      try {
+        localStorage.setItem("pomodoro-timer", JSON.stringify({
+          mode: state.mode,
+          timeLeft: state.timeLeft,
+          isRunning: false,
+          sessionsCompleted: state.sessionsCompleted,
+          settings: state.settings,
+        }));
+      } catch (e) {
+        console.warn("Failed to save timer to localStorage:", e);
+      }
     }
   });
 }
