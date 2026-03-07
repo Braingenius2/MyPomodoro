@@ -71,9 +71,14 @@ export function Timer() {
         }
       } catch {}
 
-      if (mode === "work") {
-        addSession({ type: mode, duration: settings.workDuration });
-      }
+      // Track all session types (work, shortBreak, longBreak)
+      const duration = mode === "work" 
+        ? settings.workDuration 
+        : mode === "shortBreak" 
+          ? settings.shortBreakDuration 
+          : settings.longBreakDuration;
+      
+      addSession({ type: mode, duration });
     }
     setPrevTimeLeft(timeLeft);
   }, [timeLeft, prevTimeLeft, mode, settings, addSession, ready]);

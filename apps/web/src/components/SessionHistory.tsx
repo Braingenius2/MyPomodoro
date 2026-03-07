@@ -32,7 +32,8 @@ export function SessionHistory() {
 
   const { todaySessions, totalWorkToday } = todayStats;
   const workCount = todaySessions.filter(s => s.type === "work").length;
-  const restCount = todaySessions.filter(s => s.type !== "work").length;
+  const shortBreakCount = todaySessions.filter(s => s.type === "shortBreak").length;
+  const longBreakCount = todaySessions.filter(s => s.type === "longBreak").length;
 
   const hours = Math.floor(totalWorkToday / 60);
   const minutes = totalWorkToday % 60;
@@ -52,19 +53,26 @@ export function SessionHistory() {
       </div>
 
       {/* Stats Row */}
-      <div className="flex justify-center items-center gap-8 sm:gap-12 mb-8">
+      <div className="flex justify-center items-center gap-6 sm:gap-8 mb-8">
         <div className="text-center">
-          <div className="text-5xl sm:text-6xl font-black text-neon-cyan" style={{ textShadow: '0 0 20px rgba(0,245,255,0.5)' }}>
+          <div className="text-4xl sm:text-5xl font-black text-neon-cyan" style={{ textShadow: '0 0 20px rgba(0,245,255,0.5)' }}>
             {workCount}
           </div>
-          <div className="text-xs font-black uppercase tracking-wider text-text-dim mt-2">Focus</div>
+          <div className="text-xs font-black uppercase tracking-wider text-text-dim mt-1">Focus</div>
         </div>
-        <div className="w-px h-12 bg-white/10" />
+        <div className="w-px h-10 bg-white/10" />
         <div className="text-center">
-          <div className="text-5xl sm:text-6xl font-black text-neon-green" style={{ textShadow: '0 0 20px rgba(0,255,136,0.5)' }}>
-            {restCount}
+          <div className="text-4xl sm:text-5xl font-black text-neon-green" style={{ textShadow: '0 0 20px rgba(0,255,136,0.5)' }}>
+            {shortBreakCount}
           </div>
-          <div className="text-xs font-black uppercase tracking-wider text-text-dim mt-2">Rest</div>
+          <div className="text-xs font-black uppercase tracking-wider text-text-dim mt-1">Short</div>
+        </div>
+        <div className="w-px h-10 bg-white/10" />
+        <div className="text-center">
+          <div className="text-4xl sm:text-5xl font-black text-neon-pink" style={{ textShadow: '0 0 20px rgba(255,0,170,0.5)' }}>
+            {longBreakCount}
+          </div>
+          <div className="text-xs font-black uppercase tracking-wider text-text-dim mt-1">Long</div>
         </div>
       </div>
 
@@ -79,10 +87,12 @@ export function SessionHistory() {
                 text-xs font-black transition-all duration-300 hover:scale-110 hover:z-10
                 ${session.type === "work" 
                   ? "bg-neon-cyan text-dark-bg shadow-[0_0_10px_rgba(0,245,255,0.4)]" 
-                  : "bg-neon-green text-dark-bg shadow-[0_0_10px_rgba(0,255,136,0.4)]"
+                  : session.type === "shortBreak"
+                    ? "bg-neon-green text-dark-bg shadow-[0_0_10px_rgba(0,255,136,0.4)]"
+                    : "bg-neon-pink text-dark-bg shadow-[0_0_10px_rgba(255,0,170,0.4)]"
                 }
               `}
-              title={`${session.duration} min - ${session.type}`}
+              title={`${session.duration} min - ${session.type === 'work' ? 'Focus' : session.type === 'shortBreak' ? 'Short Rest' : 'Long Break'}`}
             >
               {session.duration}
             </div>
