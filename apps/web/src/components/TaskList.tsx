@@ -95,7 +95,10 @@ export function TaskList() {
                 {task.completed && <Check className="w-4 h-4" />}
               </button>
               
-              <span className={`flex-1 text-sm font-medium transition-all truncate ${task.completed ? 'line-through text-text-dim' : 'text-text-primary'}`}>
+              <span 
+                className={`flex-1 text-sm font-medium transition-all truncate ${task.completed ? 'line-through text-text-dim' : 'text-text-primary'}`}
+                title={task.title}
+              >
                 {task.title}
               </span>
 

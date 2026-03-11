@@ -5,12 +5,12 @@
   "identifier": "com.mypomodoro.app",
   "build": {
     "frontendDist": "../out",
-    "devUrl": "http://localhost:3000",
+    "devUrl": "http://localhost:3001",
     "beforeDevCommand": "npm run dev",
-    "beforeBuildCommand": "npm run build",
-    "devtools": true
+    "beforeBuildCommand": "npm run build"
   },
   "app": {
+    "withGlobalTauri": true,
     "windows": [
       {
         "title": "My Pomodoro",

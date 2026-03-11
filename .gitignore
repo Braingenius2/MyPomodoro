@@ -8,6 +8,7 @@ node_modules/
 out/
 dist/
 build/
+next-env.d.ts
 
 # Local env files
 .env
