@@ -2,10 +2,10 @@
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "My Pomodoro",
   "version": "0.1.0",
-  "identifier": "com.mypomodoro.app",
+  "identifier": "com.mypomodoro.desktop",
   "build": {
     "frontendDist": "../out",
-    "devUrl": "http://localhost:3001",
+    "devUrl": "http://localhost:3000",
     "beforeDevCommand": "npm run dev",
     "beforeBuildCommand": "npm run build"
   },
