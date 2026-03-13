@@ -4,7 +4,9 @@
   "scripts": {
     "dev": "turbo dev",
     "build": "turbo build",
-    "lint": "turbo lint"
+    "lint": "turbo lint",
+    "tauri:dev": "turbo run tauri:dev --filter=@my-pomodoro/web",
+    "tauri:build": "turbo run tauri:build --filter=@my-pomodoro/web"
   },
   "devDependencies": {
     "turbo": "^2.8.16"
