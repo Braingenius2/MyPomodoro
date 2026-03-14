@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useTimerStore, formatTime } from "@/store/timerStore";
 import { useSessionStore } from "@/store/sessionStore";
 import { SettingsPanel } from "@/components/SettingsPanel";
@@ -15,6 +15,8 @@ export function Timer() {
   const [mounted, setMounted] = useState(false);
   const [ready, setReady] = useState(false);
   const [prevTimeLeft, setPrevTimeLeft] = useState<number | null>(null);
+  const [alarmActive, setAlarmActive] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const mode = useTimerStore((s) => s.mode);
   const timeLeft = useTimerStore((s) => s.timeLeft);
@@ -58,11 +60,13 @@ export function Timer() {
   // Track timeLeft changes to detect transition to 0
   useEffect(() => {
     if (prevTimeLeft !== null && prevTimeLeft > 0 && timeLeft === 0) {
-      // Timer just completed - trigger notifications
+      // Timer just completed - trigger looping alarm
+      setAlarmActive(true);
       try {
         if (typeof window !== "undefined") {
-          const audio = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
-          audio.play().catch(() => {});
+          if (audioRef.current) {
+            audioRef.current.play().catch(() => {});
+          }
           if ("Notification" in window && Notification.permission === "granted") {
             new Notification("My Pomodoro", {
               body: mode === "work" ? "Session completed! Take a break." : "Break is over! Time to focus."
@@ -82,6 +86,16 @@ export function Timer() {
     }
     setPrevTimeLeft(timeLeft);
   }, [timeLeft, prevTimeLeft, mode, settings, addSession, ready]);
+
+  // Stop alarm when user clicks start
+  const handleStart = () => {
+    setAlarmActive(false);
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+    start();
+  };
 
   // Request notification permission once mounted
   useEffect(() => {
@@ -106,6 +120,9 @@ export function Timer() {
   };
   const progressColor = colorValues[mode];
 
+  // Audio element for alarm
+  const alarmUrl = "https://actions.google.com/sounds/v1/alarms/beep_short.ogg";
+
   if (!ready) {
     return (
       <div className="w-full max-w-xl mx-auto px-6">
@@ -123,6 +140,14 @@ export function Timer() {
 
   return (
     <div className="w-full max-w-xl mx-auto px-6 space-y-10">
+      {/* Hidden audio element for alarm */}
+      <audio
+        ref={audioRef}
+        src={alarmUrl}
+        loop
+        preload="auto"
+      />
+      
       {/* Main Timer */}
       <Panel glow={modeConfig[mode].color} className="p-8 sm:p-12">
         {/* Mode Tabs */}
@@ -190,10 +215,10 @@ export function Timer() {
         </div>
 
         {/* Status */}
-        <div className={`flex items-center justify-center gap-3 mb-10 ${isRunning ? 'text-neon-green' : 'text-text-dim'}`}>
-          <span className={`w-2 h-2 rounded-full ${isRunning ? 'bg-neon-green animate-pulse' : 'bg-text-dim'}`} />
+        <div className={`flex items-center justify-center gap-3 mb-10 ${alarmActive ? 'text-neon-red animate-pulse' : isRunning ? 'text-neon-green' : 'text-text-dim'}`}>
+          <span className={`w-2 h-2 rounded-full ${alarmActive ? 'bg-neon-red animate-pulse' : isRunning ? 'bg-neon-green animate-pulse' : 'bg-text-dim'}`} />
           <span className="text-xs font-black uppercase tracking-widest">
-            {isRunning ? "Running" : "Paused"}
+            {alarmActive ? "Alarm - Click Start" : isRunning ? "Running" : "Paused"}
           </span>
         </div>
 
@@ -203,7 +228,7 @@ export function Timer() {
             variant="primary"
             colorScheme={modeConfig[mode].color}
             size="lg"
-            onClick={() => isRunning ? pause() : start()}
+            onClick={() => isRunning ? pause() : handleStart()}
             className="min-w-[140px]"
           >
             {isRunning ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}

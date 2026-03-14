@@ -15,6 +15,7 @@ const config: Config = {
         'neon-pink': '#ff00aa',
         'neon-yellow': '#ffdd00',
         'neon-green': '#00ff88',
+        'neon-red': '#ff4444',
         'text-primary': '#e0e0ff',
         'text-dim': '#6a6a8a',
       },
