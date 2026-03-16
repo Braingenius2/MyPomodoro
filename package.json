@@ -2,14 +2,13 @@
   "name": "my-pomodoro",
   "private": true,
   "scripts": {
-    "dev": "turbo dev",
-    "build": "turbo build",
-    "lint": "turbo lint",
+    "dev": "pnpm --filter @my-pomodoro/web dev",
+    "build": "pnpm --filter @my-pomodoro/web build",
+    "lint": "pnpm --filter @my-pomodoro/web lint",
     "tauri:dev": "pnpm --filter @my-pomodoro/web tauri dev",
-    "tauri:build": "pnpm --filter @my-pomodoro/web tauri build"
-  },
-  "devDependencies": {
-    "turbo": "^2.8.16"
+    "tauri:build": "pnpm --filter @my-pomodoro/web tauri build",
+    "tauri:android:dev": "pnpm --filter @my-pomodoro/web tauri android dev",
+    "tauri:android:build": "pnpm --filter @my-pomodoro/web tauri android build"
   },
   "packageManager": "pnpm@9.15.0",
   "engines": {
