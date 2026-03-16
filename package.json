@@ -5,8 +5,8 @@
     "dev": "turbo dev",
     "build": "turbo build",
     "lint": "turbo lint",
-    "tauri:dev": "turbo run tauri:dev --filter=@my-pomodoro/web",
-    "tauri:build": "turbo run tauri:build --filter=@my-pomodoro/web"
+    "tauri:dev": "pnpm --filter @my-pomodoro/web tauri dev",
+    "tauri:build": "pnpm --filter @my-pomodoro/web tauri build"
   },
   "devDependencies": {
     "turbo": "^2.8.16"

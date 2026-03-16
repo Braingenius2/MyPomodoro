@@ -88,12 +88,11 @@ export const useTimerStore = create<TimerState>((set, get) => ({
       };
 
       const newSessions = isWork ? sessionsCompleted + 1 : sessionsCompleted;
-      const shouldAutoStart = (isWork && settings.autoStartBreaks) || (!isWork && settings.autoStartPomodoros);
 
       set({
         mode: nextMode,
         timeLeft: durations[nextMode],
-        isRunning: shouldAutoStart,
+        isRunning: false,
         sessionsCompleted: newSessions,
       });
     }
