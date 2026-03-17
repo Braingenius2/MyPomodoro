@@ -34,7 +34,7 @@ The workflow you'll learn:
 
 Before writing code, understand the structure.
 
-### Monorepo with Turbo
+### pnpm Workspace Layout
 
 ```
 my-pomodoro/
@@ -47,12 +47,13 @@ my-pomodoro/
 │       │   └── lib/     # Utilities
 │       └── src-tauri/   # Rust desktop app
 ├── packages/
-│   └── utils/           # Shared utilities
-├── turbo.json           # Turborepo config
+│   ├── ui/              # Reserved space for shared UI packages
+│   └── utils/           # Shared utilities package
+├── pnpm-workspace.yaml  # Workspace package boundaries
 └── package.json
 ```
 
-**Why this structure?** Turbo only rebuilds what's changed. If you edit `apps/web`, it won't rebuild `packages/utils`.
+**Why this structure?** The project is organized as a pnpm workspace so the web app and any shared packages can live in one repo.
 
 ### Next.js App Router
 
@@ -462,9 +463,14 @@ test("tick decrements timeLeft", () => {
 ### Running Tests
 
 ```bash
+# From the repo root
 pnpm test
-# or with Vitest UI
-pnpm test --ui
+pnpm test:ui
+pnpm typecheck
+pnpm lint
+
+# Or just the web app
+pnpm --filter @my-pomodoro/web test
 ```
 
 ---
@@ -478,7 +484,7 @@ pnpm test --ui
 pnpm dev
 
 # Start just the web app
-cd apps/web && pnpm dev
+pnpm --filter @my-pomodoro/web dev
 ```
 
 ### Build
@@ -502,8 +508,8 @@ Now that you've walked through this project:
 
 1. **Add a feature**: Use AI to add a daily statistics view
 2. **Improve styling**: Customize the theme with your own colors
-3. **Add tests**: Test the TaskList and SettingsPanel components
-4. **Deploy**: Push to Vercel or Netlify (already configured for static export)
+3. **Add tests**: Expand coverage for persistence, auto-start behavior, and notifications
+4. **Deploy**: Publish the static export to your preferred host
 
 ### Recommended Learning Path
 

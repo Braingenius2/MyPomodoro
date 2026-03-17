@@ -1,20 +1,27 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useTimerStore, Settings } from "@/store/timerStore";
+import { useState } from "react";
+import {
+  useTimerStore,
+  type Settings,
+  DEFAULT_SETTINGS,
+} from "@/store/timerStore";
 import { Button } from "@/components/ui/Button";
 import { Panel } from "@/components/ui/Panel";
 import { RangeInput } from "@/components/ui/RangeInput";
 import { X, Settings as SettingsIcon } from "lucide-react";
 
-const DEFAULT_SETTINGS: Settings = {
-  workDuration: 25,
-  shortBreakDuration: 5,
-  longBreakDuration: 15,
-  autoStartBreaks: false,
-  autoStartPomodoros: false,
-  longBreakInterval: 4,
-};
+const COLOR_TEXT_CLASSES = {
+  cyan: "text-neon-cyan",
+  green: "text-neon-green",
+  pink: "text-neon-pink",
+  yellow: "text-neon-yellow",
+} as const;
+
+const TOGGLE_BACKGROUND_CLASSES = {
+  cyan: "bg-neon-cyan",
+  green: "bg-neon-green",
+} as const;
 
 const SETTING_FIELDS = [
   { label: "Focus", color: "cyan" as const, min: 5, max: 60, key: "workDuration" as const, unit: "min" },
@@ -29,15 +36,10 @@ const TOGGLE_FIELDS = [
 ];
 
 export function SettingsPanel() {
-  const { settings, updateSettings } = useTimerStore();
+  const settings = useTimerStore((state) => state.settings);
+  const updateSettings = useTimerStore((state) => state.updateSettings);
   const [isOpen, setIsOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
   const [localSettings, setLocalSettings] = useState<Settings>(DEFAULT_SETTINGS);
-
-  useEffect(() => {
-    setMounted(true);
-    setLocalSettings(settings);
-  }, [settings]);
 
   const handleSave = () => {
     updateSettings(localSettings);
@@ -49,17 +51,17 @@ export function SettingsPanel() {
     setIsOpen(false);
   };
 
-  if (!mounted) {
-    return (
-      <Button variant="ghost" colorScheme="cyan" size="sm" disabled>
-        <SettingsIcon className="w-4 h-4" />
-      </Button>
-    );
-  }
-
   if (!isOpen) {
     return (
-      <Button variant="ghost" colorScheme="cyan" size="sm" onClick={() => setIsOpen(true)}>
+      <Button
+        variant="ghost"
+        colorScheme="cyan"
+        size="sm"
+        onClick={() => {
+          setLocalSettings(settings);
+          setIsOpen(true);
+        }}
+      >
         <SettingsIcon className="w-4 h-4" />
         <span>Settings</span>
       </Button>
@@ -67,14 +69,22 @@ export function SettingsPanel() {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4">
+    <div
+      className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="settings-panel-title"
+    >
       <Panel glow="pink" className="w-full max-w-md p-6 sm:p-8">
-        {/* Header */}
         <div className="flex justify-between items-center gap-4 mb-8">
-          <h2 className="text-xl font-black uppercase tracking-[0.15em] text-neon-pink">
+          <h2
+            id="settings-panel-title"
+            className="text-xl font-black uppercase tracking-[0.15em] text-neon-pink"
+          >
             Settings
           </h2>
           <button 
+            type="button"
             onClick={handleCancel} 
             className="p-2 hover:bg-white/5 rounded-lg transition-colors"
             aria-label="Close settings"
@@ -83,36 +93,43 @@ export function SettingsPanel() {
           </button>
         </div>
 
-        {/* Settings Fields */}
         <div className="space-y-6">
           {SETTING_FIELDS.map(({ label, color, min, max, key, unit }) => (
             <div key={key}>
               <div className="flex justify-between items-center mb-3">
-                <label className={`text-xs font-black uppercase tracking-wider text-neon-${color}`}>
+                <label
+                  htmlFor={`settings-${key}`}
+                  className={`text-xs font-black uppercase tracking-wider ${COLOR_TEXT_CLASSES[color]}`}
+                >
                   {label}
                 </label>
-                <span className={`text-sm font-black text-neon-${color}`}>
+                <span className={`text-sm font-black ${COLOR_TEXT_CLASSES[color]}`}>
                   {localSettings[key]} {unit}
                 </span>
               </div>
               <RangeInput 
+                id={`settings-${key}`}
                 min={min} 
                 max={max} 
                 value={localSettings[key]} 
-                onChange={(e) => setLocalSettings({...localSettings, [key]: parseInt(e.target.value)})} 
+                onChange={(e) =>
+                  setLocalSettings({
+                    ...localSettings,
+                    [key]: Number.parseInt(e.target.value, 10),
+                  })
+                }
                 color={color}
               />
             </div>
           ))}
         </div>
 
-        {/* Toggle Options */}
         <div className="flex flex-col gap-3 pt-6 mt-6 border-t border-white/5">
           {TOGGLE_FIELDS.map(({ key, label, color }) => (
             <label key={key} className="flex items-center gap-3 cursor-pointer group">
               <div className={`
                 w-10 h-6 rounded-full relative transition-colors duration-300
-                ${localSettings[key] ? `bg-neon-${color}` : 'bg-white/10'}
+                ${localSettings[key] ? TOGGLE_BACKGROUND_CLASSES[color] : "bg-white/10"}
               `}>
                 <input 
                   type="checkbox" 
@@ -132,7 +149,6 @@ export function SettingsPanel() {
           ))}
         </div>
 
-        {/* Action Buttons */}
         <div className="flex gap-3 mt-8">
           <Button 
             variant="primary" 

@@ -1,176 +1,99 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { SessionHistory } from '@/components/SessionHistory';
-import { useSessionStore } from '@/store/sessionStore';
+import { beforeEach, describe, expect, it } from "vitest";
+import { render, screen, waitFor, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { SessionHistory } from "@/components/SessionHistory";
+import { useSessionStore } from "@/store/sessionStore";
 
-describe('SessionHistory Component', () => {
+function resetSessionStore() {
+  useSessionStore.setState({
+    sessions: [],
+    initialized: true,
+  });
+}
+
+describe("SessionHistory", () => {
   beforeEach(() => {
-    useSessionStore.setState({ sessions: [], initialized: true });
+    resetSessionStore();
     localStorage.clear();
   });
 
-  it('should show loading state during initialization', () => {
+  it("shows a loading skeleton before the store is ready", () => {
     useSessionStore.setState({ initialized: false });
     const { container } = render(<SessionHistory />);
-    const skeleton = container.querySelector('div[class*="animate-pulse"]');
-    expect(skeleton).toBeInTheDocument();
+
+    expect(container.querySelector(".animate-pulse")).toBeInTheDocument();
   });
 
-  it('should display no data message when there are no sessions', () => {
-    useSessionStore.setState({ sessions: [], initialized: true });
+  it("shows an empty state when there are no sessions today", async () => {
     render(<SessionHistory />);
-    
-    expect(screen.getByText(/NO DATA - START FOCUSING!/i)).toBeInTheDocument();
+
+    await screen.findByText("Today's Log");
+    expect(screen.getByText("No sessions yet. Start focusing!")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Clear all sessions" })).not.toBeInTheDocument();
   });
 
-  it('should display session stats', async () => {
+  it("summarizes only today's sessions", async () => {
     const now = new Date().toISOString();
+    const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
     useSessionStore.setState({
       sessions: [
-        { id: '1', type: 'work', duration: 25, completedAt: now },
-        { id: '2', type: 'shortBreak', duration: 5, completedAt: now },
+        { id: "1", type: "work", duration: 25, completedAt: now },
+        { id: "2", type: "shortBreak", duration: 5, completedAt: now },
+        { id: "3", type: "work", duration: 25, completedAt: yesterday },
       ],
       initialized: true,
     });
-    
+
     render(<SessionHistory />);
-    
-    await waitFor(() => {
-      expect(screen.getByText('1')).toBeInTheDocument(); // Focus sessions count
-      expect(screen.getByText(/Focus Sessions/i)).toBeInTheDocument();
-    });
+
+    await screen.findByText("Today's Log");
+    expect(screen.getByText("25m")).toBeInTheDocument();
+
+    const focusStat = screen.getByText("Focus").parentElement;
+    const shortStat = screen.getByText("Short").parentElement;
+    const longStat = screen.getByText("Long").parentElement;
+
+    expect(focusStat).not.toBeNull();
+    expect(shortStat).not.toBeNull();
+    expect(longStat).not.toBeNull();
+    expect(within(focusStat as HTMLElement).getByText("1")).toBeInTheDocument();
+    expect(within(shortStat as HTMLElement).getByText("1")).toBeInTheDocument();
+    expect(within(longStat as HTMLElement).getByText("0")).toBeInTheDocument();
   });
 
-  it('should display total work duration', async () => {
+  it("renders recent session tiles for today", async () => {
     const now = new Date().toISOString();
     useSessionStore.setState({
       sessions: [
-        { id: '1', type: 'work', duration: 25, completedAt: now },
-        { id: '2', type: 'work', duration: 25, completedAt: now },
-        { id: '3', type: 'shortBreak', duration: 5, completedAt: now },
+        { id: "1", type: "work", duration: 25, completedAt: now },
+        { id: "2", type: "longBreak", duration: 15, completedAt: now },
       ],
       initialized: true,
     });
-    
+
     render(<SessionHistory />);
-    
-    await waitFor(() => {
-      // 50 minutes = 0h 50m
-      expect(screen.getByText(/0h 50m/)).toBeInTheDocument();
-    });
+
+    await screen.findByText("Today's Log");
+    expect(screen.getByTitle("25 min - Focus")).toBeInTheDocument();
+    expect(screen.getByTitle("15 min - Long Break")).toBeInTheDocument();
   });
 
-  it('should display session grid', async () => {
-    const now = new Date().toISOString();
-    useSessionStore.setState({
-      sessions: [
-        { id: '1', type: 'work', duration: 25, completedAt: now },
-        { id: '2', type: 'shortBreak', duration: 5, completedAt: now },
-      ],
-      initialized: true,
-    });
-    
-    render(<SessionHistory />);
-    
-    await waitFor(() => {
-      expect(screen.getByText('25')).toBeInTheDocument();
-      expect(screen.getByText('5')).toBeInTheDocument();
-    });
-  });
-
-  it('should show clear button only when there are sessions', async () => {
-    useSessionStore.setState({ sessions: [], initialized: true });
-    const { rerender } = render(<SessionHistory />);
-    
-    expect(screen.queryByText(/CLEAR DATA/i)).not.toBeInTheDocument();
-    
-    const now = new Date().toISOString();
-    useSessionStore.setState({
-      sessions: [{ id: '1', type: 'work', duration: 25, completedAt: now }],
-    });
-    
-    rerender(<SessionHistory />);
-    
-    await waitFor(() => {
-      expect(screen.getByText(/CLEAR DATA/i)).toBeInTheDocument();
-    });
-  });
-
-  it('should clear sessions when button is clicked', async () => {
+  it("clears stored sessions from the UI", async () => {
     const user = userEvent.setup();
     const now = new Date().toISOString();
     useSessionStore.setState({
-      sessions: [{ id: '1', type: 'work', duration: 25, completedAt: now }],
+      sessions: [{ id: "1", type: "work", duration: 25, completedAt: now }],
       initialized: true,
     });
-    
-    render(<SessionHistory />);
-    
-    await waitFor(() => {
-      expect(screen.getByText(/CLEAR DATA/i)).toBeInTheDocument();
-    });
 
-    const clearButton = screen.getByText(/CLEAR DATA/i);
+    render(<SessionHistory />);
+
+    const clearButton = await screen.findByRole("button", { name: "Clear all sessions" });
     await user.click(clearButton);
-    
+
     await waitFor(() => {
       expect(useSessionStore.getState().sessions).toHaveLength(0);
     });
-  });
-
-  it('should only count today sessions', async () => {
-    const now = new Date().toISOString();
-    const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-    
-    useSessionStore.setState({
-      sessions: [
-        { id: '1', type: 'work', duration: 25, completedAt: now },
-        { id: '2', type: 'work', duration: 25, completedAt: yesterday },
-      ],
-      initialized: true,
-    });
-    
-    render(<SessionHistory />);
-    
-    await waitFor(() => {
-      // Should only show 1 today session
-      expect(screen.getByText('1')).toBeInTheDocument();
-    });
-  });
-
-  it('should display correct session types in grid', async () => {
-    const now = new Date().toISOString();
-    useSessionStore.setState({
-      sessions: [
-        { id: '1', type: 'work', duration: 25, completedAt: now },
-        { id: '2', type: 'shortBreak', duration: 5, completedAt: now },
-      ],
-      initialized: true,
-    });
-    
-    const { container } = render(<SessionHistory />);
-    
-    await waitFor(() => {
-      const gridItems = container.querySelectorAll('div[class*="bg-neon"]');
-      expect(gridItems.length).toBeGreaterThanOrEqual(2);
-    });
-  });
-
-  it('should display header with logo and stats', async () => {
-    const now = new Date().toISOString();
-    useSessionStore.setState({
-      sessions: [
-        { id: '1', type: 'work', duration: 25, completedAt: now },
-      ],
-      initialized: true,
-    });
-    
-    render(<SessionHistory />);
-    
-    await waitFor(() => {
-      expect(screen.getByText(/TODAY'S LOG/i)).toBeInTheDocument();
-      expect(screen.getByText('📊')).toBeInTheDocument();
-    });
+    expect(screen.getByText("No sessions yet. Start focusing!")).toBeInTheDocument();
   });
 });

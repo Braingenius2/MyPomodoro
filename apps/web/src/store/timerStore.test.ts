@@ -1,221 +1,342 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { useTimerStore, formatTime } from '@/store/timerStore';
+import { beforeEach, describe, expect, it } from "vitest";
+import {
+  DEFAULT_SETTINGS,
+  formatTime,
+  useTimerStore,
+} from "@/store/timerStore";
 
-describe('timerStore', () => {
+function resetTimerStore() {
+  useTimerStore.setState({
+    mode: "work",
+    timeLeft: DEFAULT_SETTINGS.workDuration * 60,
+    isRunning: false,
+    alarmActive: false,
+    sessionsCompleted: 0,
+    settings: DEFAULT_SETTINGS,
+    initialized: false,
+    lastCompletion: null,
+  });
+}
+
+describe("timerStore", () => {
   beforeEach(() => {
-    // Reset store state before each test
-    useTimerStore.setState({
-      mode: 'work',
-      timeLeft: 1500,
-      isRunning: false,
-      sessionsCompleted: 0,
-      initialized: false,
-    });
+    resetTimerStore();
     localStorage.clear();
   });
 
-  describe('formatTime', () => {
-    it('should format seconds to MM:SS format', () => {
-      expect(formatTime(0)).toBe('00:00');
-      expect(formatTime(59)).toBe('00:59');
-      expect(formatTime(60)).toBe('01:00');
-      expect(formatTime(3599)).toBe('59:59');
-      expect(formatTime(3660)).toBe('61:00');
-    });
-
-    it('should pad minutes and seconds with leading zeros', () => {
-      expect(formatTime(65)).toBe('01:05');
-      expect(formatTime(125)).toBe('02:05');
+  describe("formatTime", () => {
+    it("formats seconds as MM:SS", () => {
+      expect(formatTime(0)).toBe("00:00");
+      expect(formatTime(59)).toBe("00:59");
+      expect(formatTime(65)).toBe("01:05");
+      expect(formatTime(3660)).toBe("61:00");
     });
   });
 
-  describe('state initialization', () => {
-    it('should initialize with default values', () => {
-      const state = useTimerStore.getState();
-      expect(state.mode).toBe('work');
-      expect(state.isRunning).toBe(false);
-      expect(state.timeLeft).toBe(1500);
-      expect(state.sessionsCompleted).toBe(0);
+  describe("initialization", () => {
+    it("loads defaults when storage is empty", () => {
+      useTimerStore.getState().initialize();
+
+      expect(useTimerStore.getState()).toMatchObject({
+        mode: "work",
+        timeLeft: 1500,
+        isRunning: false,
+        sessionsCompleted: 0,
+        settings: DEFAULT_SETTINGS,
+        initialized: true,
+        lastCompletion: null,
+      });
     });
 
-    it('should initialize from localStorage if available', () => {
-      const savedState = {
-        mode: 'shortBreak',
-        timeLeft: 300,
+    it("loads persisted state when storage is valid", () => {
+      localStorage.setItem(
+        "pomodoro-timer",
+        JSON.stringify({
+          mode: "shortBreak",
+          timeLeft: 180,
+          sessionsCompleted: 2,
+          settings: {
+            workDuration: 30,
+            shortBreakDuration: 3,
+            longBreakDuration: 20,
+            autoStartBreaks: true,
+            autoStartPomodoros: false,
+            longBreakInterval: 5,
+          },
+        })
+      );
+
+      useTimerStore.getState().initialize();
+
+      expect(useTimerStore.getState()).toMatchObject({
+        mode: "shortBreak",
+        timeLeft: 180,
         sessionsCompleted: 2,
+        initialized: true,
         settings: {
           workDuration: 30,
-          shortBreakDuration: 5,
-          longBreakDuration: 15,
+          shortBreakDuration: 3,
+          longBreakDuration: 20,
           autoStartBreaks: true,
           autoStartPomodoros: false,
-          longBreakInterval: 4,
+          longBreakInterval: 5,
         },
-      };
-      localStorage.setItem('pomodoro-timer', JSON.stringify(savedState));
-      
+      });
+    });
+
+    it("sanitizes invalid persisted values", () => {
+      localStorage.setItem(
+        "pomodoro-timer",
+        JSON.stringify({
+          mode: "invalid",
+          timeLeft: -10,
+          sessionsCompleted: -4,
+          settings: {
+            workDuration: 99,
+            shortBreakDuration: -4,
+            longBreakDuration: 0,
+            autoStartBreaks: "yes",
+            autoStartPomodoros: 1,
+            longBreakInterval: 100,
+          },
+        })
+      );
+
       useTimerStore.getState().initialize();
-      const state = useTimerStore.getState();
-      
-      expect(state.mode).toBe('shortBreak');
-      expect(state.timeLeft).toBe(300);
-      expect(state.sessionsCompleted).toBe(2);
+
+      expect(useTimerStore.getState()).toMatchObject({
+        mode: "work",
+        timeLeft: 3600,
+        sessionsCompleted: 0,
+        initialized: true,
+        settings: {
+          workDuration: 60,
+          shortBreakDuration: 1,
+          longBreakDuration: 10,
+          autoStartBreaks: false,
+          autoStartPomodoros: false,
+          longBreakInterval: 8,
+        },
+      });
+    });
+
+    it("falls back to defaults for corrupted storage", () => {
+      localStorage.setItem("pomodoro-timer", "not valid json");
+
+      expect(() => useTimerStore.getState().initialize()).not.toThrow();
+      expect(useTimerStore.getState()).toMatchObject({
+        mode: "work",
+        timeLeft: 1500,
+        settings: DEFAULT_SETTINGS,
+        initialized: true,
+      });
     });
   });
 
-  describe('start/pause/reset', () => {
-    it('should start the timer', () => {
-      useTimerStore.getState().start();
-      expect(useTimerStore.getState().isRunning).toBe(true);
-    });
+  describe("timer transitions", () => {
+    it("decrements by one second while time remains", () => {
+      useTimerStore.setState({ timeLeft: 1500, isRunning: true });
 
-    it('should pause the timer', () => {
-      useTimerStore.getState().start();
-      useTimerStore.getState().pause();
-      expect(useTimerStore.getState().isRunning).toBe(false);
-    });
-
-    it('should reset timeLeft when reset is called', () => {
-      const state = useTimerStore.getState();
-      state.setMode('work');
-      state.reset();
-      
-      expect(useTimerStore.getState().timeLeft).toBe(1500);
-      expect(useTimerStore.getState().isRunning).toBe(false);
-    });
-
-    it('should reset to correct duration based on mode', () => {
-      const state = useTimerStore.getState();
-      state.setMode('shortBreak');
-      state.reset();
-      
-      expect(useTimerStore.getState().timeLeft).toBe(300);
-    });
-  });
-
-  describe('tick', () => {
-    it('should decrement timeLeft by 1', () => {
       useTimerStore.getState().tick();
+
       expect(useTimerStore.getState().timeLeft).toBe(1499);
+      expect(useTimerStore.getState().mode).toBe("work");
+      expect(useTimerStore.getState().lastCompletion).toBeNull();
     });
 
-    it('should not go below 0', () => {
-      const state = useTimerStore.getState();
-      state.tick();
-      state.tick();
-      // Keep ticking until we're at 1
-      for (let i = 0; i < 1498; i++) {
-        state.tick();
-      }
-      expect(useTimerStore.getState().timeLeft).toBe(1);
-      state.tick();
-      expect(useTimerStore.getState().timeLeft).toBe(0);
-      state.tick();
-      // Should not go negative
-      expect(useTimerStore.getState().timeLeft).toBe(0);
+    it("completes work immediately when ticking from one second", () => {
+      useTimerStore.setState({ mode: "work", timeLeft: 1, isRunning: true });
+
+      useTimerStore.getState().tick();
+
+      expect(useTimerStore.getState()).toMatchObject({
+        mode: "shortBreak",
+        timeLeft: 300,
+        isRunning: false,
+        sessionsCompleted: 1,
+        lastCompletion: {
+          completedMode: "work",
+          nextMode: "shortBreak",
+          duration: 25,
+          autoStarted: false,
+        },
+      });
     });
 
-    it('should transition from work to shortBreak on timeout', () => {
-      const state = useTimerStore.getState();
-      state.setMode('work');
-      // Fast forward to end
-      useTimerStore.setState({ timeLeft: 1 });
-      state.tick();
-      
-      expect(useTimerStore.getState().mode).toBe('shortBreak');
-      expect(useTimerStore.getState().sessionsCompleted).toBe(1);
+    it("starts a long break after the configured number of work sessions", () => {
+      useTimerStore.setState({
+        mode: "work",
+        timeLeft: 1,
+        sessionsCompleted: 3,
+      });
+
+      useTimerStore.getState().tick();
+
+      expect(useTimerStore.getState()).toMatchObject({
+        mode: "longBreak",
+        timeLeft: 900,
+        sessionsCompleted: 4,
+        lastCompletion: {
+          completedMode: "work",
+          nextMode: "longBreak",
+          duration: 25,
+        },
+      });
     });
 
-    it('should advance to longBreak after configured sessions', () => {
-      const state = useTimerStore.getState();
-      
-      // Complete 4 work sessions (default longBreakInterval)
-      for (let i = 0; i < 4; i++) {
-        state.setMode('work');
-        useTimerStore.setState({ timeLeft: 1 });
-        state.tick();
-        // Complete the break
-        useTimerStore.setState({ timeLeft: 1 });
-        state.tick();
-      }
-      
-      // Next should be long break
-      expect(useTimerStore.getState().sessionsCompleted).toBe(4);
+    it("returns to work after completing a break without incrementing sessions", () => {
+      useTimerStore.setState({
+        mode: "shortBreak",
+        timeLeft: 1,
+        sessionsCompleted: 2,
+      });
+
+      useTimerStore.getState().tick();
+
+      expect(useTimerStore.getState()).toMatchObject({
+        mode: "work",
+        timeLeft: 1500,
+        sessionsCompleted: 2,
+        lastCompletion: {
+          completedMode: "shortBreak",
+          nextMode: "work",
+          duration: 5,
+        },
+      });
+    });
+
+    it("auto-starts breaks when the setting is enabled", () => {
+      useTimerStore.setState({
+        mode: "work",
+        timeLeft: 1,
+        isRunning: true,
+        settings: {
+          ...DEFAULT_SETTINGS,
+          autoStartBreaks: true,
+        },
+      });
+
+      useTimerStore.getState().tick();
+
+      expect(useTimerStore.getState()).toMatchObject({
+        mode: "shortBreak",
+        timeLeft: 300,
+        isRunning: true,
+        sessionsCompleted: 1,
+        lastCompletion: {
+          completedMode: "work",
+          autoStarted: true,
+        },
+      });
+    });
+
+    it("auto-starts focus sessions when the setting is enabled", () => {
+      useTimerStore.setState({
+        mode: "longBreak",
+        timeLeft: 1,
+        isRunning: true,
+        settings: {
+          ...DEFAULT_SETTINGS,
+          autoStartPomodoros: true,
+        },
+      });
+
+      useTimerStore.getState().tick();
+
+      expect(useTimerStore.getState()).toMatchObject({
+        mode: "work",
+        timeLeft: 1500,
+        isRunning: true,
+        sessionsCompleted: 0,
+        lastCompletion: {
+          completedMode: "longBreak",
+          autoStarted: true,
+        },
+      });
     });
   });
 
-  describe('setMode', () => {
-    it('should change mode and update timeLeft', () => {
-      const state = useTimerStore.getState();
-      state.setMode('shortBreak');
-      
-      expect(useTimerStore.getState().mode).toBe('shortBreak');
-      expect(useTimerStore.getState().timeLeft).toBe(300);
+  describe("actions", () => {
+    it("resets the current mode duration and pauses", () => {
+      useTimerStore.setState({ mode: "longBreak", timeLeft: 60, isRunning: true });
+
+      useTimerStore.getState().reset();
+
+      expect(useTimerStore.getState()).toMatchObject({
+        mode: "longBreak",
+        timeLeft: 900,
+        isRunning: false,
+      });
     });
 
-    it('should stop timer when changing mode', () => {
-      const state = useTimerStore.getState();
-      state.start();
-      state.setMode('longBreak');
-      
-      expect(useTimerStore.getState().isRunning).toBe(false);
+    it("changes mode and updates the timer length", () => {
+      useTimerStore.getState().setMode("shortBreak");
+
+      expect(useTimerStore.getState()).toMatchObject({
+        mode: "shortBreak",
+        timeLeft: 300,
+        isRunning: false,
+      });
+    });
+
+    it("updates the current duration while paused", () => {
+      useTimerStore.setState({ mode: "work", isRunning: false, timeLeft: 1500 });
+
+      useTimerStore.getState().updateSettings({ workDuration: 30 });
+
+      expect(useTimerStore.getState()).toMatchObject({
+        timeLeft: 1800,
+        settings: {
+          ...DEFAULT_SETTINGS,
+          workDuration: 30,
+        },
+      });
+    });
+
+    it("keeps the remaining time while running", () => {
+      useTimerStore.setState({ mode: "work", isRunning: true, timeLeft: 1200 });
+
+      useTimerStore.getState().updateSettings({ workDuration: 30 });
+
+      expect(useTimerStore.getState()).toMatchObject({
+        timeLeft: 1200,
+        settings: {
+          ...DEFAULT_SETTINGS,
+          workDuration: 30,
+        },
+      });
+    });
+
+    it("clears the completion event after acknowledgement", () => {
+      useTimerStore.setState({
+        lastCompletion: {
+          id: 1,
+          completedMode: "work",
+          nextMode: "shortBreak",
+          duration: 25,
+          autoStarted: false,
+        },
+      });
+
+      useTimerStore.getState().acknowledgeCompletion();
+
+      expect(useTimerStore.getState().lastCompletion).toBeNull();
     });
   });
 
-  describe('settings', () => {
-    it('should update settings', () => {
-      const state = useTimerStore.getState();
-      state.updateSettings({ workDuration: 30 });
-      
-      expect(useTimerStore.getState().settings.workDuration).toBe(30);
-    });
+  describe("persistence", () => {
+    it("persists timer state after initialization", () => {
+      useTimerStore.getState().initialize();
 
-    it('should apply new duration when updating settings', () => {
-      const state = useTimerStore.getState();
-      state.setMode('work');
-      state.updateSettings({ workDuration: 30 });
-      
-      expect(useTimerStore.getState().timeLeft).toBe(1800);
-    });
+      useTimerStore.getState().setMode("shortBreak");
 
-    it('should auto-start breaks if setting is enabled', () => {
-      const state = useTimerStore.getState();
-      state.updateSettings({ autoStartBreaks: true });
-      
-      state.setMode('work');
-      useTimerStore.setState({ timeLeft: 1 });
-      state.tick();
-      
-      expect(useTimerStore.getState().isRunning).toBe(true);
-      expect(useTimerStore.getState().mode).toBe('shortBreak');
-    });
-
-    it('should auto-start pomodoros if setting is enabled', () => {
-      const state = useTimerStore.getState();
-      state.updateSettings({ autoStartPomodoros: true });
-      
-      state.setMode('shortBreak');
-      useTimerStore.setState({ timeLeft: 1 });
-      state.tick();
-      
-      expect(useTimerStore.getState().isRunning).toBe(true);
-      expect(useTimerStore.getState().mode).toBe('work');
-    });
-  });
-
-  describe('localStorage persistence', () => {
-    it('should save state to localStorage', () => {
-      const state = useTimerStore.getState();
-      state.initialize();
-      state.start();
-      state.tick();
-      
-      const saved = localStorage.getItem('pomodoro-timer');
-      expect(saved).toBeTruthy();
-      
-      const parsed = JSON.parse(saved!);
-      expect(parsed.isRunning).toBe(false); // Saved as paused
-      expect(parsed.timeLeft).toBeGreaterThan(0);
+      const saved = JSON.parse(localStorage.getItem("pomodoro-timer") ?? "{}");
+      expect(saved).toMatchObject({
+        mode: "shortBreak",
+        timeLeft: 300,
+        isRunning: false,
+        settings: DEFAULT_SETTINGS,
+      });
     });
   });
 });

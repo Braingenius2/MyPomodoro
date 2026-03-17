@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { useSessionStore } from "@/store/sessionStore";
 import { Panel } from "@/components/ui/Panel";
 import { Trash2 } from "lucide-react";
@@ -9,9 +9,6 @@ export function SessionHistory() {
   const sessions = useSessionStore((state) => state.sessions);
   const clearSessions = useSessionStore((state) => state.clearSessions);
   const initialized = useSessionStore((state) => state.initialized);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => setMounted(true), []);
 
   const todayStats = useMemo(() => {
     const sessionList = Array.isArray(sessions) ? sessions : [];
@@ -20,9 +17,7 @@ export function SessionHistory() {
     return { todaySessions, totalWorkToday };
   }, [sessions]);
 
-  const isReady = mounted && initialized;
-
-  if (!isReady) {
+  if (!initialized) {
     return (
       <Panel className="p-8">
         <div className="h-6 w-32 bg-white/10 rounded animate-pulse" />
@@ -43,7 +38,7 @@ export function SessionHistory() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <h3 className="text-sm font-black uppercase tracking-[0.2em] text-text-dim">
-          Today's Log
+          Today&apos;s Log
         </h3>
         <div className="px-4 py-2 bg-dark-bg rounded-full border border-neon-yellow/30">
           <span className="text-lg font-black text-neon-yellow">

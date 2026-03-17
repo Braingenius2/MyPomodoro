@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useTimerStore, formatTime } from "@/store/timerStore";
 import { useSessionStore } from "@/store/sessionStore";
 import { SettingsPanel } from "@/components/SettingsPanel";
@@ -11,16 +11,19 @@ import { Play, Pause, RotateCcw, Zap, Coffee, Moon } from "lucide-react";
 
 export type TimerMode = "work" | "shortBreak" | "longBreak";
 
+const ACTIVE_MODE_TAB_CLASSES: Record<TimerMode, string> = {
+  work: "bg-neon-cyan text-dark-bg shadow-[0_0_20px_rgba(0,245,255,0.4)]",
+  shortBreak: "bg-neon-green text-dark-bg shadow-[0_0_20px_rgba(0,255,136,0.4)]",
+  longBreak: "bg-neon-pink text-dark-bg shadow-[0_0_20px_rgba(255,0,170,0.4)]",
+};
+
 export function Timer() {
-  const [mounted, setMounted] = useState(false);
-  const [ready, setReady] = useState(false);
-  const [prevTimeLeft, setPrevTimeLeft] = useState<number | null>(null);
-  const [alarmActive, setAlarmActive] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const mode = useTimerStore((s) => s.mode);
   const timeLeft = useTimerStore((s) => s.timeLeft);
   const isRunning = useTimerStore((s) => s.isRunning);
+  const alarmActive = useTimerStore((s) => s.alarmActive);
   const sessionsCompleted = useTimerStore((s) => s.sessionsCompleted);
   const initialized = useTimerStore((s) => s.initialized);
   const start = useTimerStore((s) => s.start);
@@ -29,6 +32,8 @@ export function Timer() {
   const setMode = useTimerStore((s) => s.setMode);
   const initTimer = useTimerStore((s) => s.initialize);
   const settings = useTimerStore((s) => s.settings);
+  const lastCompletion = useTimerStore((s) => s.lastCompletion);
+  const acknowledgeCompletion = useTimerStore((s) => s.acknowledgeCompletion);
 
   const sessionsInitialized = useSessionStore((s) => s.initialized);
   const addSession = useSessionStore((s) => s.addSession);
@@ -37,14 +42,7 @@ export function Timer() {
   useEffect(() => {
     initTimer();
     initSessions();
-    setMounted(true);
   }, [initTimer, initSessions]);
-
-  useEffect(() => {
-    if (mounted && initialized && sessionsInitialized) {
-      setReady(true);
-    }
-  }, [mounted, initialized, sessionsInitialized]);
 
   useEffect(() => {
     if (!isRunning) return;
@@ -57,52 +55,65 @@ export function Timer() {
     return () => clearInterval(interval);
   }, [isRunning]);
 
-  // Track timeLeft changes to detect transition to 0
   useEffect(() => {
-    if (prevTimeLeft !== null && prevTimeLeft > 0 && timeLeft === 0) {
-      // Timer just completed - trigger looping alarm
-      setAlarmActive(true);
-      try {
-        if (typeof window !== "undefined") {
-          if (audioRef.current) {
-            audioRef.current.play().catch(() => {});
-          }
-          if ("Notification" in window && Notification.permission === "granted") {
-            new Notification("My Pomodoro", {
-              body: mode === "work" ? "Session completed! Take a break." : "Break is over! Time to focus."
-            });
-          }
-        }
-      } catch {}
-
-      // Track all session types (work, shortBreak, longBreak)
-      const duration = mode === "work" 
-        ? settings.workDuration 
-        : mode === "shortBreak" 
-          ? settings.shortBreakDuration 
-          : settings.longBreakDuration;
-      
-      addSession({ type: mode, duration });
+    if (!initialized || !sessionsInitialized || !lastCompletion) {
+      return;
     }
-    setPrevTimeLeft(timeLeft);
-  }, [timeLeft, prevTimeLeft, mode, settings, addSession, ready]);
 
-  // Stop alarm when user clicks start
-  const handleStart = () => {
-    setAlarmActive(false);
-    if (audioRef.current) {
+    try {
+      if (typeof window !== "undefined") {
+        if (!lastCompletion.autoStarted && audioRef.current) {
+          audioRef.current.play().catch(() => {});
+        }
+
+        if ("Notification" in window && Notification.permission === "granted") {
+          new Notification("My Pomodoro", {
+            body:
+              lastCompletion.completedMode === "work"
+                ? "Session completed! Take a break."
+                : "Break is over! Time to focus.",
+          });
+        }
+      }
+    } catch {}
+
+    addSession({
+      type: lastCompletion.completedMode,
+      duration: lastCompletion.duration,
+    });
+    acknowledgeCompletion();
+  }, [
+    initialized,
+    sessionsInitialized,
+    lastCompletion,
+    addSession,
+    acknowledgeCompletion,
+  ]);
+
+  useEffect(() => {
+    if (!alarmActive && audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
     }
+  }, [alarmActive]);
+
+  const handleStart = () => {
     start();
   };
 
-  // Request notification permission once mounted
+  const handleReset = () => {
+    reset();
+  };
+
+  const handleModeChange = (nextMode: TimerMode) => {
+    setMode(nextMode);
+  };
+
   useEffect(() => {
-    if (mounted && "Notification" in window && Notification.permission === "default") {
+    if ("Notification" in window && Notification.permission === "default") {
       Notification.requestPermission();
     }
-  }, [mounted]);
+  }, []);
 
   const modeConfig: Record<TimerMode, { label: string; icon: React.ReactNode; color: "cyan" | "green" | "pink" }> = {
     work: { label: "Focus", icon: <Zap className="w-5 h-5" />, color: "cyan" },
@@ -110,8 +121,13 @@ export function Timer() {
     longBreak: { label: "Break", icon: <Moon className="w-5 h-5" />, color: "pink" },
   };
 
-  const totalDuration = mode === "work" ? settings.workDuration * 60 : mode === "shortBreak" ? settings.shortBreakDuration * 60 : settings.longBreakDuration * 60;
-  const progress = ((totalDuration - timeLeft) / totalDuration) * 100;
+  const totalDuration =
+    mode === "work"
+      ? settings.workDuration * 60
+      : mode === "shortBreak"
+        ? settings.shortBreakDuration * 60
+        : settings.longBreakDuration * 60;
+  const progress = totalDuration > 0 ? Math.min(100, Math.max(0, ((totalDuration - timeLeft) / totalDuration) * 100)) : 0;
   
   const colorValues = {
     work: "#00f5ff",
@@ -120,8 +136,8 @@ export function Timer() {
   };
   const progressColor = colorValues[mode];
 
-  // Audio element for alarm
   const alarmUrl = "https://actions.google.com/sounds/v1/alarms/beep_short.ogg";
+  const ready = initialized && sessionsInitialized;
 
   if (!ready) {
     return (
@@ -140,7 +156,6 @@ export function Timer() {
 
   return (
     <div className="w-full max-w-xl mx-auto px-6 space-y-10">
-      {/* Hidden audio element for alarm */}
       <audio
         ref={audioRef}
         src={alarmUrl}
@@ -148,19 +163,20 @@ export function Timer() {
         preload="auto"
       />
       
-      {/* Main Timer */}
       <Panel glow={modeConfig[mode].color} className="p-8 sm:p-12">
-        {/* Mode Tabs */}
         <div className="flex justify-center gap-2 mb-10">
           {(["work", "shortBreak", "longBreak"] as TimerMode[]).map((m) => (
             <button
               key={m}
-              onClick={() => setMode(m)}
+              type="button"
+              onClick={() => handleModeChange(m)}
+              aria-pressed={mode === m}
+              aria-label={`${modeConfig[m].label} mode`}
               className={`
                 flex items-center gap-2 px-5 py-2.5 rounded-full font-black text-xs uppercase tracking-wider
                 transition-all duration-300
-                ${mode === m 
-                  ? `bg-${modeConfig[m].color === 'cyan' ? 'neon-cyan' : modeConfig[m].color === 'green' ? 'neon-green' : 'neon-pink'} text-dark-bg shadow-[0_0_20px_rgba(0,245,255,0.4)]` 
+                ${mode === m
+                  ? ACTIVE_MODE_TAB_CLASSES[m]
                   : 'bg-dark-surface text-text-dim hover:text-text-primary border border-white/5'}
               `}
             >
@@ -170,10 +186,8 @@ export function Timer() {
           ))}
         </div>
 
-        {/* Circular Timer */}
         <div className="relative flex items-center justify-center mb-10">
           <svg className="w-64 h-64 sm:w-72 sm:h-72 -rotate-90" viewBox="0 0 120 120">
-            {/* Background ring */}
             <circle
               cx="60"
               cy="60"
@@ -182,7 +196,6 @@ export function Timer() {
               stroke="rgba(255,255,255,0.05)"
               strokeWidth="3"
             />
-            {/* Progress ring */}
             <circle
               cx="60"
               cy="60"
@@ -200,7 +213,6 @@ export function Timer() {
             />
           </svg>
           
-          {/* Time Display */}
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             <div 
               className="text-6xl sm:text-7xl font-black tabular-nums tracking-tight"
@@ -214,7 +226,6 @@ export function Timer() {
           </div>
         </div>
 
-        {/* Status */}
         <div className={`flex items-center justify-center gap-3 mb-10 ${alarmActive ? 'text-neon-red animate-pulse' : isRunning ? 'text-neon-green' : 'text-text-dim'}`}>
           <span className={`w-2 h-2 rounded-full ${alarmActive ? 'bg-neon-red animate-pulse' : isRunning ? 'bg-neon-green animate-pulse' : 'bg-text-dim'}`} />
           <span className="text-xs font-black uppercase tracking-widest">
@@ -222,7 +233,6 @@ export function Timer() {
           </span>
         </div>
 
-        {/* Controls */}
         <div className="flex justify-center gap-4">
           <Button
             variant="primary"
@@ -238,26 +248,24 @@ export function Timer() {
             variant="secondary"
             colorScheme="cyan"
             size="lg"
-            onClick={reset}
+            onClick={handleReset}
+            aria-label="Reset timer"
           >
             <RotateCcw className="w-5 h-5" />
           </Button>
         </div>
 
-        {/* Sessions Counter */}
         <div className="flex items-center justify-center gap-4 mt-10 pt-8 border-t border-white/5">
           <span className="text-xs font-black uppercase tracking-widest text-text-dim">Sessions</span>
           <span className="text-3xl font-black text-neon-yellow">{sessionsCompleted}</span>
           <span className="text-xl">🍅</span>
         </div>
 
-        {/* Settings */}
         <div className="flex justify-center mt-8">
           <SettingsPanel />
         </div>
       </Panel>
 
-      {/* Session History */}
       <SessionHistory />
     </div>
   );

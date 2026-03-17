@@ -190,7 +190,6 @@ describe('sessionStore', () => {
       
       // Add sessions with different times
       const now = new Date();
-      const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
       
       // Note: The store doesn't directly support this, but consumers can filter
       state.addSession({ type: 'work', duration: 25 });

@@ -1,236 +1,162 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { Timer } from '@/components/Timer';
-import { useTimerStore } from '@/store/timerStore';
-import { useSessionStore } from '@/store/sessionStore';
+import { beforeEach, describe, expect, it } from "vitest";
+import { act, render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { Timer } from "@/components/Timer";
+import { DEFAULT_SETTINGS, useTimerStore } from "@/store/timerStore";
+import { useSessionStore } from "@/store/sessionStore";
 
-describe('Timer Component', () => {
-  beforeEach(() => {
-    useTimerStore.setState({
-      mode: 'work',
-      timeLeft: 1500,
-      isRunning: false,
-      sessionsCompleted: 0,
-      initialized: true,
-    });
-    useSessionStore.setState({ sessions: [], initialized: true });
-    localStorage.clear();
-    vi.clearAllTimers();
+const defaultTimerInitialize = useTimerStore.getState().initialize;
+const defaultSessionInitialize = useSessionStore.getState().initialize;
+
+function resetStores() {
+  useTimerStore.setState({
+    mode: "work",
+    timeLeft: DEFAULT_SETTINGS.workDuration * 60,
+    isRunning: false,
+    alarmActive: false,
+    sessionsCompleted: 0,
+    settings: DEFAULT_SETTINGS,
+    initialized: true,
+    lastCompletion: null,
+    initialize: defaultTimerInitialize,
   });
 
-  it('should show loading state during initialization', () => {
+  useSessionStore.setState({
+    sessions: [],
+    initialized: true,
+    initialize: defaultSessionInitialize,
+  });
+}
+
+describe("Timer", () => {
+  beforeEach(() => {
+    resetStores();
+    localStorage.clear();
+  });
+
+  it("shows the loading state while stores are initializing", () => {
     useTimerStore.setState({ initialized: false });
     useSessionStore.setState({ initialized: false });
-    
+    useTimerStore.setState({ initialize: () => undefined });
+    useSessionStore.setState({ initialize: () => undefined });
+
     render(<Timer />);
-    expect(screen.getByText(/INITIALIZING/i)).toBeInTheDocument();
+
+    expect(screen.getByText("INITIALIZING")).toBeInTheDocument();
   });
 
-  it('should render title', async () => {
+  it("renders the current mode, time, and paused status", async () => {
     render(<Timer />);
-    
-    await waitFor(() => {
-      expect(screen.getByText('MY POMODORO')).toBeInTheDocument();
-    });
+
+    await screen.findByText("25:00");
+    expect(screen.getByText("Focus Time")).toBeInTheDocument();
+    expect(screen.getByText("Paused")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Focus mode" })).toHaveAttribute(
+      "aria-pressed",
+      "true"
+    );
   });
 
-  it('should display current mode buttons', async () => {
-    render(<Timer />);
-    
-    await waitFor(() => {
-      expect(screen.getByText('FOCUS')).toBeInTheDocument();
-      expect(screen.getByText('REST')).toBeInTheDocument();
-      expect(screen.getByText('BREAK')).toBeInTheDocument();
-    });
-  });
-
-  it('should display timer in MM:SS format', async () => {
-    useTimerStore.setState({ timeLeft: 125 }); // 2:05
-    render(<Timer />);
-    
-    await waitFor(() => {
-      expect(screen.getByText('02:05')).toBeInTheDocument();
-    });
-  });
-
-  it('should switch between modes when buttons are clicked', async () => {
+  it("starts and pauses through the main control", async () => {
     const user = userEvent.setup();
     render(<Timer />);
-    
-    await waitFor(() => {
-      expect(screen.getByText('FOCUS TIME')).toBeInTheDocument();
-    });
 
-    const restButton = screen.getByRole('button', { name: /REST/ });
-    await user.click(restButton);
-    
-    await waitFor(() => {
-      expect(screen.getByText('SHORT REST')).toBeInTheDocument();
-    });
-  });
-
-  it('should start timer when START button is clicked', async () => {
-    const user = userEvent.setup();
-    render(<Timer />);
-    
-    await waitFor(() => {
-      expect(screen.getByText(/PAUSED/)).toBeInTheDocument();
-    });
-
-    const startButton = screen.getByRole('button', { name: /START/ });
+    const startButton = await screen.findByRole("button", { name: /start/i });
     await user.click(startButton);
-    
-    await waitFor(() => {
-      expect(screen.getByText(/ACTIVE/)).toBeInTheDocument();
-    });
+
+    expect(useTimerStore.getState().isRunning).toBe(true);
+    expect(screen.getByText("Running")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: /pause/i }));
+
+    expect(useTimerStore.getState().isRunning).toBe(false);
+    expect(screen.getByText("Paused")).toBeInTheDocument();
   });
 
-  it('should pause timer when PAUSE button is clicked', async () => {
+  it("switches modes from the mode tabs", async () => {
     const user = userEvent.setup();
-    useTimerStore.setState({ isRunning: true });
     render(<Timer />);
-    
-    await waitFor(() => {
-      expect(screen.getByText(/ACTIVE/)).toBeInTheDocument();
-    });
 
-    const pauseButton = screen.getByRole('button', { name: /PAUSE/ });
-    await user.click(pauseButton);
-    
+    await screen.findByText("25:00");
+    await user.click(screen.getByRole("button", { name: "Rest mode" }));
+
     await waitFor(() => {
-      expect(screen.getByText(/PAUSED/)).toBeInTheDocument();
+      expect(useTimerStore.getState()).toMatchObject({
+        mode: "shortBreak",
+        timeLeft: 300,
+        isRunning: false,
+      });
     });
+    expect(screen.getByText("Short Rest")).toBeInTheDocument();
   });
 
-  it('should reset timer when RESET button is clicked', async () => {
+  it("resets the current timer back to its full duration", async () => {
     const user = userEvent.setup();
-    useTimerStore.setState({ timeLeft: 500 });
+    useTimerStore.setState({ timeLeft: 60 });
     render(<Timer />);
-    
-    const resetButton = screen.getByRole('button', { name: /RESET/ });
-    await user.click(resetButton);
-    
+
+    await screen.findByText("01:00");
+    await user.click(screen.getByRole("button", { name: "Reset timer" }));
+
     await waitFor(() => {
       expect(useTimerStore.getState().timeLeft).toBe(1500);
     });
+    expect(screen.getByText("25:00")).toBeInTheDocument();
   });
 
-  it('should display sessions count', async () => {
-    useTimerStore.setState({ sessionsCompleted: 3 });
-    render(<Timer />);
-    
-    await waitFor(() => {
-      expect(screen.getByText('3')).toBeInTheDocument();
-      expect(screen.getByText(/Sessions/)).toBeInTheDocument();
-    });
-  });
-
-  it('should display settings button', async () => {
-    render(<Timer />);
-    
-    await waitFor(() => {
-      const settingsButton = screen.getByRole('button', { name: '⚙' });
-      expect(settingsButton).toBeInTheDocument();
-    });
-  });
-
-  it('should have progress bar', async () => {
-    useTimerStore.setState({ timeLeft: 750 }); // 50% progress
-    const { container } = render(<Timer />);
-    
-    await waitFor(() => {
-      const progressBar = container.querySelector('[class*="transition-all"]');
-      expect(progressBar).toBeInTheDocument();
-    });
-  });
-
-  it('should display correct mode label based on selected mode', async () => {
-    const user = userEvent.setup();
-    render(<Timer />);
-    
-    await waitFor(() => {
-      expect(screen.getByText('FOCUS TIME')).toBeInTheDocument();
-    });
-
-    const breakButton = screen.getByRole('button', { name: /BREAK/ });
-    await user.click(breakButton);
-    
-    await waitFor(() => {
-      expect(screen.getByText('LONG BREAK')).toBeInTheDocument();
-    });
-  });
-
-  it('should display status indicator', async () => {
-    render(<Timer />);
-    
-    await waitFor(() => {
-      expect(screen.getByText(/PAUSED/)).toBeInTheDocument();
-    });
-  });
-
-  it('should show session history component', async () => {
-    render(<Timer />);
-    
-    await waitFor(() => {
-      expect(screen.getByText(/TODAY'S LOG/i)).toBeInTheDocument();
-    });
-  });
-
-  it('should set interval when timer is running', async () => {
-    const user = userEvent.setup();
-    vi.useFakeTimers();
-    
-    render(<Timer />);
-    
-    await waitFor(() => {
-      expect(screen.getByText(/.*/)).toBeInTheDocument();
-    });
-
-    const startButton = screen.getByRole('button', { name: /START/ });
-    await user.click(startButton);
-    
-    expect(useTimerStore.getState().isRunning).toBe(true);
-    
-    vi.runAllTimers();
-    vi.useRealTimers();
-  });
-
-  it('should display all mode buttons with icons', async () => {
-    render(<Timer />);
-    
-    await waitFor(() => {
-      const focusButton = screen.getByRole('button', { name: /FOCUS/ });
-      const restButton = screen.getByRole('button', { name: /REST/ });
-      const breakButton = screen.getByRole('button', { name: /BREAK/ });
-      
-      expect(focusButton).toBeInTheDocument();
-      expect(restButton).toBeInTheDocument();
-      expect(breakButton).toBeInTheDocument();
-    });
-  });
-
-  it('should reflect active mode button styling', async () => {
-    const user = userEvent.setup();
-    const { container } = render(<Timer />);
-    
-    await waitFor(() => {
-      const focusButton = screen.getByRole('button', { name: /FOCUS/ });
-      // Active button should have glow effect
-      expect(focusButton).toHaveClass('shadow-[0_0_30px_currentColor]');
-    });
-  });
-
-  it('should track completed sessions', async () => {
-    const user = userEvent.setup();
+  it("completes work sessions immediately, shows the alarm state, and logs one session", async () => {
     useTimerStore.setState({ timeLeft: 1, isRunning: true });
     render(<Timer />);
-    
-    // Simulate timer tick
-    useTimerStore.getState().tick();
-    
-    await waitFor(() => {
-      expect(useTimerStore.getState().sessionsCompleted).toBeGreaterThanOrEqual(0);
+
+    await screen.findByText("00:01");
+
+    act(() => {
+      useTimerStore.getState().tick();
     });
+
+    await waitFor(() => {
+      expect(useTimerStore.getState()).toMatchObject({
+        mode: "shortBreak",
+        sessionsCompleted: 1,
+      });
+      expect(useSessionStore.getState().sessions).toHaveLength(1);
+    });
+
+    expect(screen.getByText("Alarm - Click Start")).toBeInTheDocument();
+    expect(screen.getByText("Short Rest")).toBeInTheDocument();
+    expect(useSessionStore.getState().sessions[0]).toMatchObject({
+      type: "work",
+      duration: 25,
+    });
+  });
+
+  it("auto-starts the next break without showing the alarm prompt", async () => {
+    useTimerStore.setState({
+      timeLeft: 1,
+      isRunning: true,
+      settings: {
+        ...DEFAULT_SETTINGS,
+        autoStartBreaks: true,
+      },
+    });
+    render(<Timer />);
+
+    await screen.findByText("00:01");
+
+    act(() => {
+      useTimerStore.getState().tick();
+    });
+
+    await waitFor(() => {
+      expect(useTimerStore.getState()).toMatchObject({
+        mode: "shortBreak",
+        isRunning: true,
+        sessionsCompleted: 1,
+      });
+      expect(useSessionStore.getState().sessions).toHaveLength(1);
+    });
+
+    expect(screen.getByText("Running")).toBeInTheDocument();
+    expect(screen.queryByText("Alarm - Click Start")).not.toBeInTheDocument();
   });
 });

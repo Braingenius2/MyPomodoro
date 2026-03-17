@@ -8,15 +8,13 @@ import { Check, Plus, Trash2 } from "lucide-react";
 
 export function TaskList() {
   const { tasks, initialized, addTask, toggleTask, deleteTask, clearCompleted } = useTaskStore();
-  const [mounted, setMounted] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState("");
 
   useEffect(() => {
     useTaskStore.getState().initialize();
-    setMounted(true);
   }, []);
 
-  if (!mounted || !initialized) {
+  if (!initialized) {
     return (
       <Panel glow="cyan" className="p-6 sm:p-8 flex flex-col h-full min-h-[400px]">
         <div className="h-6 w-32 bg-white/10 rounded animate-pulse mb-6" />
@@ -44,6 +42,7 @@ export function TaskList() {
         </h2>
         {tasks.some(t => t.completed) && (
           <button
+            type="button"
             onClick={clearCompleted}
             className="text-xs font-black uppercase text-text-dim hover:text-neon-pink transition-colors flex items-center gap-1"
           >
@@ -63,6 +62,7 @@ export function TaskList() {
           className="flex-1 bg-dark-bg border border-white/10 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-neon-cyan/50 text-text-primary placeholder:text-text-dim transition-colors truncate"
         />
         <Button variant="primary" colorScheme="cyan" type="submit" className="px-4 py-2 min-w-[3rem]">
+          <span className="sr-only">Add task</span>
           <Plus className="w-5 h-5 mx-auto" />
         </Button>
       </form>
@@ -84,7 +84,9 @@ export function TaskList() {
               `}
             >
               <button
+                type="button"
                 onClick={() => toggleTask(task.id)}
+                aria-label={task.completed ? `Mark ${task.title} as incomplete` : `Mark ${task.title} as complete`}
                 className={`
                   w-6 h-6 shrink-0 rounded-full border-2 flex items-center justify-center transition-colors
                   ${task.completed 
@@ -103,9 +105,10 @@ export function TaskList() {
               </span>
 
               <button
+                type="button"
                 onClick={() => deleteTask(task.id)}
                 className="opacity-0 group-hover:opacity-100 p-2 text-text-dim hover:text-neon-pink hover:bg-white/5 rounded-lg transition-all"
-                aria-label="Delete task"
+                aria-label={`Delete task ${task.title}`}
               >
                 <Trash2 className="w-4 h-4" />
               </button>
