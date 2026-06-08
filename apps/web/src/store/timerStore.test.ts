@@ -15,6 +15,8 @@ function resetTimerStore() {
     settings: DEFAULT_SETTINGS,
     initialized: false,
     lastCompletion: null,
+    initialTimeLeft: 0,
+    focusMode: false,
   });
 }
 
@@ -279,6 +281,16 @@ describe("timerStore", () => {
       });
     });
 
+    it("sets focus mode on start and clears on pause", () => {
+      useTimerStore.setState({ focusMode: false });
+
+      useTimerStore.getState().start();
+      expect(useTimerStore.getState().focusMode).toBe(true);
+
+      useTimerStore.getState().pause();
+      expect(useTimerStore.getState().focusMode).toBe(false);
+    });
+
     it("updates the current duration while paused", () => {
       useTimerStore.setState({ mode: "work", isRunning: false, timeLeft: 1500 });
 
@@ -307,6 +319,41 @@ describe("timerStore", () => {
       });
     });
 
+    it("quickStart sets a 5-minute work timer and starts running", () => {
+      useTimerStore.getState().quickStart();
+
+      expect(useTimerStore.getState()).toMatchObject({
+        mode: "work",
+        timeLeft: 300,
+        isRunning: true,
+        focusMode: true,
+        initialTimeLeft: 300,
+      });
+    });
+
+    it("uses actual duration from quickStart when logging completion", () => {
+      useTimerStore.getState().quickStart();
+      useTimerStore.setState({ timeLeft: 1 });
+
+      useTimerStore.getState().tick();
+
+      expect(useTimerStore.getState().lastCompletion).toMatchObject({
+        completedMode: "work",
+        duration: 5,
+      });
+    });
+
+    it("uses settings-based duration when initialTimeLeft is not set", () => {
+      useTimerStore.setState({ mode: "work", timeLeft: 1, isRunning: true });
+
+      useTimerStore.getState().tick();
+
+      expect(useTimerStore.getState().lastCompletion).toMatchObject({
+        completedMode: "work",
+        duration: 25,
+      });
+    });
+
     it("clears the completion event after acknowledgement", () => {
       useTimerStore.setState({
         lastCompletion: {
@@ -322,6 +369,7 @@ describe("timerStore", () => {
 
       expect(useTimerStore.getState().lastCompletion).toBeNull();
     });
+
   });
 
   describe("persistence", () => {

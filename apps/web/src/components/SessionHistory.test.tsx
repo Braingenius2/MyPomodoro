@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { SessionHistory } from "@/components/SessionHistory";
 import { useSessionStore } from "@/store/sessionStore";
@@ -24,31 +24,30 @@ describe("SessionHistory", () => {
     expect(container.querySelector(".animate-pulse")).toBeInTheDocument();
   });
 
-  it("shows an empty state when there are no sessions today", async () => {
+  it("shows an empty state when there are no sessions", async () => {
     render(<SessionHistory />);
 
-    await screen.findByText("Today's Log");
+    await screen.findByText("Recent Sessions");
     expect(screen.getByText("No sessions yet. Start focusing!")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Clear all sessions" })).not.toBeInTheDocument();
   });
 
-  it("summarizes only today's sessions", async () => {
+  it("shows stats for the last 8 sessions only", async () => {
     const now = new Date().toISOString();
-    const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
     useSessionStore.setState({
-      sessions: [
-        { id: "1", type: "work", duration: 25, completedAt: now },
-        { id: "2", type: "shortBreak", duration: 5, completedAt: now },
-        { id: "3", type: "work", duration: 25, completedAt: yesterday },
-      ],
+      sessions: Array.from({ length: 10 }, (_, i) => ({
+        id: `${i}`,
+        type: (i % 3 === 0 ? "work" : i % 3 === 1 ? "shortBreak" : "longBreak") as "work" | "shortBreak" | "longBreak",
+        duration: i % 3 === 0 ? 25 : i % 3 === 1 ? 5 : 15,
+        completedAt: now,
+      })),
       initialized: true,
     });
 
     render(<SessionHistory />);
 
-    await screen.findByText("Today's Log");
-    expect(screen.getByText("25m")).toBeInTheDocument();
-
+    await screen.findByText("Recent Sessions");
+    // 10 sessions, last 8 shown: 3 work, 3 shortBreak, 2 longBreak
     const focusStat = screen.getByText("Focus").parentElement;
     const shortStat = screen.getByText("Short").parentElement;
     const longStat = screen.getByText("Long").parentElement;
@@ -56,12 +55,12 @@ describe("SessionHistory", () => {
     expect(focusStat).not.toBeNull();
     expect(shortStat).not.toBeNull();
     expect(longStat).not.toBeNull();
-    expect(within(focusStat as HTMLElement).getByText("1")).toBeInTheDocument();
-    expect(within(shortStat as HTMLElement).getByText("1")).toBeInTheDocument();
-    expect(within(longStat as HTMLElement).getByText("0")).toBeInTheDocument();
+    expect(focusStat!.querySelector(".font-black")).toHaveTextContent("3");
+    expect(shortStat!.querySelector(".font-black")).toHaveTextContent("3");
+    expect(longStat!.querySelector(".font-black")).toHaveTextContent("2");
   });
 
-  it("renders recent session tiles for today", async () => {
+  it("renders session tiles for the last 8 sessions", async () => {
     const now = new Date().toISOString();
     useSessionStore.setState({
       sessions: [
@@ -73,7 +72,7 @@ describe("SessionHistory", () => {
 
     render(<SessionHistory />);
 
-    await screen.findByText("Today's Log");
+    await screen.findByText("Recent Sessions");
     expect(screen.getByTitle("25 min - Focus")).toBeInTheDocument();
     expect(screen.getByTitle("15 min - Long Break")).toBeInTheDocument();
   });

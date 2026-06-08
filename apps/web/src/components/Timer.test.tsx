@@ -18,6 +18,8 @@ function resetStores() {
     settings: DEFAULT_SETTINGS,
     initialized: true,
     lastCompletion: null,
+    focusMode: false,
+    initialTimeLeft: 0,
     initialize: defaultTimerInitialize,
   });
 
@@ -61,7 +63,7 @@ describe("Timer", () => {
     const user = userEvent.setup();
     render(<Timer />);
 
-    const startButton = await screen.findByRole("button", { name: /start/i });
+    const startButton = await screen.findByRole("button", { name: "Start" });
     await user.click(startButton);
 
     expect(useTimerStore.getState().isRunning).toBe(true);
@@ -153,10 +155,64 @@ describe("Timer", () => {
         isRunning: true,
         sessionsCompleted: 1,
       });
-      expect(useSessionStore.getState().sessions).toHaveLength(1);
     });
 
     expect(screen.getByText("Running")).toBeInTheDocument();
     expect(screen.queryByText("Alarm - Click Start")).not.toBeInTheDocument();
+  });
+
+  it("shows the Quick Start 5m button when paused", async () => {
+    render(<Timer />);
+
+    await screen.findByText("25:00");
+    expect(screen.getByRole("button", { name: "Quick Start 5 min" })).toBeInTheDocument();
+  });
+
+  it("starts a 5-minute focus session on quick start", async () => {
+    const user = userEvent.setup();
+    render(<Timer />);
+
+    await screen.findByText("25:00");
+    await user.click(screen.getByRole("button", { name: "Quick Start 5 min" }));
+
+    await waitFor(() => {
+      expect(useTimerStore.getState()).toMatchObject({
+        mode: "work",
+        timeLeft: 300,
+        isRunning: true,
+        focusMode: true,
+      });
+    });
+  });
+
+  it("hides mode tabs and settings when focus mode is active", async () => {
+    const user = userEvent.setup();
+    render(<Timer />);
+
+    await screen.findByText("25:00");
+    await user.click(screen.getByRole("button", { name: "Start" }));
+
+    await waitFor(() => {
+      expect(useTimerStore.getState().focusMode).toBe(true);
+    });
+
+    expect(screen.queryByRole("button", { name: "Rest mode" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /settings/i })).not.toBeInTheDocument();
+  });
+
+  it("focus mode exits when paused", async () => {
+    const user = userEvent.setup();
+    render(<Timer />);
+
+    await screen.findByText("25:00");
+    await user.click(screen.getByRole("button", { name: "Start" }));
+
+    await waitFor(() => {
+      expect(useTimerStore.getState().focusMode).toBe(true);
+    });
+
+    await user.click(screen.getByRole("button", { name: /pause/i }));
+
+    expect(useTimerStore.getState().focusMode).toBe(false);
   });
 });

@@ -1,13 +1,14 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useTimerStore, formatTime } from "@/store/timerStore";
 import { useSessionStore } from "@/store/sessionStore";
 import { SettingsPanel } from "@/components/SettingsPanel";
 import { SessionHistory } from "@/components/SessionHistory";
+import { FocusTaskBar } from "@/components/FocusTask";
 import { Button } from "@/components/ui/Button";
 import { Panel } from "@/components/ui/Panel";
-import { Play, Pause, RotateCcw, Zap, Coffee, Moon } from "lucide-react";
+import { Play, Pause, RotateCcw, Zap, Coffee, Moon, Maximize2, Minimize2 } from "lucide-react";
 
 export type TimerMode = "work" | "shortBreak" | "longBreak";
 
@@ -19,6 +20,7 @@ const ACTIVE_MODE_TAB_CLASSES: Record<TimerMode, string> = {
 
 export function Timer() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   const mode = useTimerStore((s) => s.mode);
   const timeLeft = useTimerStore((s) => s.timeLeft);
@@ -29,6 +31,7 @@ export function Timer() {
   const start = useTimerStore((s) => s.start);
   const pause = useTimerStore((s) => s.pause);
   const reset = useTimerStore((s) => s.reset);
+  const quickStart = useTimerStore((s) => s.quickStart);
   const setMode = useTimerStore((s) => s.setMode);
   const initTimer = useTimerStore((s) => s.initialize);
   const settings = useTimerStore((s) => s.settings);
@@ -39,6 +42,8 @@ export function Timer() {
   const addSession = useSessionStore((s) => s.addSession);
   const initSessions = useSessionStore((s) => s.initialize);
 
+  const isFocusSession = mode === "work" && isRunning;
+
   useEffect(() => {
     initTimer();
     initSessions();
@@ -46,12 +51,9 @@ export function Timer() {
 
   useEffect(() => {
     if (!isRunning) return;
-    
-    // Interval only depends on isRunning. tick() handles the rest.
     const interval = setInterval(() => {
       useTimerStore.getState().tick();
     }, 1000);
-    
     return () => clearInterval(interval);
   }, [isRunning]);
 
@@ -97,22 +99,26 @@ export function Timer() {
     }
   }, [alarmActive]);
 
-  const handleStart = () => {
-    start();
-  };
-
-  const handleReset = () => {
-    reset();
-  };
-
-  const handleModeChange = (nextMode: TimerMode) => {
-    setMode(nextMode);
-  };
-
   useEffect(() => {
     if ("Notification" in window && Notification.permission === "default") {
       Notification.requestPermission();
     }
+  }, []);
+
+  const handleFullscreenToggle = useCallback(() => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+      setIsFullscreen(true);
+    } else {
+      document.exitFullscreen().catch(() => {});
+      setIsFullscreen(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    const onFsChange = () => setIsFullscreen(!!document.fullscreenElement);
+    document.addEventListener("fullscreenchange", onFsChange);
+    return () => document.removeEventListener("fullscreenchange", onFsChange);
   }, []);
 
   const modeConfig: Record<TimerMode, { label: string; icon: React.ReactNode; color: "cyan" | "green" | "pink" }> = {
@@ -128,7 +134,7 @@ export function Timer() {
         ? settings.shortBreakDuration * 60
         : settings.longBreakDuration * 60;
   const progress = totalDuration > 0 ? Math.min(100, Math.max(0, ((totalDuration - timeLeft) / totalDuration) * 100)) : 0;
-  
+
   const colorValues = {
     work: "#00f5ff",
     shortBreak: "#00ff88",
@@ -155,39 +161,58 @@ export function Timer() {
   }
 
   return (
-    <div className="w-full max-w-xl mx-auto px-6 space-y-10">
+    <div className="w-full max-w-xl mx-auto px-6 space-y-6">
       <audio
         ref={audioRef}
         src={alarmUrl}
         loop
         preload="auto"
       />
-      
-      <Panel glow={modeConfig[mode].color} className="p-8 sm:p-12">
-        <div className="flex justify-center gap-2 mb-10">
-          {(["work", "shortBreak", "longBreak"] as TimerMode[]).map((m) => (
-            <button
-              key={m}
-              type="button"
-              onClick={() => handleModeChange(m)}
-              aria-pressed={mode === m}
-              aria-label={`${modeConfig[m].label} mode`}
-              className={`
-                flex items-center gap-2 px-5 py-2.5 rounded-full font-black text-xs uppercase tracking-wider
-                transition-all duration-300
-                ${mode === m
-                  ? ACTIVE_MODE_TAB_CLASSES[m]
-                  : 'bg-dark-surface text-text-dim hover:text-text-primary border border-white/5'}
-              `}
-            >
-              {modeConfig[m].icon}
-              <span>{modeConfig[m].label}</span>
-            </button>
-          ))}
-        </div>
 
-        <div className="relative flex items-center justify-center mb-10">
-          <svg className="w-64 h-64 sm:w-72 sm:h-72 -rotate-90" viewBox="0 0 120 120">
+      <FocusTaskBar isFocusSession={isFocusSession} />
+
+      <Panel glow={modeConfig[mode].color} className={`p-8 sm:p-12 ${isFocusSession ? 'pt-6' : ''}`}>
+        {/* Quick Start / Mode Tabs */}
+        {!isFocusSession && (
+          <div className="mb-6">
+            <button
+              type="button"
+              onClick={quickStart}
+              className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-gradient-to-r from-neon-green/20 to-neon-cyan/20 border border-neon-green/40 text-neon-green font-black text-sm uppercase tracking-wider hover:brightness-110 hover:shadow-[0_0_30px_rgba(0,255,136,0.3)] transition-all duration-300 active:scale-[0.98] mb-4"
+            >
+              <Zap className="w-5 h-5" />
+              <span>Quick Start 5 min</span>
+            </button>
+
+            <div className="flex justify-center gap-2">
+              {(["work", "shortBreak", "longBreak"] as TimerMode[]).map((m) => (
+                <button
+                  key={m}
+                  type="button"
+                  onClick={() => setMode(m)}
+                  aria-pressed={mode === m}
+                  aria-label={`${modeConfig[m].label} mode`}
+                  className={`
+                    flex items-center gap-2 px-4 py-2 rounded-full font-black text-[10px] uppercase tracking-wider
+                    transition-all duration-300
+                    ${mode === m
+                      ? ACTIVE_MODE_TAB_CLASSES[m]
+                      : 'bg-dark-surface text-text-dim hover:text-text-primary border border-white/5'}
+                  `}
+                >
+                  {modeConfig[m].icon}
+                  <span className="hidden sm:inline">{modeConfig[m].label}</span>
+                  <span className="sm:hidden">
+                    {m === "work" ? `${settings.workDuration}m` : m === "shortBreak" ? `${settings.shortBreakDuration}m` : `${settings.longBreakDuration}m`}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className="relative flex items-center justify-center mb-8">
+          <svg className={`${isFullscreen ? 'w-80 h-80' : isFocusSession ? 'w-72 h-72 sm:w-80 sm:h-80' : 'w-64 h-64 sm:w-72 sm:h-72'} -rotate-90 transition-all duration-500`} viewBox="0 0 120 120">
             <circle
               cx="60"
               cy="60"
@@ -212,23 +237,23 @@ export function Timer() {
               }}
             />
           </svg>
-          
+
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <div 
-              className="text-6xl sm:text-7xl font-black tabular-nums tracking-tight"
+            <div
+              className={`${isFullscreen ? 'text-7xl' : isFocusSession ? 'text-6xl sm:text-7xl' : 'text-5xl sm:text-6xl'} font-black tabular-nums tracking-tight transition-all duration-500`}
               style={{ color: progressColor, textShadow: `0 0 30px ${progressColor}` }}
             >
               {formatTime(timeLeft)}
             </div>
-            <div className="text-xs font-black uppercase tracking-[0.3em] text-text-dim mt-2">
+            <div className="text-[10px] font-black uppercase tracking-[0.3em] text-text-dim mt-2">
               {mode === "work" ? "Focus Time" : mode === "shortBreak" ? "Short Rest" : "Long Break"}
             </div>
           </div>
         </div>
 
-        <div className={`flex items-center justify-center gap-3 mb-10 ${alarmActive ? 'text-neon-red animate-pulse' : isRunning ? 'text-neon-green' : 'text-text-dim'}`}>
+        <div className={`flex items-center justify-center gap-3 mb-8 ${alarmActive ? 'text-neon-red animate-pulse' : isRunning ? 'text-neon-green' : 'text-text-dim'}`}>
           <span className={`w-2 h-2 rounded-full ${alarmActive ? 'bg-neon-red animate-pulse' : isRunning ? 'bg-neon-green animate-pulse' : 'bg-text-dim'}`} />
-          <span className="text-xs font-black uppercase tracking-widest">
+          <span className="text-[10px] font-black uppercase tracking-widest">
             {alarmActive ? "Alarm - Click Start" : isRunning ? "Running" : "Paused"}
           </span>
         </div>
@@ -237,36 +262,55 @@ export function Timer() {
           <Button
             variant="primary"
             colorScheme={modeConfig[mode].color}
-            size="lg"
-            onClick={() => isRunning ? pause() : handleStart()}
-            className="min-w-[140px]"
+            size={isFocusSession ? "lg" : "lg"}
+            onClick={() => isRunning ? pause() : start()}
+            className={`min-w-[140px] ${isFocusSession ? 'scale-110' : ''}`}
           >
             {isRunning ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
             <span>{isRunning ? "Pause" : "Start"}</span>
           </Button>
-          <Button
-            variant="secondary"
-            colorScheme="cyan"
-            size="lg"
-            onClick={handleReset}
-            aria-label="Reset timer"
-          >
-            <RotateCcw className="w-5 h-5" />
-          </Button>
+          {!isFocusSession && (
+            <Button
+              variant="secondary"
+              colorScheme="cyan"
+              size="lg"
+              onClick={reset}
+              aria-label="Reset timer"
+            >
+              <RotateCcw className="w-5 h-5" />
+            </Button>
+          )}
         </div>
 
-        <div className="flex items-center justify-center gap-4 mt-10 pt-8 border-t border-white/5">
-          <span className="text-xs font-black uppercase tracking-widest text-text-dim">Sessions</span>
-          <span className="text-3xl font-black text-neon-yellow">{sessionsCompleted}</span>
-          <span className="text-xl">🍅</span>
-        </div>
+        {!isFocusSession && (
+          <div className="flex items-center justify-center gap-4 mt-8 pt-8 border-t border-white/5">
+            <span className="text-xs font-black uppercase tracking-widest text-text-dim">Sessions</span>
+            <span className="text-3xl font-black text-neon-yellow">{sessionsCompleted}</span>
+            <span className="text-xl">🍅</span>
+          </div>
+        )}
 
-        <div className="flex justify-center mt-8">
-          <SettingsPanel />
-        </div>
+        {!isFocusSession && (
+          <div className="flex justify-center mt-8">
+            <SettingsPanel />
+          </div>
+        )}
       </Panel>
 
-      <SessionHistory />
+      {!isFocusSession && <SessionHistory />}
+
+      {/* Fullscreen toggle */}
+      <div className="flex justify-center">
+        <button
+          type="button"
+          onClick={handleFullscreenToggle}
+          className="flex items-center gap-2 px-4 py-2 rounded-full bg-dark-surface/50 border border-white/5 text-text-dim hover:text-neon-cyan transition-colors text-[10px] font-black uppercase tracking-wider"
+          aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+        >
+          {isFullscreen ? <Minimize2 className="w-3 h-3" /> : <Maximize2 className="w-3 h-3" />}
+          {isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
+        </button>
+      </div>
     </div>
   );
 }

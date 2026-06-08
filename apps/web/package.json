@@ -13,7 +13,8 @@
     "typecheck": "tsc --noEmit",
     "tauri": "tauri",
     "tauri:dev": "tauri dev",
-    "tauri:build": "tauri build"
+    "tauri:build": "tauri build",
+    "deploy": "pnpm build && echo 'Static export ready in apps/web/out/. Deploy to gh-pages with: npx gh-pages -d apps/web/out -t'"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.67.2",

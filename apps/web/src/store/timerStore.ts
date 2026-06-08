@@ -126,6 +126,8 @@ interface TimerState {
   settings: Settings;
   initialized: boolean;
   lastCompletion: CompletionEvent | null;
+  initialTimeLeft: number;
+  focusMode: boolean;
   start: () => void;
   pause: () => void;
   reset: () => void;
@@ -134,6 +136,7 @@ interface TimerState {
   updateSettings: (settings: Partial<Settings>) => void;
   initialize: () => void;
   acknowledgeCompletion: () => void;
+  quickStart: () => void;
 }
 
 export const useTimerStore = create<TimerState>((set, get) => ({
@@ -145,10 +148,26 @@ export const useTimerStore = create<TimerState>((set, get) => ({
   settings: DEFAULT_SETTINGS,
   initialized: false,
   lastCompletion: null,
+  initialTimeLeft: 0,
+  focusMode: false,
 
-  start: () => set({ isRunning: true, alarmActive: false }),
+  start: () => {
+    const { timeLeft } = get();
+    set({ isRunning: true, alarmActive: false, focusMode: true, initialTimeLeft: timeLeft });
+  },
 
-  pause: () => set({ isRunning: false }),
+  quickStart: () => {
+    set({
+      mode: "work",
+      timeLeft: 300,
+      isRunning: true,
+      alarmActive: false,
+      focusMode: true,
+      initialTimeLeft: 300,
+    });
+  },
+
+  pause: () => set({ isRunning: false, focusMode: false }),
 
   reset: () => {
     const { mode, settings } = get();
@@ -156,11 +175,13 @@ export const useTimerStore = create<TimerState>((set, get) => ({
       timeLeft: getModeDurationSeconds(mode, settings),
       isRunning: false,
       alarmActive: false,
+      focusMode: false,
+      initialTimeLeft: 0,
     });
   },
 
   tick: () => {
-    const { timeLeft, mode, sessionsCompleted, settings, lastCompletion } = get();
+    const { timeLeft, mode, sessionsCompleted, settings, lastCompletion, initialTimeLeft } = get();
 
     if (timeLeft > 1) {
       set({ timeLeft: timeLeft - 1 });
@@ -168,7 +189,9 @@ export const useTimerStore = create<TimerState>((set, get) => ({
     }
 
     const completedMode = mode;
-    const completedDuration = getModeDurationMinutes(completedMode, settings);
+    const completedDuration = initialTimeLeft > 0
+      ? Math.round(initialTimeLeft / 60)
+      : getModeDurationMinutes(completedMode, settings);
     const completedWorkSessions = completedMode === "work" ? sessionsCompleted + 1 : sessionsCompleted;
     const nextMode: TimerMode =
       completedMode === "work"
@@ -185,6 +208,7 @@ export const useTimerStore = create<TimerState>((set, get) => ({
       isRunning: autoStarted,
       alarmActive: !autoStarted,
       sessionsCompleted: completedWorkSessions,
+      focusMode: autoStarted && nextMode === "work",
       lastCompletion: {
         id: getNextCompletionId(lastCompletion),
         completedMode,
@@ -202,6 +226,7 @@ export const useTimerStore = create<TimerState>((set, get) => ({
       timeLeft: getModeDurationSeconds(mode, settings),
       isRunning: false,
       alarmActive: false,
+      focusMode: false,
     });
   },
 
@@ -248,6 +273,8 @@ export const useTimerStore = create<TimerState>((set, get) => ({
           settings,
           initialized: true,
           lastCompletion: null,
+          focusMode: false,
+          initialTimeLeft: 0,
         });
       } else {
         set({
@@ -259,6 +286,8 @@ export const useTimerStore = create<TimerState>((set, get) => ({
           settings: DEFAULT_SETTINGS,
           initialized: true,
           lastCompletion: null,
+          focusMode: false,
+          initialTimeLeft: 0,
         });
       }
     } catch {
@@ -271,6 +300,8 @@ export const useTimerStore = create<TimerState>((set, get) => ({
         settings: DEFAULT_SETTINGS,
         initialized: true,
         lastCompletion: null,
+        focusMode: false,
+        initialTimeLeft: 0,
       });
     }
   },
