@@ -2,6 +2,8 @@
 
 A neon-themed Pomodoro productivity timer with task management, session history, and a desktop Tauri app.
 
+🌐 **Live app:** https://braingenius2.github.io/MyPomodoro/
+
 ## Tech Stack
 
 - **Framework:** Next.js (static export) + React 19
@@ -31,7 +33,7 @@ packages/utils/    # Shared utilities
 
 ## Deployment
 
-The web app is deployed to GitHub Pages via GitHub Actions. On every push to `main`, the app is built as a static export and published to the `gh-pages` branch.
+The web app is deployed to GitHub Pages via GitHub Actions. Every push to `main` triggers an automatic build and deploy.
 
 ## Desktop App
 
