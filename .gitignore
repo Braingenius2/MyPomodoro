@@ -36,3 +36,6 @@ Thumbs.db
 
 # Tauri
 apps/web/src-tauri/target/
+
+# Agent skills (personal workflow config)
+skills/
