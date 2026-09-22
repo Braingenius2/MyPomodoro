@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "My Pomodoro",
-  description: "A super pomodoro app for productivity",
+  title: "KPMG Performance Command Center",
+  description: "A private planning and KBAC study system for a Technology Risk Analyst.",
 };
 
 export default function RootLayout({
