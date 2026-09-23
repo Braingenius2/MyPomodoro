@@ -226,6 +226,18 @@
   .sources a b { display: block; margin-bottom: 4px; }
   .sources a span { color: var(--muted); }
 
+  .lab-selects { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+  .lab-selects label { display: grid; gap: 5px; font-size: .64rem; font-weight: 800; text-transform: uppercase; letter-spacing: .09em; color: var(--blue); }
+  .lab-selects select { border: 1px solid var(--line); background: #fbfdff; border-radius: 8px; padding: 9px 10px; font: inherit; font-size: .82rem; min-width: 200px; color: var(--ink); }
+  .lab-item.is-correct { border-color: var(--green); background: #f6fdf9; }
+  .lab-item.is-wrong { border-color: var(--red); background: #fdf8f7; }
+  .taccounts { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+  .taccount { border: 1px solid var(--line); border-radius: 12px; background: #fbfdff; padding: 14px; }
+  .taccount h4 { margin: 0 0 8px; font-family: Georgia, serif; font-size: 1rem; color: var(--navy); }
+  .taccount table { font-size: .76rem; }
+  .taccount th { font-size: .58rem; }
+  .tbalance { margin-top: 9px; font-size: .74rem; font-weight: 700; color: var(--blue); }
+
   footer { margin-top: 60px; padding: 30px 0 50px; border-top: 1px solid var(--line); color: var(--muted); font-size: .75rem; }
 
   @media (max-width: 980px) {
@@ -274,6 +286,7 @@
     <a href="#map">Big picture</a>
     <a href="#topics">Modules</a>
     <a href="#drill">Journal drill</a>
+    <a href="#lab">Class lab</a>
     <a href="#cards">Flashcards</a>
     <a href="#quiz">Question bank</a>
     <a href="#mock">Mock exam</a>
@@ -286,7 +299,7 @@
   <div class="wrap">
     <p class="eyebrow">Fortune Uzodinma | Basic Accounting and Regulatory Environment</p>
     <h1>Learn the rule.<br>Work the example.<br>Explain it cold.</h1>
-    <p class="deck">An elite, interactive study system for the Academy General Test. Fourteen modules, a journal entry drill, 40 flashcards, a 49-question bank, and a timed mock exam. Everything saves on this device.</p>
+    <p class="deck">An elite, interactive study system for the Academy General Test. Sixteen modules, a journal entry drill, a solved class exercise lab, 50 flashcards, a 63-question bank, and a timed mock exam. Everything saves on this device.</p>
     <div class="notice">
       <span>!</span>
       <p><strong>Scope truth:</strong> the Academy agenda confirms the topics taught on 22 and 23 September and a General Test on 24 September. It does not confirm the question count, pass mark, or weighting. This is a tailored study tool, not an official KPMG blueprint. Rates and thresholds move: the Academy handout wins every argument.</p>
@@ -311,6 +324,7 @@
         <label class="check"><input type="checkbox" data-plan="t2"><span>Module 4 and 5: accounting cycle, adjustments</span></label>
         <label class="check"><input type="checkbox" data-plan="t3"><span>Journal drill: score 10 or better out of 12</span></label>
         <label class="check"><input type="checkbox" data-plan="t4"><span>Explain the DEALER rule aloud with no notes</span></label>
+        <label class="check"><input type="checkbox" data-plan="t5"><span>Fred's class exercise lab: build all 7 entries, then reveal the solution</span></label>
       </div>
       <div class="day">
         <p class="tag">Tonight, second block | Wed 23 Sep</p>
@@ -319,7 +333,7 @@
         <label class="check"><input type="checkbox" data-plan="w1"><span>Modules 6 to 8: statements, analysis, IFRS</span></label>
         <label class="check"><input type="checkbox" data-plan="w2"><span>Modules 9 to 12: finance function, processes, regulators, tax</span></label>
         <label class="check"><input type="checkbox" data-plan="w3"><span>Modules 13 and 14: firm, culture, and your Technology Risk bridge</span></label>
-        <label class="check"><input type="checkbox" data-plan="w4"><span>All 40 flashcards known, question bank above 85%, one mock exam done</span></label>
+        <label class="check"><input type="checkbox" data-plan="w4"><span>All 50 flashcards known, question bank above 85%, one mock exam done</span></label>
       </div>
       <div class="day">
         <p class="tag">Test morning | Thu 24 Sep</p>
@@ -340,13 +354,13 @@
     <div class="dash">
       <div>
         <span>Module mastery</span>
-        <strong id="stat-mastery">0 / 14</strong>
+        <strong id="stat-mastery">0 / 16</strong>
         <small>Can explain or test-ready</small>
         <div class="bar"><i id="bar-mastery"></i></div>
       </div>
       <div>
         <span>Flashcards known</span>
-        <strong id="stat-cards">0 / 40</strong>
+        <strong id="stat-cards">0 / 50</strong>
         <small>Marked as known</small>
         <div class="bar"><i id="bar-cards"></i></div>
       </div>
@@ -365,7 +379,7 @@
 
   <section id="map">
     <div class="sec-head">
-      <p class="eyebrow">One story, not nine definitions</p>
+      <p class="eyebrow">One story, not sixteen definitions</p>
       <h2>How business activity becomes a financial statement.</h2>
       <p class="lead">Read this flow until you can redraw it from memory. Every module in this guide hangs on this spine.</p>
     </div>
@@ -391,7 +405,7 @@
 
   <section id="topics">
     <div class="sec-head">
-      <p class="eyebrow">Fourteen modules</p>
+      <p class="eyebrow">Sixteen modules</p>
       <h2>Confirmed Academy content, engineered for recall.</h2>
       <p class="lead">Each module gives you the plain rule, a worked example, the trap, recall prompts, and the Technology Risk link. Set your mastery level as you go. The dashboard tracks it.</p>
     </div>
@@ -409,8 +423,21 @@
         </div>
       </details>
 
+      <details class="module" data-id="m15" data-title="Accounting defined and types of business">
+        <summary><span class="num">02</span><h3>Accounting defined: purpose, users, and types of business</h3><select class="mastery" aria-label="Accounting fundamentals mastery"><option>Not started</option><option>Learning</option><option>Can explain</option><option>Test-ready</option></select></summary>
+        <div class="body">
+          <div><span class="label">Plain-English rule</span><p>Accounting is the process of identifying, recording, classifying, summarising, and communicating economic information about an entity so that users can make informed decisions. It is called the language of business for a reason: it turns activity into numbers people can act on.</p></div>
+          <div><span class="label">Why you learn it</span><ul><li>To read and interpret financial statements instead of nodding politely at them.</li><li>To see how business activity becomes reported numbers, and where it can go wrong.</li><li>To understand what finance teams own, so your Technology Risk questions land in their language.</li><li>To spot fraud, error, and misstatement risk in systems and processes.</li></ul></div>
+          <div><span class="label">Main types of business</span><ul><li><strong>Sole proprietorship:</strong> one owner, simple to set up, owner has unlimited liability, business is not a separate legal person. Equity shows as a capital account.</li><li><strong>Partnership:</strong> two or more owners sharing capital and profits, generally with unlimited liability in a general partnership. A limited liability partnership limits members' liability.</li><li><strong>Limited liability company:</strong> a separate legal person owned by shareholders whose liability is limited to their shares. Registered under CAMA in Nigeria. Private (Ltd) or public (Plc). Equity shows as share capital plus retained earnings.</li></ul></div>
+          <div class="trap"><span class="label">Common trap</span><p>Do not mix up the owner and the business. In accounting, the business is treated as separate from its owner, which is why drawings and owner contributions are recorded rather than ignored.</p></div>
+          <div><span class="label">Two statements to name in any answer</span><p>The <strong>balance sheet</strong> (statement of financial position) shows assets, liabilities, and equity at a point in time. The <strong>income statement</strong> (profit or loss) shows revenue, expenses, and profit over a period. One is a photograph, the other is a video.</p></div>
+          <div class="wide"><span class="label">Recall prompts</span><ol><li>Define accounting in one sentence without using the word money.</li><li>Name the three main types of business and one liability feature of each.</li><li>Which statement is a photograph and which is a video?</li></ol></div>
+          <div class="wide link"><span class="label">Technology Risk link</span><p>Every business type still produces financial statements, and every financial statement is fed by systems. Your edge is understanding both the business structure and the technology chain behind the numbers.</p></div>
+        </div>
+      </details>
+
       <details class="module" data-id="m2" data-title="Debits and credits">
-        <summary><span class="num">02</span><h3>Debits, credits, and the DEALER rule</h3><select class="mastery" aria-label="Debits and credits mastery"><option>Not started</option><option>Learning</option><option>Can explain</option><option>Test-ready</option></select></summary>
+        <summary><span class="num">03</span><h3>Debits, credits, and the DEALER rule</h3><select class="mastery" aria-label="Debits and credits mastery"><option>Not started</option><option>Learning</option><option>Can explain</option><option>Test-ready</option></select></summary>
         <div class="body">
           <div><span class="label">Plain-English rule</span><p>Debit means the left side of an account. Credit means the right side. <strong>DEALER</strong>: <strong>D</strong>rawings and dividends, <strong>E</strong>xpenses, <strong>A</strong>ssets increase with a debit. <strong>L</strong>iabilities, <strong>E</strong>quity, <strong>R</strong>evenue increase with a credit. Every transaction has at least one debit and one credit, and they must be equal.</p></div>
           <div><span class="label">Worked example</span><p>Pay ₦80,000 rent in cash: debit Rent Expense ₦80,000, credit Cash ₦80,000. Make a ₦50,000 cash sale: debit Cash ₦50,000, credit Sales Revenue ₦50,000.</p></div>
@@ -421,7 +448,7 @@
       </details>
 
       <details class="module" data-id="m3" data-title="Double entry and the journal">
-        <summary><span class="num">03</span><h3>Double entry and the journal</h3><select class="mastery" aria-label="Double entry mastery"><option>Not started</option><option>Learning</option><option>Can explain</option><option>Test-ready</option></select></summary>
+        <summary><span class="num">04</span><h3>Double entry and the journal</h3><select class="mastery" aria-label="Double entry mastery"><option>Not started</option><option>Learning</option><option>Can explain</option><option>Test-ready</option></select></summary>
         <div class="body">
           <div><span class="label">Plain-English rule</span><p>Every transaction touches at least two accounts. The journal records the date, accounts, amounts, narration, and reference. Posting moves those entries into ledger accounts. Double entry is what creates traceability from a source document to the financial statements.</p></div>
           <div><span class="label">Worked example</span><p>Buy inventory on credit for ₦250,000: debit Inventory ₦250,000, credit Accounts Payable ₦250,000. Pay the supplier later: debit Accounts Payable ₦250,000, credit Bank ₦250,000.</p></div>
@@ -431,8 +458,21 @@
         </div>
       </details>
 
+      <details class="module" data-id="m16" data-title="T-accounts and closing entries">
+        <summary><span class="num">05</span><h3>T-accounts, normal balances, and closing entries</h3><select class="mastery" aria-label="T-accounts mastery"><option>Not started</option><option>Learning</option><option>Can explain</option><option>Test-ready</option></select></summary>
+        <div class="body">
+          <div><span class="label">Plain-English rule</span><p>A T-account is the visual form of a ledger account. Debits sit on the left, credits sit on the right. At period end, the difference is the balance: carried down (c/d) on the smaller side and brought down (b/d) on the larger side to start the next period.</p></div>
+          <div><span class="label">Normal balances</span><ul><li>Debit-balanced accounts: assets, expenses, drawings, dividends, purchases.</li><li>Credit-balanced accounts: liabilities, equity or capital, revenue or sales, accruals.</li><li>Contra accounts reverse the pattern: accumulated depreciation is credit-balanced, drawings is debit-balanced.</li></ul></div>
+          <div><span class="label">Closing entries for a sole trader</span><ol><li>Close revenue to the profit and loss account: debit sales, credit P&amp;L.</li><li>Close expenses and purchases to the P&amp;L account: debit P&amp;L, credit each expense account.</li><li>The P&amp;L balance is the profit or loss. Transfer it to capital: profit means debit P&amp;L, credit capital. A loss reverses.</li><li>Assets and liabilities are never closed. Their balances are carried forward to the statement of financial position.</li></ol></div>
+          <div><span class="label">Worked mini example</span><p>Sales of ₦400,000, purchases of ₦250,000, rent of ₦60,000. Close sales: Dr Sales 400,000 / Cr P&amp;L 400,000. Close purchases and rent: Dr P&amp;L 310,000 / Cr Purchases 250,000 / Cr Rent 60,000. The P&amp;L shows a ₦90,000 profit, transferred to capital: Dr P&amp;L 90,000 / Cr Capital 90,000.</p></div>
+          <div class="trap"><span class="label">Common trap</span><p>Only temporary (nominal) accounts close: revenue, expenses, purchases, and the P&amp;L itself. Permanent (real) accounts such as cash, equipment, loans, and payables stay open and carry forward. Closing a real account destroys the balance sheet.</p></div>
+          <div class="wide"><span class="label">Recall prompts</span><ol><li>Which accounts have a normal debit balance?</li><li>Write the four closing steps for a sole trader in order.</li><li>Why do asset and liability balances appear on the statement of financial position after closing?</li></ol></div>
+          <div class="wide link"><span class="label">Technology Risk link</span><p>Closing and carry-forward are automated in every ERP and core banking system. When period-end routines change in a system upgrade, the closing logic is a financial reporting control that deserves a controlled change record.</p></div>
+        </div>
+      </details>
+
       <details class="module" data-id="m4" data-title="The accounting cycle">
-        <summary><span class="num">04</span><h3>The accounting cycle and the trial balance</h3><select class="mastery" aria-label="Accounting cycle mastery"><option>Not started</option><option>Learning</option><option>Can explain</option><option>Test-ready</option></select></summary>
+        <summary><span class="num">06</span><h3>The accounting cycle and the trial balance</h3><select class="mastery" aria-label="Accounting cycle mastery"><option>Not started</option><option>Learning</option><option>Can explain</option><option>Test-ready</option></select></summary>
         <div class="body">
           <div><span class="label">Plain-English rule</span><p>The cycle: source documents, journal, post to ledger, extract the trial balance, make adjusting entries, produce the adjusted trial balance, prepare the financial statements, then close the temporary accounts. A trial balance simply lists closing balances and proves total debits equal total credits.</p></div>
           <div><span class="label">Worked example</span><p>Total debits of ₦4,200,000 against total credits of ₦4,200,000: the trial balance agrees. It still tells you nothing about whether a whole transaction was omitted or an amount was posted to the wrong account.</p></div>
@@ -443,7 +483,7 @@
       </details>
 
       <details class="module" data-id="m5" data-title="Adjustments">
-        <summary><span class="num">05</span><h3>Accruals, prepayments, depreciation, and other adjustments</h3><select class="mastery" aria-label="Adjustments mastery"><option>Not started</option><option>Learning</option><option>Can explain</option><option>Test-ready</option></select></summary>
+        <summary><span class="num">07</span><h3>Accruals, prepayments, depreciation, and other adjustments</h3><select class="mastery" aria-label="Adjustments mastery"><option>Not started</option><option>Learning</option><option>Can explain</option><option>Test-ready</option></select></summary>
         <div class="body">
           <div><span class="label">Plain-English rule</span><p>The accrual basis matches income and expenses to the period they belong to, not the period cash moves. Accruals record expenses or income before cash moves. Prepayments record cash before the benefit is consumed. Depreciation allocates the cost of a long-lived asset across its useful life.</p></div>
           <div><span class="label">Worked examples</span><ul><li>Unpaid December rent of ₦100,000: debit Rent Expense, credit Accrued Expenses.</li><li>Prepaid insurance of ₦120,000 for twelve months: debit Prepaid Insurance, credit Cash, then release ₦10,000 monthly to expense.</li><li>Equipment of ₦1,200,000 over five years, straight line: ₦240,000 depreciation each year. Debit Depreciation Expense, credit Accumulated Depreciation.</li><li>Customer owes ₦30,000 and will not pay: debit Impairment Expense, credit Trade Receivables.</li></ul></div>
@@ -454,7 +494,7 @@
       </details>
 
       <details class="module" data-id="m6" data-title="Financial statements">
-        <summary><span class="num">06</span><h3>The complete set of financial statements</h3><select class="mastery" aria-label="Financial statements mastery"><option>Not started</option><option>Learning</option><option>Can explain</option><option>Test-ready</option></select></summary>
+        <summary><span class="num">08</span><h3>The complete set of financial statements</h3><select class="mastery" aria-label="Financial statements mastery"><option>Not started</option><option>Learning</option><option>Can explain</option><option>Test-ready</option></select></summary>
         <div class="body">
           <div><span class="label">Plain-English rule</span><p>IAS 1 requires a complete set: (1) statement of financial position at the reporting date, (2) statement of profit or loss and other comprehensive income for the period, (3) statement of changes in equity, (4) statement of cash flows, (5) notes including accounting policies, plus comparative figures for the prior period.</p></div>
           <div><span class="label">What each one answers</span><ul><li>Financial position: what do we own and owe right now?</li><li>Profit or loss: how did we perform over the period?</li><li>Changes in equity: what moved owners' interest and why?</li><li>Cash flows: where did cash actually come from and go?</li><li>Notes: the detail and judgement behind the numbers.</li></ul></div>
@@ -466,7 +506,7 @@
       </details>
 
       <details class="module" data-id="m7" data-title="Financial statement analysis">
-        <summary><span class="num">07</span><h3>Financial statement analysis and ratios</h3><select class="mastery" aria-label="Analysis mastery"><option>Not started</option><option>Learning</option><option>Can explain</option><option>Test-ready</option></select></summary>
+        <summary><span class="num">09</span><h3>Financial statement analysis and ratios</h3><select class="mastery" aria-label="Analysis mastery"><option>Not started</option><option>Learning</option><option>Can explain</option><option>Test-ready</option></select></summary>
         <div class="body">
           <div><span class="label">Plain-English rule</span><p>Analysis turns numbers into meaning. Profitability ratios measure earning power. Liquidity ratios measure the ability to meet short-term obligations. Leverage ratios measure debt exposure. Efficiency ratios measure how well working capital is managed. Always compare across time and against the industry.</p></div>
           <div><span class="label">Core formulas</span><ul><li>Gross margin = gross profit ÷ revenue</li><li>Net margin = net profit ÷ revenue</li><li>Return on equity = net profit ÷ total equity</li><li>Current ratio = current assets ÷ current liabilities</li><li>Quick ratio = (current assets − inventory) ÷ current liabilities</li><li>Debt to equity = total debt ÷ total equity</li><li>Interest cover = earnings before interest and tax ÷ interest expense</li><li>Receivable days = receivables ÷ revenue × 365</li></ul></div>
@@ -478,7 +518,7 @@
       </details>
 
       <details class="module" data-id="m8" data-title="IFRS essentials">
-        <summary><span class="num">08</span><h3>IFRS: the framework and the standards worth knowing</h3><select class="mastery" aria-label="IFRS mastery"><option>Not started</option><option>Learning</option><option>Can explain</option><option>Test-ready</option></select></summary>
+        <summary><span class="num">10</span><h3>IFRS: the framework and the standards worth knowing</h3><select class="mastery" aria-label="IFRS mastery"><option>Not started</option><option>Learning</option><option>Can explain</option><option>Test-ready</option></select></summary>
         <div class="body">
           <div><span class="label">Plain-English rule</span><p>IFRS is a principles-based set of standards that gives global users a common basis for general-purpose financial statements. The Conceptual Framework sets the objective (useful information for decisions) and the fundamental qualitative characteristics: relevance and faithful representation. Enhancing characteristics are comparability, verifiability, timeliness, and understandability.</p></div>
           <div><span class="label">Standards to recognise</span><ul><li>IAS 1: presentation of financial statements</li><li>IAS 2: inventories, measured at the lower of cost and net realisable value</li><li>IAS 16: property, plant and equipment, depreciated over useful life</li><li>IAS 21: foreign currency translation</li><li>IFRS 15: revenue, five-step model (identify the contract, identify performance obligations, determine the transaction price, allocate it, recognise revenue when each obligation is satisfied)</li><li>IFRS 9: financial instruments, including expected credit loss impairment, which matters deeply to banks</li><li>IFRS 16: leases on the balance sheet</li></ul></div>
@@ -490,10 +530,11 @@
       </details>
 
       <details class="module" data-id="m9" data-title="Finance function">
-        <summary><span class="num">09</span><h3>Roles and responsibilities of the finance function</h3><select class="mastery" aria-label="Finance function mastery"><option>Not started</option><option>Learning</option><option>Can explain</option><option>Test-ready</option></select></summary>
+        <summary><span class="num">11</span><h3>Roles and responsibilities of the finance function</h3><select class="mastery" aria-label="Finance function mastery"><option>Not started</option><option>Learning</option><option>Can explain</option><option>Test-ready</option></select></summary>
         <div class="body">
           <div><span class="label">Plain-English rule</span><p>Finance plans, records, controls, reports, and explains money. Typical responsibilities: record to report, procure to pay, order to cash, treasury and cash management, budgeting and forecasting, tax compliance, financial control, and stakeholder reporting. Internal audit provides independent assurance and does not run the processes it reviews.</p></div>
           <div><span class="label">Who does what</span><ul><li>CFO: owns the financial agenda and reports to the board.</li><li>Financial controller: owns the close, controls, and statutory reporting.</li><li>Treasurer: owns cash, funding, and banking relationships.</li><li>Management accountant: owns budgets, forecasts, and performance analysis.</li><li>Tax lead: owns filings, assessments, and tax risk.</li><li>Internal audit: independent assurance over the whole system of internal control.</li></ul></div>
+          <div><span class="label">Core responsibilities from the Academy session</span><ul><li><strong>Accounts payable management:</strong> supplier invoices, three-way matching, payment runs, reconciliations, and managing the payables ledger.</li><li><strong>Accounts receivable management:</strong> customer invoicing, credit control, collections, and managing the receivables ledger.</li><li><strong>Payroll system management:</strong> processing salaries, statutory deductions (PAYE, pension, NHF), and controls over changes to payroll data.</li><li><strong>Financial reporting:</strong> preparing financial statements under <strong>IFRS</strong>, with audit work performed under <strong>ISA</strong> (International Standards on Auditing).</li><li><strong>Cash and treasury management:</strong> cash positioning, bank relationships, funding, and liquidity.</li><li><strong>Tax and regulatory compliance:</strong> filings, remittances, and staying current with the regulators.</li></ul></div>
           <div><span class="label">Worked example</span><p>Procure to pay: an approved requisition becomes a purchase order, goods are received with a goods received note, the supplier invoice is matched to both, payment is approved, and the transaction is reconciled. Each stage has an owner and a control.</p></div>
           <div class="trap"><span class="label">Common trap</span><p>Finance owns many controls, but IT operates the systems, access, interfaces, and change processes those controls depend on. A clean process narrative that ignores the technology layer is an incomplete story.</p></div>
           <div class="wide"><span class="label">Recall prompts</span><ol><li>Name the core stages of procure to pay.</li><li>What does record to report produce, and who owns it?</li><li>Where could segregation of duties fail in a payment process?</li></ol></div>
@@ -502,7 +543,7 @@
       </details>
 
       <details class="module" data-id="m10" data-title="Key business processes">
-        <summary><span class="num">10</span><h3>Key business processes and their controls</h3><select class="mastery" aria-label="Business processes mastery"><option>Not started</option><option>Learning</option><option>Can explain</option><option>Test-ready</option></select></summary>
+        <summary><span class="num">12</span><h3>Key business processes and their controls</h3><select class="mastery" aria-label="Business processes mastery"><option>Not started</option><option>Learning</option><option>Can explain</option><option>Test-ready</option></select></summary>
         <div class="body">
           <div><span class="label">Plain-English rule</span><p>A process converts inputs into controlled outputs. For any process, learn the trigger, the people, the systems, the approvals, the records, the exceptions, the reconciliations, and the reporting. Controls are either preventive (stop it happening) or detective (find it after), and either manual or automated.</p></div>
           <div><span class="label">The three big flows</span><ul><li>Procure to pay: requisition, purchase order, goods receipt, invoice, three-way match, approval, payment, reconciliation.</li><li>Order to cash: customer order, credit check, fulfilment, invoice, collection, cash application, reconciliation.</li><li>Record to report: close calendar, journal processing, reconciliations, consolidation, financial reporting.</li></ul></div>
@@ -514,7 +555,7 @@
       </details>
 
       <details class="module" data-id="m11" data-title="Nigerian regulators">
-        <summary><span class="num">11</span><h3>Regulators in the Nigerian financial system</h3><select class="mastery" aria-label="Regulators mastery"><option>Not started</option><option>Learning</option><option>Can explain</option><option>Test-ready</option></select></summary>
+        <summary><span class="num">13</span><h3>Regulators in the Nigerian financial system</h3><select class="mastery" aria-label="Regulators mastery"><option>Not started</option><option>Learning</option><option>Can explain</option><option>Test-ready</option></select></summary>
         <div class="body">
           <div><span class="label">Plain-English rule</span><p>Know each regulator's lane, then match the institution and the activity to the mandate. Overlap is normal: a fintech can face payment system rules, data protection obligations, and AML requirements at the same time.</p></div>
           <div><span class="label">The map</span>
@@ -539,9 +580,13 @@
       </details>
 
       <details class="module" data-id="m12" data-title="Nigerian tax system">
-        <summary><span class="num">12</span><h3>Nigerian tax system essentials</h3><select class="mastery" aria-label="Tax mastery"><option>Not started</option><option>Learning</option><option>Can explain</option><option>Test-ready</option></select></summary>
+        <summary><span class="num">14</span><h3>Nigerian tax system essentials</h3><select class="mastery" aria-label="Tax mastery"><option>Not started</option><option>Learning</option><option>Can explain</option><option>Test-ready</option></select></summary>
         <div class="body">
-          <div><span class="label">Plain-English rule</span><p>Tax has a base (what is taxed), a rate (the percentage), a taxpayer, a filing obligation, an assessment, a payment, and enforcement. Direct taxes hit income and profits. Indirect taxes hit consumption and transactions. Nigeria's tax administration was reshaped by the Nigeria Tax Administration Act 2025, effective January 2026, with the Nigeria Revenue Service taking over from the FIRS.</p></div>
+          <div><span class="label">Plain-English rule</span><p>Tax is a compulsory levy imposed by government on income, consumption, or wealth. Tax has a base (what is taxed), a rate (the percentage), a taxpayer, a filing obligation, an assessment, a payment, and enforcement. Direct taxes hit income and profits. Indirect taxes hit consumption and transactions. Nigeria's tax administration was reshaped by the Nigeria Tax Administration Act 2025, effective January 2026, with the Nigeria Revenue Service taking over from the FIRS.</p></div>
+          <div><span class="label">Overview of taxation: what it is for</span><ul><li><strong>Revenue:</strong> funding public goods, infrastructure, security, and services.</li><li><strong>Redistribution:</strong> moving resources toward social objectives and equity.</li><li><strong>Regulation:</strong> discouraging or encouraging behaviour through tax.</li><li><strong>Protection:</strong> tariffs and duties can shield local industry.</li></ul></div>
+          <div><span class="label">The Nigerian tax environment</span><ul><li>Three tiers of government, each with taxing powers: federal, state, and local government.</li><li>Many taxes and levies, which is why harmonisation and multiple-taxation complaints are constant themes.</li><li>A large informal sector, which makes administration and compliance a permanent challenge.</li><li>Reform direction under the Nigeria Tax Act 2025 and the Nigeria Tax Administration Act 2025: simplified administration, consolidated levies, and a stronger revenue service.</li><li>A Taxpayer Identification Number (TIN) is the anchor of compliance, with e-filing and self-assessment now standard.</li></ul></div>
+          <div><span class="label">Administration of taxation in Nigeria</span><ul><li><strong>Federal:</strong> the Nigeria Revenue Service (NRS) administers federal taxes, succeeding the FIRS.</li><li><strong>State:</strong> State Internal Revenue Services handle personal income tax and state levies. Lagos runs LIRS.</li><li><strong>FCT:</strong> the FCT Internal Revenue Service handles the capital territory.</li><li><strong>Local government:</strong> local revenue committees handle minor levies within their limits.</li><li>Assessment can be self-assessed or raised by the authority, followed by payment, enforcement, and objection or appeal rights.</li></ul></div>
+          <div><span class="label">Classification of taxes</span><ul><li><strong>Direct versus indirect:</strong> direct taxes are borne by the taxpayer (companies income tax, personal income tax, capital gains tax). Indirect taxes are collected by intermediaries and passed on (VAT, customs duties, excise).</li><li><strong>By base:</strong> income taxes, consumption taxes, and wealth or property taxes.</li><li><strong>By rate structure:</strong> progressive (rate rises with the base), proportional (flat rate), and regressive (falls hardest on lower income earners).</li></ul></div>
           <div><span class="label">Taxes to recognise</span><ul><li>Companies income tax on company profits, with a 30% rate for large companies and exemptions for qualifying small companies.</li><li>VAT at 7.5% on most goods and services.</li><li>Withholding tax deducted at source on many payments, functioning as advance tax.</li><li>Personal income tax, progressive, with reliefs including rent relief under the new framework.</li><li>Development levy consolidated under the new tax acts, replacing several older levies.</li><li>Capital gains tax and stamp duties on qualifying transactions.</li></ul></div>
           <div><span class="label">Worked example</span><p>A large company earns ₦200,000,000 of taxable profit. Conceptually, companies income tax at 30% gives ₦60,000,000. The real computation involves capital allowances, disallowed expenses, and minimum tax rules, so treat this as a teaching example, not a filing.</p></div>
           <div class="trap"><span class="label">Common trap</span><p>Do not memorise stale rates from random notes. The 2026 reforms changed administration, levies, and thresholds. Use the Academy handout for exam detail and the statutes for real work.</p></div>
@@ -551,7 +596,7 @@
       </details>
 
       <details class="module" data-id="m13" data-title="Firm and culture">
-        <summary><span class="num">13</span><h3>KPMG: story, values, structure, and conduct</h3><select class="mastery" aria-label="Firm and culture mastery"><option>Not started</option><option>Learning</option><option>Can explain</option><option>Test-ready</option></select></summary>
+        <summary><span class="num">15</span><h3>KPMG: story, values, structure, and conduct</h3><select class="mastery" aria-label="Firm and culture mastery"><option>Not started</option><option>Learning</option><option>Can explain</option><option>Test-ready</option></select></summary>
         <div class="body">
           <div><span class="label">The story</span><p>The name comes from the founders whose firms merged in 1987: Klynveld, Peat, Marwick, and Goerdeler. Today KPMG is a global network operating in more than 140 countries, and KPMG Professional Services is the Nigerian member firm, with its head office at KPMG Tower, Victoria Island, Lagos.</p></div>
           <div><span class="label">Values</span><p>Integrity. Excellence. Courage. Together. For Better. Learn them as behaviours, not slogans: speak up when something is wrong, deliver quality even when nobody is watching, and treat the team and the client with respect.</p></div>
@@ -564,7 +609,7 @@
       </details>
 
       <details class="module" data-id="m14" data-title="Professional toolkit">
-        <summary><span class="num">14</span><h3>Professional toolkit: evidence, controls, and your first 90 days</h3><select class="mastery" aria-label="Professional toolkit mastery"><option>Not started</option><option>Learning</option><option>Can explain</option><option>Test-ready</option></select></summary>
+        <summary><span class="num">16</span><h3>Professional toolkit: evidence, controls, and your first 90 days</h3><select class="mastery" aria-label="Professional toolkit mastery"><option>Not started</option><option>Learning</option><option>Can explain</option><option>Test-ready</option></select></summary>
         <div class="body">
           <div><span class="label">Plain-English rule</span><p>An audit is a structured argument: risk, control, evidence, conclusion. Working papers must be complete, accurate, clear, and timely. Evidence must be traceable to its source, dated, and reviewable by someone who was not there. If you cannot trace it, you cannot rely on it.</p></div>
           <div><span class="label">Core vocabulary</span><ul><li>Test of design: is the control capable of preventing or detecting the risk?</li><li>Test of operating effectiveness: did it actually work across the period?</li><li>ITGC: access to programs and data, change management, computer operations, program development.</li><li>ITAC: automated controls inside applications, such as validations, matches, and thresholds.</li><li>Population testing: testing 100% of records with analytics instead of a sample.</li></ul></div>
@@ -591,10 +636,179 @@
     <div id="drill-list"></div>
   </section>
 
+  <section id="lab">
+    <div class="sec-head">
+      <p class="eyebrow">Class exercise lab</p>
+      <h2>Fred's transactions, from journal to balance sheet.</h2>
+      <p class="lead">This is the exercise from the Academy slide. Build each double entry, then reveal the full solution: journal, T-accounts, closing entries, profit and loss account, and statement of financial position. Assumption: the sale was for cash. A credit sale version is noted in the solution.</p>
+    </div>
+    <div class="qscore">
+      <span class="count" id="lab-count">0 / 7 correct on first attempt</span>
+      <button class="btn ghost" id="lab-reset" type="button">Reset lab</button>
+    </div>
+    <div id="lab-list"></div>
+    <div class="btnrow" style="margin-top:8px">
+      <button class="btn" id="lab-reveal" type="button">Reveal the full solution</button>
+    </div>
+    <div id="lab-solution" style="display:none">
+      <div class="card" style="margin-top:16px">
+        <h3>Step 1: journal entries</h3>
+        <table style="margin-top:10px">
+          <tr><th>#</th><th>Transaction</th><th>Debit</th><th>Credit</th></tr>
+          <tr><td>1</td><td>Fred started business with ₦500,000</td><td>Cash ₦500,000</td><td>Capital ₦500,000</td></tr>
+          <tr><td>2</td><td>Paid electricity ₦50,000 cash</td><td>Electricity expense ₦50,000</td><td>Cash ₦50,000</td></tr>
+          <tr><td>3</td><td>Bought a laptop for ₦300,000 cash</td><td>Office equipment ₦300,000</td><td>Cash ₦300,000</td></tr>
+          <tr><td>4</td><td>Took a bank loan of ₦2,000,000</td><td>Cash ₦2,000,000</td><td>Bank loan ₦2,000,000</td></tr>
+          <tr><td>5</td><td>Paid rent of ₦300,000</td><td>Rent expense ₦300,000</td><td>Cash ₦300,000</td></tr>
+          <tr><td>6</td><td>Bought goods on credit for ₦600,000</td><td>Purchases ₦600,000</td><td>Accounts payable ₦600,000</td></tr>
+          <tr><td>7</td><td>Sold the goods for ₦1,000,000</td><td>Cash ₦1,000,000</td><td>Sales revenue ₦1,000,000</td></tr>
+        </table>
+      </div>
+      <div class="card" style="margin-top:14px">
+        <h3>Step 2: T-accounts after posting</h3>
+        <div class="taccounts">
+          <div class="taccount">
+            <h4>Cash</h4>
+            <table>
+              <tr><th>Debit</th><th>₦</th><th>Credit</th><th>₦</th></tr>
+              <tr><td>Capital</td><td>500,000</td><td>Electricity</td><td>50,000</td></tr>
+              <tr><td>Bank loan</td><td>2,000,000</td><td>Office equipment</td><td>300,000</td></tr>
+              <tr><td>Sales</td><td>1,000,000</td><td>Rent</td><td>300,000</td></tr>
+              <tr><td>Balance b/d</td><td>2,850,000</td><td>Balance c/d</td><td>2,850,000</td></tr>
+              <tr><td><strong>Total</strong></td><td><strong>3,500,000</strong></td><td><strong>Total</strong></td><td><strong>3,500,000</strong></td></tr>
+            </table>
+            <p class="tbalance">Balance carried down: ₦2,850,000 Dr</p>
+          </div>
+          <div class="taccount">
+            <h4>Capital</h4>
+            <table>
+              <tr><th>Debit</th><th>₦</th><th>Credit</th><th>₦</th></tr>
+              <tr><td>Balance c/d</td><td>550,000</td><td>Cash</td><td>500,000</td></tr>
+              <tr><td></td><td></td><td>Profit from P&amp;L</td><td>50,000</td></tr>
+              <tr><td><strong>Total</strong></td><td><strong>550,000</strong></td><td><strong>Total</strong></td><td><strong>550,000</strong></td></tr>
+            </table>
+            <p class="tbalance">Balance carried down: ₦550,000 Cr</p>
+          </div>
+          <div class="taccount">
+            <h4>Bank loan</h4>
+            <table>
+              <tr><th>Debit</th><th>₦</th><th>Credit</th><th>₦</th></tr>
+              <tr><td>Balance c/d</td><td>2,000,000</td><td>Cash</td><td>2,000,000</td></tr>
+            </table>
+            <p class="tbalance">Balance carried down: ₦2,000,000 Cr</p>
+          </div>
+          <div class="taccount">
+            <h4>Accounts payable</h4>
+            <table>
+              <tr><th>Debit</th><th>₦</th><th>Credit</th><th>₦</th></tr>
+              <tr><td>Balance c/d</td><td>600,000</td><td>Purchases</td><td>600,000</td></tr>
+            </table>
+            <p class="tbalance">Balance carried down: ₦600,000 Cr</p>
+          </div>
+          <div class="taccount">
+            <h4>Office equipment (laptop)</h4>
+            <table>
+              <tr><th>Debit</th><th>₦</th><th>Credit</th><th>₦</th></tr>
+              <tr><td>Cash</td><td>300,000</td><td>Balance c/d</td><td>300,000</td></tr>
+            </table>
+            <p class="tbalance">Balance carried down: ₦300,000 Dr</p>
+          </div>
+          <div class="taccount">
+            <h4>Sales revenue</h4>
+            <table>
+              <tr><th>Debit</th><th>₦</th><th>Credit</th><th>₦</th></tr>
+              <tr><td>P&amp;L (closed)</td><td>1,000,000</td><td>Cash</td><td>1,000,000</td></tr>
+            </table>
+            <p class="tbalance">Closed to P&amp;L. Balance nil.</p>
+          </div>
+          <div class="taccount">
+            <h4>Purchases</h4>
+            <table>
+              <tr><th>Debit</th><th>₦</th><th>Credit</th><th>₦</th></tr>
+              <tr><td>Accounts payable</td><td>600,000</td><td>P&amp;L (closed)</td><td>600,000</td></tr>
+            </table>
+            <p class="tbalance">Closed to P&amp;L. Balance nil.</p>
+          </div>
+          <div class="taccount">
+            <h4>Electricity expense</h4>
+            <table>
+              <tr><th>Debit</th><th>₦</th><th>Credit</th><th>₦</th></tr>
+              <tr><td>Cash</td><td>50,000</td><td>P&amp;L (closed)</td><td>50,000</td></tr>
+            </table>
+            <p class="tbalance">Closed to P&amp;L. Balance nil.</p>
+          </div>
+          <div class="taccount">
+            <h4>Rent expense</h4>
+            <table>
+              <tr><th>Debit</th><th>₦</th><th>Credit</th><th>₦</th></tr>
+              <tr><td>Cash</td><td>300,000</td><td>P&amp;L (closed)</td><td>300,000</td></tr>
+            </table>
+            <p class="tbalance">Closed to P&amp;L. Balance nil.</p>
+          </div>
+          <div class="taccount">
+            <h4>Profit and loss account</h4>
+            <table>
+              <tr><th>Debit</th><th>₦</th><th>Credit</th><th>₦</th></tr>
+              <tr><td>Purchases</td><td>600,000</td><td>Sales</td><td>1,000,000</td></tr>
+              <tr><td>Electricity</td><td>50,000</td><td></td><td></td></tr>
+              <tr><td>Rent</td><td>300,000</td><td></td><td></td></tr>
+              <tr><td>Profit to capital</td><td>50,000</td><td></td><td></td></tr>
+              <tr><td><strong>Total</strong></td><td><strong>1,000,000</strong></td><td><strong>Total</strong></td><td><strong>1,000,000</strong></td></tr>
+            </table>
+            <p class="tbalance">Net profit: ₦50,000</p>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:14px">
+        <h3>Step 3: closing entries</h3>
+        <table style="margin-top:10px">
+          <tr><th>#</th><th>Debit</th><th>Credit</th><th>Why</th></tr>
+          <tr><td>1</td><td>Sales ₦1,000,000</td><td>P&amp;L ₦1,000,000</td><td>Close revenue to the P&amp;L account</td></tr>
+          <tr><td>2</td><td>P&amp;L ₦600,000</td><td>Purchases ₦600,000</td><td>Close purchases to the P&amp;L account</td></tr>
+          <tr><td>3</td><td>P&amp;L ₦50,000</td><td>Electricity ₦50,000</td><td>Close electricity expense</td></tr>
+          <tr><td>4</td><td>P&amp;L ₦300,000</td><td>Rent ₦300,000</td><td>Close rent expense</td></tr>
+          <tr><td>5</td><td>P&amp;L ₦50,000</td><td>Capital ₦50,000</td><td>Transfer net profit to capital</td></tr>
+        </table>
+        <p style="margin-top:10px;font-size:.82rem;color:var(--muted)">Cash, office equipment, bank loan, and accounts payable are not closed. Their balances carry forward to the statement of financial position.</p>
+      </div>
+      <div class="grid-2" style="margin-top:14px">
+        <div class="card">
+          <h3>Profit and loss account</h3>
+          <table style="margin-top:10px">
+            <tr><td>Sales</td><td>₦1,000,000</td></tr>
+            <tr><td>Less: Purchases</td><td>(₦600,000)</td></tr>
+            <tr><td><strong>Gross profit</strong></td><td><strong>₦400,000</strong></td></tr>
+            <tr><td>Less: Electricity</td><td>(₦50,000)</td></tr>
+            <tr><td>Less: Rent</td><td>(₦300,000)</td></tr>
+            <tr><td><strong>Net profit</strong></td><td><strong>₦50,000</strong></td></tr>
+          </table>
+        </div>
+        <div class="card">
+          <h3>Statement of financial position</h3>
+          <table style="margin-top:10px">
+            <tr><th>Assets</th><th>₦</th></tr>
+            <tr><td>Office equipment (laptop)</td><td>300,000</td></tr>
+            <tr><td>Cash</td><td>2,850,000</td></tr>
+            <tr><td><strong>Total assets</strong></td><td><strong>3,150,000</strong></td></tr>
+            <tr><th>Equity and liabilities</th><th>₦</th></tr>
+            <tr><td>Capital (500,000 + 50,000 profit)</td><td>550,000</td></tr>
+            <tr><td>Bank loan</td><td>2,000,000</td></tr>
+            <tr><td>Accounts payable</td><td>600,000</td></tr>
+            <tr><td><strong>Total equity and liabilities</strong></td><td><strong>3,150,000</strong></td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="safety" style="margin-top:14px">
+        <span>!</span>
+        <p><strong>Credit sale variant:</strong> if transaction 7 was on credit, debit receivables instead of cash. Cash becomes ₦1,850,000, receivables ₦1,000,000, total assets stay at ₦3,150,000, and profit is unchanged. The balance sheet always balances if the entries are right.</p>
+      </div>
+    </div>
+  </section>
+
   <section id="cards">
     <div class="sec-head">
       <p class="eyebrow">Active recall</p>
-      <h2>Forty flashcards. Click to flip.</h2>
+      <h2>Fifty flashcards. Click to flip.</h2>
       <p class="lead">Read the prompt, answer aloud before flipping, then mark honestly. "Review again" cards come back around at the end of the deck.</p>
     </div>
     <div class="flashwrap">
@@ -611,7 +825,7 @@
         </div>
       </div>
       <div class="flashside">
-        <div class="card"><span class="label" style="color:var(--blue);font-size:.64rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase">Deck progress</span><div class="big" id="flash-progress">0 / 40 known</div><div class="bar"><i id="flash-bar"></i></div></div>
+        <div class="card"><span class="label" style="color:var(--blue);font-size:.64rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase">Deck progress</span><div class="big" id="flash-progress">0 / 50 known</div><div class="bar"><i id="flash-bar"></i></div></div>
         <div class="card"><h3>How to use the deck</h3><p style="color:var(--muted);font-size:.82rem;margin-top:8px">Answer out loud first. Flip. If your answer was vague, press Review again even if you were close. Vague knowledge fails under exam pressure.</p></div>
       </div>
     </div>
@@ -620,7 +834,7 @@
   <section id="quiz">
     <div class="sec-head">
       <p class="eyebrow">Question bank</p>
-      <h2>Forty-nine questions across ten categories.</h2>
+      <h2>Sixty-three questions across ten categories.</h2>
       <p class="lead">Filter by category or run the whole bank. First attempt is what counts, so answer before you peek at the options twice.</p>
     </div>
     <div class="btnrow" id="quiz-filters" style="margin-bottom:14px"></div>
@@ -917,6 +1131,105 @@
   });
   renderDrill();
 
+  /* ---------- Class exercise lab ---------- */
+  var LAB_ACCOUNTS = ["Cash", "Capital", "Electricity expense", "Office equipment (laptop)", "Bank loan", "Rent expense", "Purchases", "Accounts payable", "Sales revenue"];
+  var LAB = [
+    { t: "Fred started business with ₦500,000.", d: "Cash", c: "Capital", e: "Cash comes in (asset up, debit). Capital is equity and increases with a credit." },
+    { t: "Paid electricity ₦50,000 cash.", d: "Electricity expense", c: "Cash", e: "Expense increases with a debit. Cash reduces with a credit." },
+    { t: "Bought a laptop for ₦300,000 cash.", d: "Office equipment (laptop)", c: "Cash", e: "Equipment is an asset, so debit it. Cash reduces with a credit." },
+    { t: "Took a bank loan of ₦2,000,000.", d: "Cash", c: "Bank loan", e: "Cash increases with a debit. The loan is a liability and increases with a credit." },
+    { t: "Paid rent of ₦300,000.", d: "Rent expense", c: "Cash", e: "Expense increases with a debit. Cash reduces with a credit." },
+    { t: "Bought goods on credit for ₦600,000.", d: "Purchases", c: "Accounts payable", e: "Goods for resale are debited. The supplier obligation is a liability, credited." },
+    { t: "Sold the goods for ₦1,000,000.", d: "Cash", c: "Sales revenue", e: "Cash received is debited. Revenue is credited. For a credit sale, debit receivables instead." }
+  ];
+  var labState = load(STORE.quiz + "-lab", {});
+  function renderLab() {
+    var host = el("lab-list");
+    host.innerHTML = "";
+    var correctCount = 0;
+    LAB.forEach(function (item, index) {
+      var entry = labState[index] || {};
+      var checked = entry.checked === true;
+      var card = document.createElement("div");
+      card.className = "qitem lab-item" + (checked ? (entry.correct ? " is-correct" : " is-wrong") : "");
+      var tag = document.createElement("p");
+      tag.className = "qtag";
+      tag.textContent = "Transaction " + (index + 1);
+      var text = document.createElement("p");
+      text.className = "qtext";
+      text.textContent = item.t;
+      var selects = document.createElement("div");
+      selects.className = "lab-selects";
+      [["Debit", "debit"], ["Credit", "credit"]].forEach(function (pair) {
+        var label = document.createElement("label");
+        label.textContent = pair[0];
+        var select = document.createElement("select");
+        var blank = document.createElement("option");
+        blank.value = "";
+        blank.textContent = "Choose account";
+        select.appendChild(blank);
+        LAB_ACCOUNTS.forEach(function (account) {
+          var option = document.createElement("option");
+          option.value = account;
+          option.textContent = account;
+          select.appendChild(option);
+        });
+        select.value = entry[pair[1]] || "";
+        select.disabled = checked;
+        select.addEventListener("change", function () {
+          labState[index] = labState[index] || {};
+          labState[index][pair[1]] = select.value;
+          save(STORE.quiz + "-lab", labState);
+        });
+        label.appendChild(select);
+        selects.appendChild(label);
+      });
+      card.appendChild(tag); card.appendChild(text); card.appendChild(selects);
+      if (checked) {
+        var verdict = document.createElement("p");
+        verdict.className = "explain";
+        verdict.style.display = "block";
+        verdict.innerHTML = (entry.correct ? "<strong style='color:var(--green)'>Correct.</strong> " : "<strong style='color:var(--red)'>Repair this.</strong> Correct entry: Dr " + item.d + " / Cr " + item.c + ". ") + item.e;
+        card.appendChild(verdict);
+      } else {
+        var actions = document.createElement("div");
+        actions.className = "btnrow";
+        actions.style.marginTop = "10px";
+        var checkBtn = document.createElement("button");
+        checkBtn.type = "button";
+        checkBtn.className = "btn";
+        checkBtn.textContent = "Check entry";
+        checkBtn.addEventListener("click", function () {
+          var current = labState[index] || {};
+          if (!current.debit || !current.credit) {
+            window.alert("Choose both a debit account and a credit account first.");
+            return;
+          }
+          current.correct = current.debit === item.d && current.credit === item.c;
+          current.checked = true;
+          labState[index] = current;
+          save(STORE.quiz + "-lab", labState);
+          renderLab();
+        });
+        actions.appendChild(checkBtn);
+        card.appendChild(actions);
+      }
+      host.appendChild(card);
+      if (entry.correct) correctCount += 1;
+    });
+    el("lab-count").textContent = correctCount + " / " + LAB.length + " correct on first attempt";
+  }
+  el("lab-reset").addEventListener("click", function () {
+    labState = {}; save(STORE.quiz + "-lab", labState); renderLab();
+  });
+  el("lab-reveal").addEventListener("click", function () {
+    var solution = el("lab-solution");
+    var hidden = solution.style.display === "none";
+    solution.style.display = hidden ? "block" : "none";
+    el("lab-reveal").textContent = hidden ? "Hide the full solution" : "Reveal the full solution";
+  });
+  renderLab();
+
   /* ---------- Flashcards ---------- */
   var CARDS = [
     { f: "Assets", b: "Resources the business controls, expected to bring future benefit. Cash, receivables, inventory, equipment." },
@@ -958,7 +1271,17 @@
     { f: "KPMG values", b: "Integrity, Excellence, Courage, Together, For Better." },
     { f: "ITGC categories", b: "Access to programs and data, change management, computer operations, program development." },
     { f: "Test of design vs operating effectiveness", b: "Design: is the control capable? Operating effectiveness: did it actually work across the period?" },
-    { f: "Population testing", b: "Using analytics to test 100% of records instead of a sample. The Technology Risk partner's vision." }
+    { f: "Population testing", b: "Using analytics to test 100% of records instead of a sample. The Technology Risk partner's vision." },
+    { f: "Accounting", b: "The process of identifying, recording, summarising and communicating economic information so users can make informed decisions." },
+    { f: "Sole proprietorship", b: "One owner, unlimited liability, no separate legal personality, equity shown as a capital account." },
+    { f: "Limited liability company", b: "A separate legal person, shareholders' liability limited to their shares, equity shown as share capital plus retained earnings." },
+    { f: "T-account", b: "The visual form of a ledger account: debits on the left, credits on the right, balance carried down at period end." },
+    { f: "Normal balance", b: "The side that increases an account: debit for assets and expenses, credit for liabilities, equity and revenue." },
+    { f: "Closing entries", b: "Close revenue and expenses to the P&L, then transfer the profit or loss to capital. Assets and liabilities carry forward." },
+    { f: "Accounts payable vs receivable", b: "Payable: money the business owes suppliers. Receivable: money customers owe the business." },
+    { f: "ISA", b: "International Standards on Auditing: the standards used to audit financial statements prepared under IFRS." },
+    { f: "Direct vs indirect tax", b: "Direct: borne by the taxpayer (CIT, PIT, CGT). Indirect: collected by intermediaries and passed on (VAT, customs)." },
+    { f: "Progressive tax", b: "A tax whose rate rises as the base rises. Proportional is flat. Regressive falls hardest on lower earners." }
   ];
   var flashState = load(STORE.flash, { known: [], index: 0 });
   var flashIndex = flashState.index || 0;
@@ -1044,7 +1367,21 @@
     { c: "Firm and culture", q: "You discover you hold shares in an audit client through a family portfolio. What do you do?", o: ["Keep quiet, it is small", "Declare it immediately and follow independence guidance", "Sell them silently and say nothing", "Discuss it with friends first"], a: 1, e: "Independence threats must be declared and addressed through firm processes, immediately." },
     { c: "Technology Risk", q: "Which of these is an ITGC category?", o: ["Access to programs and data", "Marketing approval", "Office lease review", "Talent acquisition"], a: 0, e: "ITGCs cover access to programs and data, change management, computer operations and program development." },
     { c: "Technology Risk", q: "A test of operating effectiveness asks:", o: ["Is the control capable of working?", "Did the control actually work across the period?", "Is the control expensive?", "Who designed the control?"], a: 1, e: "Design asks capability. Operating effectiveness asks whether it worked consistently across the period." },
-    { c: "Technology Risk", q: "Why is 100% population testing attractive?", o: ["It is always cheaper", "It finds exceptions a sample can miss and covers the full population", "It removes the need for evidence", "It replaces the audit opinion"], a: 1, e: "Analytics can test every record, exposing patterns and outliers that sampling can miss." }
+    { c: "Technology Risk", q: "Why is 100% population testing attractive?", o: ["It is always cheaper", "It finds exceptions a sample can miss and covers the full population", "It removes the need for evidence", "It replaces the audit opinion"], a: 1, e: "Analytics can test every record, exposing patterns and outliers that sampling can miss." },
+    { c: "Accounting basics", q: "Which best defines accounting?", o: ["Identifying, recording, summarising and communicating economic information for decisions", "Preparing tax returns only", "Managing cash payments only", "Auditing financial statements"], a: 0, e: "Accounting captures economic activity and turns it into information users can act on." },
+    { c: "Accounting basics", q: "Which business type leaves the owner personally liable for business debts?", o: ["Private limited company", "Public limited company", "Sole proprietorship", "Limited liability partnership"], a: 2, e: "A sole proprietor has unlimited liability. Companies and LLPs limit owners' liability." },
+    { c: "Accounting basics", q: "In a limited liability company, owners' equity is presented as:", o: ["Capital account only", "Share capital plus retained earnings", "Drawings and capital", "Trade payables"], a: 1, e: "Companies present share capital and retained earnings. A sole trader uses a capital account." },
+    { c: "Double entry", q: "In a T-account, debits are recorded on which side?", o: ["Left", "Right", "Either side", "Only when closing"], a: 0, e: "Debit is the left side. Credit is the right side. Always." },
+    { c: "Double entry", q: "Which accounts have a normal debit balance?", o: ["Assets and expenses", "Liabilities and revenue", "Equity and revenue", "Liabilities and equity"], a: 0, e: "Assets and expenses are debit-balanced. Liabilities, equity and revenue are credit-balanced." },
+    { c: "Double entry", q: "Which accounts are closed at the end of the period?", o: ["Assets and liabilities", "Revenue and expenses", "Cash and bank loan", "Payables and receivables"], a: 1, e: "Temporary accounts (revenue, expenses, purchases) close to the P&L. Permanent accounts carry forward." },
+    { c: "Double entry", q: "Closing sales revenue to the profit and loss account means:", o: ["Dr Sales / Cr P&L", "Dr P&L / Cr Sales", "Dr Cash / Cr Sales", "Dr Capital / Cr Sales"], a: 0, e: "Revenue is credit-balanced, so you debit sales to close it into the credit side of the P&L." },
+    { c: "Double entry", q: "Fred started with ₦500,000, took a ₦2,000,000 loan, paid ₦50,000 electricity, bought a ₦300,000 laptop, paid ₦300,000 rent, bought goods on credit for ₦600,000 and sold them for ₦1,000,000 cash. What is the cash balance?", o: ["₦2,850,000", "₦3,150,000", "₦1,850,000", "₦2,550,000"], a: 0, e: "Cash in: 500,000 + 2,000,000 + 1,000,000 = 3,500,000. Cash out: 50,000 + 300,000 + 300,000 = 650,000. Balance 2,850,000." },
+    { c: "Double entry", q: "Using the same facts, what is Fred's net profit?", o: ["₦400,000", "₦50,000", "₦350,000", "₦100,000"], a: 1, e: "Sales 1,000,000 less purchases 600,000 gives gross profit 400,000. Less electricity 50,000 and rent 300,000 gives net profit 50,000." },
+    { c: "Processes", q: "Which team manages supplier invoices, payment runs and the payables ledger?", o: ["Accounts payable", "Accounts receivable", "Treasury", "Internal audit"], a: 0, e: "Accounts payable owns supplier obligations and payments. Receivables owns customer collections." },
+    { c: "Processes", q: "Financial statements are prepared under IFRS and audited under:", o: ["ISA", "IPSAS", "COBIT", "Basel III"], a: 0, e: "The International Standards on Auditing govern how the audit of those statements is performed." },
+    { c: "Tax", q: "Which is an indirect tax?", o: ["Companies income tax", "Personal income tax", "VAT", "Capital gains tax"], a: 2, e: "VAT is collected by businesses on behalf of government and passed on to the consumer, so it is indirect." },
+    { c: "Tax", q: "Federal tax administration in Nigeria sits with:", o: ["The Nigeria Revenue Service", "The Central Bank of Nigeria", "The Securities and Exchange Commission", "The Nigeria Deposit Insurance Corporation"], a: 0, e: "The Nigeria Revenue Service administers federal taxes following the 2025 reform, succeeding the FIRS." },
+    { c: "Tax", q: "A tax whose rate rises as the tax base rises is:", o: ["Progressive", "Proportional", "Regressive", "Indirect"], a: 0, e: "Progressive rates rise with the base. Proportional is flat. Regressive falls hardest on lower earners." }
   ];
 
   var quizState = load(STORE.quiz, { answers: {} });
