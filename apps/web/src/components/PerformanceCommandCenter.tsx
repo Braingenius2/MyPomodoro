@@ -717,7 +717,7 @@ function KbacView({ studyTopics, setTopicStatus }: { studyTopics: Array<{ id: st
         <p className="command-eyebrow">Academy General Test sprint</p>
         <h2>KBAC study material, built for recall under pressure.</h2>
         <p>The Academy agenda confirms the taught topics and a General Test on 24 September. It does not confirm the KBAC question count, pass mark, weighting, or exact question bank. This is a tailored concept guide and self-test, not an official exam blueprint.</p>
-        <p className="command-muted">Want the full interactive version? <a className="command-inline-link" href="kbac_study_guide.html" target="_blank" rel="noreferrer">Open the KBAC Elite Study System</a> for 14 modules, a journal drill, 40 flashcards, the full question bank, and a timed mock exam.</p>
+        <p className="command-muted">Want the full interactive version? <a className="command-inline-link" href="kbac_study_guide.html" target="_blank" rel="noreferrer">Open the KBAC Elite Study System</a> for 16 slide-aligned modules, two solved class exercises, 52 flashcards, a 98-question bank, and a 30-minute paced mock exam.</p>
       </section>
 
       <section className="command-kbac-timeline">
