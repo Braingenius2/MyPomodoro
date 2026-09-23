@@ -237,6 +237,10 @@
   .taccount table { font-size: .76rem; }
   .taccount th { font-size: .58rem; }
   .tbalance { margin-top: 9px; font-size: .74rem; font-weight: 700; color: var(--blue); }
+  .recall-answer { margin-top: 12px; border: 1px solid #e2ebf5; border-radius: 10px; background: #f8fbff; padding: 10px 12px; }
+  .recall-answer summary { cursor: pointer; color: var(--blue); font-size: .72rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+  .recall-answer ol { margin: 9px 0 0; padding-left: 20px; font-size: .82rem; color: #2c3e55; }
+  .recall-answer li { margin-bottom: 6px; }
 
   footer { margin-top: 60px; padding: 30px 0 50px; border-top: 1px solid var(--line); color: var(--muted); font-size: .75rem; }
 
@@ -299,7 +303,7 @@
   <div class="wrap">
     <p class="eyebrow">Fortune Uzodinma | Basic Accounting and Regulatory Environment</p>
     <h1>Learn the rule.<br>Work the example.<br>Explain it cold.</h1>
-    <p class="deck">An elite, interactive study system for the Academy General Test. Sixteen modules, a journal entry drill, a solved class exercise lab, 50 flashcards, a 63-question bank, and a timed mock exam. Everything saves on this device.</p>
+    <p class="deck">An elite, interactive study system for the Academy General Test. Sixteen modules, a journal entry drill, a solved class exercise lab, 52 flashcards, a 66-question bank, and a timed mock exam. Everything saves on this device.</p>
     <div class="notice">
       <span>!</span>
       <p><strong>Scope truth:</strong> the Academy agenda confirms the topics taught on 22 and 23 September and a General Test on 24 September. It does not confirm the question count, pass mark, or weighting. This is a tailored study tool, not an official KPMG blueprint. Rates and thresholds move: the Academy handout wins every argument.</p>
@@ -322,7 +326,7 @@
         <p>Modules 1 to 5 and the journal drill. If debits and credits are automatic, everything else is easier. Already fluent? Make it a 20-minute rapid review.</p>
         <label class="check"><input type="checkbox" data-plan="t1"><span>Modules 1 to 3: equation, debits and credits, double entry</span></label>
         <label class="check"><input type="checkbox" data-plan="t2"><span>Module 4 and 5: accounting cycle, adjustments</span></label>
-        <label class="check"><input type="checkbox" data-plan="t3"><span>Journal drill: score 10 or better out of 12</span></label>
+        <label class="check"><input type="checkbox" data-plan="t3"><span>Journal drill: score 12 or better out of 15</span></label>
         <label class="check"><input type="checkbox" data-plan="t4"><span>Explain the DEALER rule aloud with no notes</span></label>
         <label class="check"><input type="checkbox" data-plan="t5"><span>Fred's class exercise lab: build all 7 entries, then reveal the solution</span></label>
       </div>
@@ -333,7 +337,7 @@
         <label class="check"><input type="checkbox" data-plan="w1"><span>Modules 6 to 8: statements, analysis, IFRS</span></label>
         <label class="check"><input type="checkbox" data-plan="w2"><span>Modules 9 to 12: finance function, processes, regulators, tax</span></label>
         <label class="check"><input type="checkbox" data-plan="w3"><span>Modules 13 and 14: firm, culture, and your Technology Risk bridge</span></label>
-        <label class="check"><input type="checkbox" data-plan="w4"><span>All 50 flashcards known, question bank above 85%, one mock exam done</span></label>
+        <label class="check"><input type="checkbox" data-plan="w4"><span>All 52 flashcards known, question bank above 85%, one mock exam done</span></label>
       </div>
       <div class="day">
         <p class="tag">Test morning | Thu 24 Sep</p>
@@ -360,7 +364,7 @@
       </div>
       <div>
         <span>Flashcards known</span>
-        <strong id="stat-cards">0 / 50</strong>
+        <strong id="stat-cards">0 / 52</strong>
         <small>Marked as known</small>
         <div class="bar"><i id="bar-cards"></i></div>
       </div>
@@ -418,7 +422,7 @@
           <div><span class="label">Expanded version</span><p><code>Assets = Liabilities + Capital + Income − Expenses</code>. Profit increases equity. Drawings and dividends reduce it. This is why the statement of profit or loss connects to the statement of financial position.</p></div>
           <div><span class="label">Worked example</span><p>Owner contributes ₦1,000,000 cash: assets rise ₦1,000,000 and equity rises ₦1,000,000. The business buys equipment for ₦400,000 cash: cash falls ₦400,000 and equipment rises ₦400,000. Assets stay at ₦1,000,000.</p></div>
           <div class="trap"><span class="label">Common trap</span><p>Profit is not cash. A credit sale raises profit and receivables without a naira entering the bank. A profitable business can still fail from poor cash timing.</p></div>
-          <div class="wide"><span class="label">Recall prompts</span><ol><li>Owner invests cash. Which two elements of the equation move, and in which direction?</li><li>A company buys equipment on credit. What happens to assets and liabilities?</li><li>Why can a profitable company run out of cash?</li></ol></div>
+          <div class="wide"><span class="label">Recall prompts</span><ol><li>Owner invests cash. Which two elements of the equation move, and in which direction?</li><li>A company buys equipment on credit. What happens to assets and liabilities?</li><li>Why can a profitable company run out of cash?</li></ol><details class="recall-answer"><summary>Show model answers</summary><ol><li>Assets increase (cash) and equity increases (capital), both by the same amount.</li><li>Assets increase (equipment) and liabilities increase (payables), both by the same amount.</li><li>Profit is an accrual measure. Credit sales, slow collections, inventory build-up, or heavy cash expenses can leave a profitable business short of cash.</li></ol></details></div>
           <div class="wide link"><span class="label">Technology Risk link</span><p>System interfaces and automated postings must preserve completeness and accuracy. A ledger can look perfectly balanced while a failed interface silently omits part of the population. That is exactly the kind of gap population testing catches.</p></div>
         </div>
       </details>
@@ -431,7 +435,7 @@
           <div><span class="label">Main types of business</span><ul><li><strong>Sole proprietorship:</strong> one owner, simple to set up, owner has unlimited liability, business is not a separate legal person. Equity shows as a capital account.</li><li><strong>Partnership:</strong> two or more owners sharing capital and profits, generally with unlimited liability in a general partnership. A limited liability partnership limits members' liability.</li><li><strong>Limited liability company:</strong> a separate legal person owned by shareholders whose liability is limited to their shares. Registered under CAMA in Nigeria. Private (Ltd) or public (Plc). Equity shows as share capital plus retained earnings.</li></ul></div>
           <div class="trap"><span class="label">Common trap</span><p>Do not mix up the owner and the business. In accounting, the business is treated as separate from its owner, which is why drawings and owner contributions are recorded rather than ignored.</p></div>
           <div><span class="label">Two statements to name in any answer</span><p>The <strong>balance sheet</strong> (statement of financial position) shows assets, liabilities, and equity at a point in time. The <strong>income statement</strong> (profit or loss) shows revenue, expenses, and profit over a period. One is a photograph, the other is a video.</p></div>
-          <div class="wide"><span class="label">Recall prompts</span><ol><li>Define accounting in one sentence without using the word money.</li><li>Name the three main types of business and one liability feature of each.</li><li>Which statement is a photograph and which is a video?</li></ol></div>
+          <div class="wide"><span class="label">Recall prompts</span><ol><li>Define accounting in one sentence without using the word money.</li><li>Name the three main types of business and one liability feature of each.</li><li>Which statement is a photograph and which is a video?</li></ol><details class="recall-answer"><summary>Show model answers</summary><ol><li>Accounting identifies, records, summarises, and communicates economic information so users can make informed decisions.</li><li>Sole proprietorship: unlimited liability. General partnership: unlimited liability. Limited liability company: liability limited to the shares held.</li><li>The statement of financial position is the photograph at a point in time. The income statement is the video covering a period.</li></ol></details></div>
           <div class="wide link"><span class="label">Technology Risk link</span><p>Every business type still produces financial statements, and every financial statement is fed by systems. Your edge is understanding both the business structure and the technology chain behind the numbers.</p></div>
         </div>
       </details>
@@ -442,7 +446,7 @@
           <div><span class="label">Plain-English rule</span><p>Debit means the left side of an account. Credit means the right side. <strong>DEALER</strong>: <strong>D</strong>rawings and dividends, <strong>E</strong>xpenses, <strong>A</strong>ssets increase with a debit. <strong>L</strong>iabilities, <strong>E</strong>quity, <strong>R</strong>evenue increase with a credit. Every transaction has at least one debit and one credit, and they must be equal.</p></div>
           <div><span class="label">Worked example</span><p>Pay ₦80,000 rent in cash: debit Rent Expense ₦80,000, credit Cash ₦80,000. Make a ₦50,000 cash sale: debit Cash ₦50,000, credit Sales Revenue ₦50,000.</p></div>
           <div class="trap"><span class="label">Common trap</span><p>Debit does not mean good and credit does not mean bad. They are sides of an account, not moral verdicts. Also remember that for a bank, customer deposits are liabilities, because the bank owes that money back.</p></div>
-          <div class="wide"><span class="label">Recall prompts</span><ol><li>Which side increases an asset? Which side increases revenue?</li><li>Record a ₦50,000 cash sale without looking.</li><li>Why are customer deposits a liability on a bank's balance sheet?</li></ol></div>
+          <div class="wide"><span class="label">Recall prompts</span><ol><li>Which side increases an asset? Which side increases revenue?</li><li>Record a ₦50,000 cash sale without looking.</li><li>Why are customer deposits a liability on a bank's balance sheet?</li></ol><details class="recall-answer"><summary>Show model answers</summary><ol><li>Debits increase assets. Credits increase revenue.</li><li>Dr Cash ₦50,000 / Cr Sales revenue ₦50,000.</li><li>Because the bank owes that money back to the depositor. It controls the cash but carries an obligation to repay.</li></ol></details></div>
           <div class="wide link"><span class="label">Technology Risk link</span><p>Application controls often enforce balanced journal entries at the point of posting. Your audit question is whether the system actually prevents or flags invalid postings, and whether the override path is logged.</p></div>
         </div>
       </details>
@@ -452,8 +456,10 @@
         <div class="body">
           <div><span class="label">Plain-English rule</span><p>Every transaction touches at least two accounts. The journal records the date, accounts, amounts, narration, and reference. Posting moves those entries into ledger accounts. Double entry is what creates traceability from a source document to the financial statements.</p></div>
           <div><span class="label">Worked example</span><p>Buy inventory on credit for ₦250,000: debit Inventory ₦250,000, credit Accounts Payable ₦250,000. Pay the supplier later: debit Accounts Payable ₦250,000, credit Bank ₦250,000.</p></div>
+          <div><span class="label">Follow-up entries: credit sale and settlement</span><ol><li>Sale on credit: Dr Receivables / Cr Sales revenue.</li><li>Customer pays later: Dr Cash / Cr Receivables.</li><li>No new revenue is recorded when the customer pays. Revenue was recognised at the sale. The follow-up entry only converts a receivable into cash.</li></ol></div>
+          <div><span class="label">The two entries behind every sale (perpetual inventory)</span><p>Selling goods for ₦1,000,000 that cost ₦400,000 takes two entries. Revenue side: Dr Receivables or Cash ₦1,000,000 / Cr Sales ₦1,000,000. Cost side: Dr Cost of sales ₦400,000 / Cr Inventory ₦400,000. Gross profit is ₦600,000. In a periodic system, the cost side shows up through purchases and the closing inventory adjustment instead of a cost of sales account.</p></div>
           <div class="trap"><span class="label">Common trap</span><p>A balanced entry can still be wrong. It may hit the wrong account, wrong period, wrong entity, or wrong cost centre. Balance proves arithmetic, not truth.</p></div>
-          <div class="wide"><span class="label">Recall prompts</span><ol><li>What is the entry for inventory bought on credit?</li><li>Name two ways a balanced journal can still be wrong.</li><li>Why is journal approval a control rather than a formality?</li></ol></div>
+          <div class="wide"><span class="label">Recall prompts</span><ol><li>What is the entry for inventory bought on credit?</li><li>Name two ways a balanced journal can still be wrong.</li><li>Why is journal approval a control rather than a formality?</li></ol><details class="recall-answer"><summary>Show model answers</summary><ol><li>Dr Inventory (or Purchases) / Cr Accounts payable.</li><li>Wrong account, wrong period, wrong entity, wrong cost centre, or a completely omitted entry masked by a compensating error.</li><li>It puts a second person between the preparer and the ledger, catching error and reducing fraud risk. The approval is also audit evidence.</li></ol></details></div>
           <div class="wide link"><span class="label">Technology Risk link</span><p>For an ERP or core banking client, ask who can post, who can approve, what is automated, and whether the audit trail survives. Manual journal entry access is one of the most abused doors in any finance system.</p></div>
         </div>
       </details>
@@ -466,7 +472,7 @@
           <div><span class="label">Closing entries for a sole trader</span><ol><li>Close revenue to the profit and loss account: debit sales, credit P&amp;L.</li><li>Close expenses and purchases to the P&amp;L account: debit P&amp;L, credit each expense account.</li><li>The P&amp;L balance is the profit or loss. Transfer it to capital: profit means debit P&amp;L, credit capital. A loss reverses.</li><li>Assets and liabilities are never closed. Their balances are carried forward to the statement of financial position.</li></ol></div>
           <div><span class="label">Worked mini example</span><p>Sales of ₦400,000, purchases of ₦250,000, rent of ₦60,000. Close sales: Dr Sales 400,000 / Cr P&amp;L 400,000. Close purchases and rent: Dr P&amp;L 310,000 / Cr Purchases 250,000 / Cr Rent 60,000. The P&amp;L shows a ₦90,000 profit, transferred to capital: Dr P&amp;L 90,000 / Cr Capital 90,000.</p></div>
           <div class="trap"><span class="label">Common trap</span><p>Only temporary (nominal) accounts close: revenue, expenses, purchases, and the P&amp;L itself. Permanent (real) accounts such as cash, equipment, loans, and payables stay open and carry forward. Closing a real account destroys the balance sheet.</p></div>
-          <div class="wide"><span class="label">Recall prompts</span><ol><li>Which accounts have a normal debit balance?</li><li>Write the four closing steps for a sole trader in order.</li><li>Why do asset and liability balances appear on the statement of financial position after closing?</li></ol></div>
+          <div class="wide"><span class="label">Recall prompts</span><ol><li>Which accounts have a normal debit balance?</li><li>Write the four closing steps for a sole trader in order.</li><li>Why do asset and liability balances appear on the statement of financial position after closing?</li></ol><details class="recall-answer"><summary>Show model answers</summary><ol><li>Assets, expenses, drawings and purchases.</li><li>Close revenue to the P&amp;L, close expenses and purchases to the P&amp;L, transfer the profit or loss to capital, then leave asset and liability balances open.</li><li>They are permanent accounts. Their balances continue into the next period and are presented in the statement of financial position.</li></ol></details></div>
           <div class="wide link"><span class="label">Technology Risk link</span><p>Closing and carry-forward are automated in every ERP and core banking system. When period-end routines change in a system upgrade, the closing logic is a financial reporting control that deserves a controlled change record.</p></div>
         </div>
       </details>
@@ -477,7 +483,7 @@
           <div><span class="label">Plain-English rule</span><p>The cycle: source documents, journal, post to ledger, extract the trial balance, make adjusting entries, produce the adjusted trial balance, prepare the financial statements, then close the temporary accounts. A trial balance simply lists closing balances and proves total debits equal total credits.</p></div>
           <div><span class="label">Worked example</span><p>Total debits of ₦4,200,000 against total credits of ₦4,200,000: the trial balance agrees. It still tells you nothing about whether a whole transaction was omitted or an amount was posted to the wrong account.</p></div>
           <div class="trap"><span class="label">Common trap</span><p>A balanced trial balance is not proof of accuracy. Errors of omission (no entry at all), errors of commission (wrong account), and compensating errors all survive a balanced trial balance.</p></div>
-          <div class="wide"><span class="label">Recall prompts</span><ol><li>List the steps of the accounting cycle in order.</li><li>What exactly does a trial balance prove, and what does it not prove?</li><li>Where do adjusting entries fit in the cycle?</li></ol></div>
+          <div class="wide"><span class="label">Recall prompts</span><ol><li>List the steps of the accounting cycle in order.</li><li>What exactly does a trial balance prove, and what does it not prove?</li><li>Where do adjusting entries fit in the cycle?</li></ol><details class="recall-answer"><summary>Show model answers</summary><ol><li>Source documents, journal, ledger, trial balance, adjusting entries, adjusted trial balance, financial statements, closing entries.</li><li>It proves total debits equal total credits. It does not prove completeness, correct classification, authorisation, or correct period.</li><li>After the initial trial balance and before the adjusted trial balance and the financial statements.</li></ol></details></div>
           <div class="wide link"><span class="label">Technology Risk link</span><p>Automated trial balances depend on interfaces, posting rules, and period controls. When a system upgrade changes posting logic, the trial balance can still balance while the meaning of a balance changes. That is why change management is a financial reporting control.</p></div>
         </div>
       </details>
@@ -488,7 +494,7 @@
           <div><span class="label">Plain-English rule</span><p>The accrual basis matches income and expenses to the period they belong to, not the period cash moves. Accruals record expenses or income before cash moves. Prepayments record cash before the benefit is consumed. Depreciation allocates the cost of a long-lived asset across its useful life.</p></div>
           <div><span class="label">Worked examples</span><ul><li>Unpaid December rent of ₦100,000: debit Rent Expense, credit Accrued Expenses.</li><li>Prepaid insurance of ₦120,000 for twelve months: debit Prepaid Insurance, credit Cash, then release ₦10,000 monthly to expense.</li><li>Equipment of ₦1,200,000 over five years, straight line: ₦240,000 depreciation each year. Debit Depreciation Expense, credit Accumulated Depreciation.</li><li>Customer owes ₦30,000 and will not pay: debit Impairment Expense, credit Trade Receivables.</li></ul></div>
           <div class="trap"><span class="label">Common trap</span><p>Depreciation is not a cash payment. It is the allocation of a past cash cost. Accumulated depreciation is a contra-asset account and grows over the asset's life, while the asset stays at cost in the ledger.</p></div>
-          <div class="wide"><span class="label">Recall prompts</span><ol><li>Give the two entries for an accrued expense and for a prepayment.</li><li>Compute straight-line depreciation on ₦1,200,000 over five years with no residual value.</li><li>Why is accumulated depreciation not deducted from the asset account itself?</li></ol></div>
+          <div class="wide"><span class="label">Recall prompts</span><ol><li>Give the two entries for an accrued expense and for a prepayment.</li><li>Compute straight-line depreciation on ₦1,200,000 over five years with no residual value.</li><li>Why is accumulated depreciation not deducted from the asset account itself?</li></ol><details class="recall-answer"><summary>Show model answers</summary><ol><li>Accrued expense: Dr Expense / Cr Accruals. Prepayment: Dr Prepaid expense / Cr Cash, then release to expense as the benefit is consumed.</li><li>₦1,200,000 ÷ 5 = ₦240,000 per year.</li><li>So the asset stays at cost and total depreciation to date stays visible. Net book value is cost minus accumulated depreciation.</li></ol></details></div>
           <div class="wide link"><span class="label">Technology Risk link</span><p>Adjustment calculations are often automated, which makes the underlying configuration, master data, and change history audit-relevant. If depreciation logic changes after a system patch, someone must have approved and tested that change.</p></div>
         </div>
       </details>
@@ -500,7 +506,7 @@
           <div><span class="label">What each one answers</span><ul><li>Financial position: what do we own and owe right now?</li><li>Profit or loss: how did we perform over the period?</li><li>Changes in equity: what moved owners' interest and why?</li><li>Cash flows: where did cash actually come from and go?</li><li>Notes: the detail and judgement behind the numbers.</li></ul></div>
           <div><span class="label">Worked example</span><p>Classify: customer receipts are operating cash flow. Buying equipment is investing. Repaying a bank loan is financing. Depreciation appears in profit or loss but never as a cash payment, so it is adjusted for in the operating section of the cash flow statement.</p></div>
           <div class="trap"><span class="label">Common trap</span><p>The statement of financial position is a photograph at one date. The statement of profit or loss is a video of the whole period. Mixing those two ideas is the fastest way to lose easy marks.</p></div>
-          <div class="wide"><span class="label">Recall prompts</span><ol><li>Name the five components of a complete set of financial statements.</li><li>Classify loan repayment, equipment purchase, and customer receipts into cash flow categories.</li><li>Why are the notes not optional?</li></ol></div>
+          <div class="wide"><span class="label">Recall prompts</span><ol><li>Name the five components of a complete set of financial statements.</li><li>Classify loan repayment, equipment purchase, and customer receipts into cash flow categories.</li><li>Why are the notes not optional?</li></ol><details class="recall-answer"><summary>Show model answers</summary><ol><li>Statement of financial position, statement of profit or loss and other comprehensive income, statement of changes in equity, statement of cash flows, and notes with accounting policies and comparatives.</li><li>Loan repayment: financing. Equipment purchase: investing. Customer receipts: operating.</li><li>They explain policies, estimates, judgements and material detail. Without them the statements are incomplete and hard to understand.</li></ol></details></div>
           <div class="wide link"><span class="label">Technology Risk link</span><p>Learn which applications, interfaces, and end-of-day jobs feed each statement. Financial statement assurance is often technology assurance wearing a different jacket.</p></div>
         </div>
       </details>
@@ -512,7 +518,7 @@
           <div><span class="label">Core formulas</span><ul><li>Gross margin = gross profit ÷ revenue</li><li>Net margin = net profit ÷ revenue</li><li>Return on equity = net profit ÷ total equity</li><li>Current ratio = current assets ÷ current liabilities</li><li>Quick ratio = (current assets − inventory) ÷ current liabilities</li><li>Debt to equity = total debt ÷ total equity</li><li>Interest cover = earnings before interest and tax ÷ interest expense</li><li>Receivable days = receivables ÷ revenue × 365</li></ul></div>
           <div><span class="label">Worked example</span><p>Current assets ₦8,000,000, inventory ₦2,000,000, current liabilities ₦4,000,000. Current ratio is 2.0. Quick ratio is (8,000,000 − 2,000,000) ÷ 4,000,000 = 1.5. The business can cover short-term debts without selling inventory.</p></div>
           <div class="trap"><span class="label">Common trap</span><p>A high current ratio can hide slow-moving inventory or receivables that will never be collected. Ratios are questions, not conclusions. High profit with weak operating cash flow is a classic quality-of-earnings warning.</p></div>
-          <div class="wide"><span class="label">Recall prompts</span><ol><li>Write the current ratio and quick ratio formulas.</li><li>A company has strong profit but weak operating cash flow. Name two possible causes.</li><li>Why does ROE matter more to owners than net margin alone?</li></ol></div>
+          <div class="wide"><span class="label">Recall prompts</span><ol><li>Write the current ratio and quick ratio formulas.</li><li>A company has strong profit but weak operating cash flow. Name two possible causes.</li><li>Why does ROE matter more to owners than net margin alone?</li></ol><details class="recall-answer"><summary>Show model answers</summary><ol><li>Current ratio = current assets ÷ current liabilities. Quick ratio = (current assets − inventory) ÷ current liabilities.</li><li>Slow collections, inventory build-up, aggressive revenue recognition, or rapid repayment of payables.</li><li>ROE measures the return on the owners' capital, which is what shareholders actually earn. Net margin ignores how much capital was used to produce the profit.</li></ol></details></div>
           <div class="wide link"><span class="label">Technology Risk link</span><p>Analytics work depends on clean data. Duplicate customers, orphaned invoices, and stale master data quietly distort every ratio. Population-level testing exists precisely because samples hide these patterns.</p></div>
         </div>
       </details>
@@ -524,7 +530,7 @@
           <div><span class="label">Standards to recognise</span><ul><li>IAS 1: presentation of financial statements</li><li>IAS 2: inventories, measured at the lower of cost and net realisable value</li><li>IAS 16: property, plant and equipment, depreciated over useful life</li><li>IAS 21: foreign currency translation</li><li>IFRS 15: revenue, five-step model (identify the contract, identify performance obligations, determine the transaction price, allocate it, recognise revenue when each obligation is satisfied)</li><li>IFRS 9: financial instruments, including expected credit loss impairment, which matters deeply to banks</li><li>IFRS 16: leases on the balance sheet</li></ul></div>
           <div><span class="label">Worked example</span><p>A company signs a ₦12,000,000 contract to deliver and install equipment. Delivery and installation are separate performance obligations, so the transaction price is allocated between them and revenue is recognised as each is satisfied, not all at signature.</p></div>
           <div class="trap"><span class="label">Common trap</span><p>IFRS is not a checklist that removes judgement. Estimates, assumptions, policies, and disclosures still matter, and two honest accountants can reach different numbers from the same facts.</p></div>
-          <div class="wide"><span class="label">Recall prompts</span><ol><li>Name the two fundamental qualitative characteristics of useful financial information.</li><li>Walk through the IFRS 15 five-step model.</li><li>Why does expected credit loss matter to a bank's financial statements?</li></ol></div>
+          <div class="wide"><span class="label">Recall prompts</span><ol><li>Name the two fundamental qualitative characteristics of useful financial information.</li><li>Walk through the IFRS 15 five-step model.</li><li>Why does expected credit loss matter to a bank's financial statements?</li></ol><details class="recall-answer"><summary>Show model answers</summary><ol><li>Relevance and faithful representation.</li><li>Identify the contract, identify the performance obligations, determine the transaction price, allocate it, recognise revenue when each obligation is satisfied.</li><li>Banks hold large loan books. ECL forces earlier recognition of expected losses, which changes profit, provisions, and capital.</li></ol></details></div>
           <div class="wide link"><span class="label">Technology Risk link</span><p>Revenue recognition logic, ECL models, and report generation live inside systems. A change to that logic is a change to financial reporting, so controlled change management is not an IT housekeeping task. It is an assurance requirement.</p></div>
         </div>
       </details>
@@ -537,7 +543,7 @@
           <div><span class="label">Core responsibilities from the Academy session</span><ul><li><strong>Accounts payable management:</strong> supplier invoices, three-way matching, payment runs, reconciliations, and managing the payables ledger.</li><li><strong>Accounts receivable management:</strong> customer invoicing, credit control, collections, and managing the receivables ledger.</li><li><strong>Payroll system management:</strong> processing salaries, statutory deductions (PAYE, pension, NHF), and controls over changes to payroll data.</li><li><strong>Financial reporting:</strong> preparing financial statements under <strong>IFRS</strong>, with audit work performed under <strong>ISA</strong> (International Standards on Auditing).</li><li><strong>Cash and treasury management:</strong> cash positioning, bank relationships, funding, and liquidity.</li><li><strong>Tax and regulatory compliance:</strong> filings, remittances, and staying current with the regulators.</li></ul></div>
           <div><span class="label">Worked example</span><p>Procure to pay: an approved requisition becomes a purchase order, goods are received with a goods received note, the supplier invoice is matched to both, payment is approved, and the transaction is reconciled. Each stage has an owner and a control.</p></div>
           <div class="trap"><span class="label">Common trap</span><p>Finance owns many controls, but IT operates the systems, access, interfaces, and change processes those controls depend on. A clean process narrative that ignores the technology layer is an incomplete story.</p></div>
-          <div class="wide"><span class="label">Recall prompts</span><ol><li>Name the core stages of procure to pay.</li><li>What does record to report produce, and who owns it?</li><li>Where could segregation of duties fail in a payment process?</li></ol></div>
+          <div class="wide"><span class="label">Recall prompts</span><ol><li>Name the core stages of procure to pay.</li><li>What does record to report produce, and who owns it?</li><li>Where could segregation of duties fail in a payment process?</li></ol><details class="recall-answer"><summary>Show model answers</summary><ol><li>Requisition, purchase order, goods receipt, invoice, three-way match, approval, payment, reconciliation.</li><li>Record to report produces the financial statements and management reports. The financial controller typically owns the close.</li><li>When one person can create a supplier, approve the invoice, and release the payment. That enables fictitious supplier fraud.</li></ol></details></div>
           <div class="wide link"><span class="label">Technology Risk link</span><p>Technology Risk maps business process risk to IT general controls and application controls. Know the process first, then test the technology that supports it. That order is what makes your findings land with finance stakeholders.</p></div>
         </div>
       </details>
@@ -549,7 +555,7 @@
           <div><span class="label">The three big flows</span><ul><li>Procure to pay: requisition, purchase order, goods receipt, invoice, three-way match, approval, payment, reconciliation.</li><li>Order to cash: customer order, credit check, fulfilment, invoice, collection, cash application, reconciliation.</li><li>Record to report: close calendar, journal processing, reconciliations, consolidation, financial reporting.</li></ul></div>
           <div><span class="label">Worked example</span><p>The three-way match compares purchase order, goods received note, and supplier invoice. Quantity and price must agree before payment. It is a preventive automated control, and it is one of the most testable IT application controls in any ERP.</p></div>
           <div class="trap"><span class="label">Common trap</span><p>A process narrative that only describes the happy path is weak. Risk hides in exceptions, overrides, interfaces, manual workarounds, and month-end pressure.</p></div>
-          <div class="wide"><span class="label">Recall prompts</span><ol><li>What three documents does a three-way match compare?</li><li>Give one preventive and one detective control in order to cash.</li><li>Why do reconciliations matter even when systems are automated?</li></ol></div>
+          <div class="wide"><span class="label">Recall prompts</span><ol><li>What three documents does a three-way match compare?</li><li>Give one preventive and one detective control in order to cash.</li><li>Why do reconciliations matter even when systems are automated?</li></ol><details class="recall-answer"><summary>Show model answers</summary><ol><li>Purchase order, goods received note, supplier invoice.</li><li>Preventive: credit check before fulfilment. Detective: bank reconciliation or receivables ageing review.</li><li>Automation fails silently: dropped interface records, changed configurations, overridden exceptions. Reconciliations prove completeness and catch what the system missed.</li></ol></details></div>
           <div class="wide link"><span class="label">Technology Risk link</span><p>This module is the bridge to IT application controls. Approval thresholds, credit limits, duplicate invoice checks, and three-way matching are all automated controls you will test for design and operating effectiveness.</p></div>
         </div>
       </details>
@@ -574,7 +580,7 @@
             </table>
           </div>
           <div class="trap"><span class="label">Common trap</span><p>Do not assign every financial-sector issue to the CBN. A listed insurer answers to NAICOM and the SEC. A payment fintech answers to the CBN on payments and to the NDPC on personal data.</p></div>
-          <div class="wide"><span class="label">Recall prompts</span><ol><li>Who protects insured depositors when a covered institution fails?</li><li>Which regulator supervises the capital market, and which one supervises insurance?</li><li>Why can one fintech face three different regulators at once?</li></ol></div>
+          <div class="wide"><span class="label">Recall prompts</span><ol><li>Who protects insured depositors when a covered institution fails?</li><li>Which regulator supervises the capital market, and which one supervises insurance?</li><li>Why can one fintech face three different regulators at once?</li></ol><details class="recall-answer"><summary>Show model answers</summary><ol><li>The NDIC.</li><li>The SEC supervises the capital market. NAICOM supervises insurance.</li><li>Different activities attract different mandates: payments (CBN), personal data (NDPC), and anti-money laundering (NFIU).</li></ol></details></div>
           <div class="wide link"><span class="label">Technology Risk link</span><p>Client risk requirements are often regulator-driven. Your job is to translate a rule into a control objective, an evidence request, a test procedure, and a conclusion. That translation skill is the actual job.</p></div>
         </div>
       </details>
@@ -590,7 +596,7 @@
           <div><span class="label">Taxes to recognise</span><ul><li>Companies income tax on company profits, with a 30% rate for large companies and exemptions for qualifying small companies.</li><li>VAT at 7.5% on most goods and services.</li><li>Withholding tax deducted at source on many payments, functioning as advance tax.</li><li>Personal income tax, progressive, with reliefs including rent relief under the new framework.</li><li>Development levy consolidated under the new tax acts, replacing several older levies.</li><li>Capital gains tax and stamp duties on qualifying transactions.</li></ul></div>
           <div><span class="label">Worked example</span><p>A large company earns ₦200,000,000 of taxable profit. Conceptually, companies income tax at 30% gives ₦60,000,000. The real computation involves capital allowances, disallowed expenses, and minimum tax rules, so treat this as a teaching example, not a filing.</p></div>
           <div class="trap"><span class="label">Common trap</span><p>Do not memorise stale rates from random notes. The 2026 reforms changed administration, levies, and thresholds. Use the Academy handout for exam detail and the statutes for real work.</p></div>
-          <div class="wide"><span class="label">Recall prompts</span><ol><li>What is the difference between a tax base and a tax rate?</li><li>Why is withholding tax described as advance tax?</li><li>Why does a tax return need review and approval before filing?</li></ol></div>
+          <div class="wide"><span class="label">Recall prompts</span><ol><li>What is the difference between a tax base and a tax rate?</li><li>Why is withholding tax described as advance tax?</li><li>Why does a tax return need review and approval before filing?</li></ol><details class="recall-answer"><summary>Show model answers</summary><ol><li>The base is what is taxed (profit, income, consumption). The rate is the percentage applied to that base.</li><li>It is deducted at source and offsets the recipient's final liability, so it is tax paid in advance.</li><li>Review catches errors and unsupported positions before they attract penalties, interest, and reputational damage. It also documents management oversight.</li></ol></details></div>
           <div class="wide link"><span class="label">Technology Risk link</span><p>Tax engines and ERP tax configurations create financial reporting risk when master data, rates, or change access are weak. When rates change by statute, the change log becomes audit evidence.</p></div>
         </div>
       </details>
@@ -603,7 +609,7 @@
           <div><span class="label">How the firm is organised</span><ul><li>Audit: independent assurance over financial statements.</li><li>Tax and Regulatory Services (TRPS): tax, regulatory, and legal advisory.</li><li>Advisory: consulting, deals, risk, and technology. Technology Risk sits here.</li><li>Support functions: Clients and Markets, People Performance and Culture, ITS, Finance, Facilities, and Risk Management.</li></ul></div>
           <div><span class="label">Quality and risk, in one line</span><p>Independence, confidentiality, client acceptance, conflict checks, and consultation are not bureaucracy. They are the licence to operate. When in doubt, ask before you act, and escalate early rather than quietly hoping.</p></div>
           <div class="trap"><span class="label">Common trap</span><p>"Everyone does it" is not a control and "nobody will notice" is not a defence. Independence breaches, confidentiality slips, and unreported incidents are career events, not paperwork events.</p></div>
-          <div class="wide"><span class="label">Recall prompts</span><ol><li>Name the five KPMG values.</li><li>What does independence mean for you as a new analyst?</li><li>You suspect a colleague sent client data to a personal email. What do you do?</li></ol></div>
+          <div class="wide"><span class="label">Recall prompts</span><ol><li>Name the five KPMG values.</li><li>What does independence mean for you as a new analyst?</li><li>You suspect a colleague sent client data to a personal email. What do you do?</li></ol><details class="recall-answer"><summary>Show model answers</summary><ol><li>Integrity, Excellence, Courage, Together, For Better.</li><li>Avoiding relationships and interests that could impair objectivity: no shares in audit clients, declare conflicts, follow gift policies, and speak up when unsure.</li><li>Report it through firm channels immediately: a manager, Risk Management, or the ethics hotline. Do not investigate alone and do not stay quiet.</li></ol></details></div>
           <div class="wide link"><span class="label">Technology Risk link</span><p>You are entering a unit whose partners push automation and continuous controls monitoring. The way to stand out early is safe curiosity: understand the process, protect the data, and propose improvements through approved channels only.</p></div>
         </div>
       </details>
@@ -615,7 +621,7 @@
           <div><span class="label">Core vocabulary</span><ul><li>Test of design: is the control capable of preventing or detecting the risk?</li><li>Test of operating effectiveness: did it actually work across the period?</li><li>ITGC: access to programs and data, change management, computer operations, program development.</li><li>ITAC: automated controls inside applications, such as validations, matches, and thresholds.</li><li>Population testing: testing 100% of records with analytics instead of a sample.</li></ul></div>
           <div><span class="label">Worked example</span><p>A leaver's account stays active for 45 days after exit. The risk is unauthorised access. The control is timely de-provisioning. The evidence is the HR leaver list joined to the access log. The conclusion is a deficiency, with severity depending on what that account could reach.</p></div>
           <div class="trap"><span class="label">Common trap</span><p>New analysts lose credibility by overclaiming. "I tested it" without evidence, or a conclusion that outruns the sample, is worse than saying "I need one more piece of evidence". Calibrated language is a professional skill.</p></div>
-          <div class="wide"><span class="label">Recall prompts</span><ol><li>What is the difference between a test of design and a test of operating effectiveness?</li><li>Name the four ITGC categories.</li><li>Why does 100% population testing beat sampling when the data is reliable?</li></ol></div>
+          <div class="wide"><span class="label">Recall prompts</span><ol><li>What is the difference between a test of design and a test of operating effectiveness?</li><li>Name the four ITGC categories.</li><li>Why does 100% population testing beat sampling when the data is reliable?</li></ol><details class="recall-answer"><summary>Show model answers</summary><ol><li>Design asks whether the control is capable of addressing the risk. Operating effectiveness asks whether it actually worked across the period.</li><li>Access to programs and data, change management, computer operations, program development.</li><li>It covers every record, exposes outliers and patterns a sample misses, and supports a stronger conclusion when the data is complete and reliable.</li></ol></details></div>
           <div class="wide link"><span class="label">Technology Risk link</span><p>Your edge as a new analyst is Python and SQL discipline. The plan after the Academy: learn the engagement method first, then propose one approved, safe analytics improvement. Never with client data in personal tools.</p></div>
         </div>
       </details>
@@ -626,11 +632,11 @@
   <section id="drill">
     <div class="sec-head">
       <p class="eyebrow">Journal entry drill</p>
-      <h2>Twelve entries. Instant feedback.</h2>
+      <h2>Fifteen entries. Instant feedback.</h2>
       <p class="lead">Pick the correct double entry for each scenario. If you miss one, say the correct entry aloud twice before moving on. That is the repair loop.</p>
     </div>
     <div class="qscore">
-      <span class="count" id="drill-count">0 / 12 correct on first attempt</span>
+      <span class="count" id="drill-count">0 / 15 correct on first attempt</span>
       <button class="btn ghost" id="drill-reset" type="button">Reset drill</button>
     </div>
     <div id="drill-list"></div>
@@ -808,7 +814,7 @@
   <section id="cards">
     <div class="sec-head">
       <p class="eyebrow">Active recall</p>
-      <h2>Fifty flashcards. Click to flip.</h2>
+      <h2>Fifty-two flashcards. Click to flip.</h2>
       <p class="lead">Read the prompt, answer aloud before flipping, then mark honestly. "Review again" cards come back around at the end of the deck.</p>
     </div>
     <div class="flashwrap">
@@ -825,7 +831,7 @@
         </div>
       </div>
       <div class="flashside">
-        <div class="card"><span class="label" style="color:var(--blue);font-size:.64rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase">Deck progress</span><div class="big" id="flash-progress">0 / 50 known</div><div class="bar"><i id="flash-bar"></i></div></div>
+        <div class="card"><span class="label" style="color:var(--blue);font-size:.64rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase">Deck progress</span><div class="big" id="flash-progress">0 / 52 known</div><div class="bar"><i id="flash-bar"></i></div></div>
         <div class="card"><h3>How to use the deck</h3><p style="color:var(--muted);font-size:.82rem;margin-top:8px">Answer out loud first. Flip. If your answer was vague, press Review again even if you were close. Vague knowledge fails under exam pressure.</p></div>
       </div>
     </div>
@@ -834,7 +840,7 @@
   <section id="quiz">
     <div class="sec-head">
       <p class="eyebrow">Question bank</p>
-      <h2>Sixty-three questions across ten categories.</h2>
+      <h2>Sixty-six questions across ten categories.</h2>
       <p class="lead">Filter by category or run the whole bank. First attempt is what counts, so answer before you peek at the options twice.</p>
     </div>
     <div class="btnrow" id="quiz-filters" style="margin-bottom:14px"></div>
@@ -1081,7 +1087,10 @@
     { s: "Customer settles a ₦50,000 invoice from last month.", o: ["Dr Cash / Cr Revenue", "Dr Cash / Cr Receivables", "Dr Receivables / Cr Cash", "Dr Revenue / Cr Cash"], a: 1, e: "Revenue was already recognised. Cash increases and receivables reduce." },
     { s: "Takes a ₦2,000,000 bank loan.", o: ["Dr Cash / Cr Loan payable", "Dr Loan payable / Cr Cash", "Dr Cash / Cr Revenue", "Dr Expense / Cr Cash"], a: 0, e: "Cash increases with a debit. The loan is a liability and increases with a credit." },
     { s: "Pays ₦120,000 insurance covering the next twelve months.", o: ["Dr Insurance expense / Cr Cash", "Dr Prepaid insurance / Cr Cash", "Dr Cash / Cr Prepaid insurance", "Dr Prepaid insurance / Cr Expense"], a: 1, e: "The benefit is future, so it sits as a prepaid asset and is released to expense monthly." },
-    { s: "Writes off ₦30,000 owed by a customer who will not pay.", o: ["Dr Cash / Cr Receivables", "Dr Impairment expense / Cr Receivables", "Dr Receivables / Cr Impairment expense", "Dr Payables / Cr Cash"], a: 1, e: "The receivable is no longer recoverable. Expense increases with a debit, the receivable reduces with a credit." }
+    { s: "Writes off ₦30,000 owed by a customer who will not pay.", o: ["Dr Cash / Cr Receivables", "Dr Impairment expense / Cr Receivables", "Dr Receivables / Cr Impairment expense", "Dr Payables / Cr Cash"], a: 1, e: "The receivable is no longer recoverable. Expense increases with a debit, the receivable reduces with a credit." },
+    { s: "Sells goods on credit for ₦1,000,000.", o: ["Dr Cash / Cr Sales revenue", "Dr Receivables / Cr Sales revenue", "Dr Sales revenue / Cr Receivables", "Dr Receivables / Cr Cash"], a: 1, e: "No cash yet. Receivables increase with a debit and revenue increases with a credit." },
+    { s: "The customer later pays the ₦1,000,000 owed.", o: ["Dr Cash / Cr Sales revenue", "Dr Cash / Cr Receivables", "Dr Receivables / Cr Cash", "Dr Sales revenue / Cr Cash"], a: 1, e: "Revenue was already recognised at the sale. Settlement only moves the receivable into cash." },
+    { s: "The goods sold for ₦1,000,000 cost ₦400,000. Record the cost side.", o: ["Dr Cost of sales / Cr Inventory", "Dr Inventory / Cr Cost of sales", "Dr Purchases / Cr Sales", "Dr Cost of sales / Cr Cash"], a: 0, e: "Under perpetual inventory, every sale has a second entry: the cost side. Gross profit is 1,000,000 minus 400,000." }
   ];
   var drillState = load(STORE.quiz + "-drill", {});
   function renderDrill() {
@@ -1281,7 +1290,9 @@
     { f: "Accounts payable vs receivable", b: "Payable: money the business owes suppliers. Receivable: money customers owe the business." },
     { f: "ISA", b: "International Standards on Auditing: the standards used to audit financial statements prepared under IFRS." },
     { f: "Direct vs indirect tax", b: "Direct: borne by the taxpayer (CIT, PIT, CGT). Indirect: collected by intermediaries and passed on (VAT, customs)." },
-    { f: "Progressive tax", b: "A tax whose rate rises as the base rises. Proportional is flat. Regressive falls hardest on lower earners." }
+    { f: "Progressive tax", b: "A tax whose rate rises as the base rises. Proportional is flat. Regressive falls hardest on lower earners." },
+    { f: "Credit sale and settlement", b: "Sale: Dr Receivables / Cr Sales revenue. Settlement: Dr Cash / Cr Receivables. No new revenue is recorded when the customer pays." },
+    { f: "The two entries of a sale", b: "Revenue side: Dr Receivables or Cash / Cr Sales. Cost side under perpetual inventory: Dr Cost of sales / Cr Inventory. Gross profit is the difference." }
   ];
   var flashState = load(STORE.flash, { known: [], index: 0 });
   var flashIndex = flashState.index || 0;
@@ -1381,7 +1392,10 @@
     { c: "Processes", q: "Financial statements are prepared under IFRS and audited under:", o: ["ISA", "IPSAS", "COBIT", "Basel III"], a: 0, e: "The International Standards on Auditing govern how the audit of those statements is performed." },
     { c: "Tax", q: "Which is an indirect tax?", o: ["Companies income tax", "Personal income tax", "VAT", "Capital gains tax"], a: 2, e: "VAT is collected by businesses on behalf of government and passed on to the consumer, so it is indirect." },
     { c: "Tax", q: "Federal tax administration in Nigeria sits with:", o: ["The Nigeria Revenue Service", "The Central Bank of Nigeria", "The Securities and Exchange Commission", "The Nigeria Deposit Insurance Corporation"], a: 0, e: "The Nigeria Revenue Service administers federal taxes following the 2025 reform, succeeding the FIRS." },
-    { c: "Tax", q: "A tax whose rate rises as the tax base rises is:", o: ["Progressive", "Proportional", "Regressive", "Indirect"], a: 0, e: "Progressive rates rise with the base. Proportional is flat. Regressive falls hardest on lower earners." }
+    { c: "Tax", q: "A tax whose rate rises as the tax base rises is:", o: ["Progressive", "Proportional", "Regressive", "Indirect"], a: 0, e: "Progressive rates rise with the base. Proportional is flat. Regressive falls hardest on lower earners." },
+    { c: "Double entry", q: "Goods are sold on credit for ₦1,000,000. Which entry is correct?", o: ["Dr Cash / Cr Sales revenue", "Dr Receivables / Cr Sales revenue", "Dr Sales revenue / Cr Receivables", "Dr Receivables / Cr Cash"], a: 1, e: "Revenue is recognised at the sale even though cash has not arrived. Receivables are debited." },
+    { c: "Double entry", q: "The customer later pays the amount owed. Which entry records the settlement?", o: ["Dr Cash / Cr Sales revenue", "Dr Cash / Cr Receivables", "Dr Receivables / Cr Cash", "Dr Sales revenue / Cr Receivables"], a: 1, e: "No new revenue is recorded. Cash increases and the receivable clears." },
+    { c: "Double entry", q: "Goods sold for ₦1,000,000 cost ₦400,000. Under perpetual inventory, the cost side entry is:", o: ["Dr Cost of sales ₦400,000 / Cr Inventory ₦400,000", "Dr Inventory ₦400,000 / Cr Cost of sales ₦400,000", "Dr Purchases ₦400,000 / Cr Cash ₦400,000", "Dr Sales ₦400,000 / Cr Cost of sales ₦400,000"], a: 0, e: "Every sale has a revenue entry and a cost entry. Gross profit is ₦600,000." }
   ];
 
   var quizState = load(STORE.quiz, { answers: {} });
