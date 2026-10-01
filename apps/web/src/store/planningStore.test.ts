@@ -14,7 +14,8 @@ function resetStore() {
     monthlyPlans: [],
     evidenceRecords: [],
     automationCandidates: [],
-    studyTopics: pristine.studyTopics,
+    studyTracks: pristine.studyTracks.map((track) => ({ ...track, topics: track.topics.map((topic) => ({ ...topic })) })),
+    engagements: [],
     initialized: true,
   });
 }
@@ -119,17 +120,60 @@ describe("planningStore", () => {
       usePlanningStore.getState().removeMonthlyOutcome("2026-10", outcome!.id);
       expect(usePlanningStore.getState().monthlyPlans.find((plan) => plan.month === "2026-10")?.outcomes).toHaveLength(0);
     });
+  });
 
-    it("updates theme and review notes for the selected month", () => {
-      usePlanningStore.getState().updateMonthlyPlan("2026-09", { theme: "Academy sprint", reviewNotes: "Started strong" });
-      const monthPlan = usePlanningStore.getState().monthlyPlans.find((plan) => plan.month === "2026-09");
+  describe("study tracks", () => {
+    it("updates mastery within one track without touching the others", () => {
+      const before = usePlanningStore.getState().studyTracks;
+      const itgcTrack = before.find((track) => track.id === "track-itgc")!;
+      const firstTopic = itgcTrack.topics[0];
 
-      expect(monthPlan).toMatchObject({ theme: "Academy sprint", reviewNotes: "Started strong" });
+      usePlanningStore.getState().setTrackTopicStatus("track-itgc", firstTopic.id, "Test-ready");
+
+      const after = usePlanningStore.getState().studyTracks;
+      const updatedItgc = after.find((track) => track.id === "track-itgc")!;
+      const cisaTopic = after.find((track) => track.id === "track-cisa")!.topics[0];
+
+      expect(updatedItgc.topics.find((topic) => topic.id === firstTopic.id)?.status).toBe("Test-ready");
+      expect(cisaTopic.status).toBe("Not started");
+    });
+  });
+
+  describe("engagements", () => {
+    it("adds, updates and removes an engagement with requests", () => {
+      usePlanningStore.getState().addEngagement({
+        alias: "Financial-services access review",
+        workstream: "ITGC access testing",
+        role: "Analyst",
+        startDate: "2026-10-01",
+        endDate: "",
+        reviewNotes: "",
+        lessons: "",
+      });
+
+      const engagement = usePlanningStore.getState().engagements[0];
+      expect(engagement).toMatchObject({ alias: "Financial-services access review", requests: [] });
+
+      usePlanningStore.getState().addEngagementRequest(engagement.id, "Population extract", "2026-10-05");
+      const request = usePlanningStore.getState().engagements[0].requests[0];
+      expect(request).toMatchObject({ title: "Population extract", status: "Open" });
+
+      usePlanningStore.getState().updateEngagementRequest(engagement.id, request.id, { status: "Received" });
+      expect(usePlanningStore.getState().engagements[0].requests[0].status).toBe("Received");
+
+      usePlanningStore.getState().updateEngagement(engagement.id, { lessons: "Ask earlier for the extract" });
+      expect(usePlanningStore.getState().engagements[0].lessons).toBe("Ask earlier for the extract");
+
+      usePlanningStore.getState().removeEngagementRequest(engagement.id, request.id);
+      expect(usePlanningStore.getState().engagements[0].requests).toHaveLength(0);
+
+      usePlanningStore.getState().removeEngagement(engagement.id);
+      expect(usePlanningStore.getState().engagements).toHaveLength(0);
     });
   });
 
   describe("snapshots", () => {
-    it("round trips the full snapshot including year and month plans", () => {
+    it("round trips the full v2 snapshot", () => {
       usePlanningStore.getState().updateYearPlan({ northStar: "Analytics-led assurance" });
       usePlanningStore.getState().addMonthlyOutcome("2026-10", "Run the CISA diagnostic");
 
@@ -137,21 +181,81 @@ describe("planningStore", () => {
       const restored = usePlanningStore.getState().importSnapshot(JSON.parse(JSON.stringify(snapshot)));
 
       expect(restored).toBe(true);
+      expect(usePlanningStore.getState().version).toBe(2);
       expect(usePlanningStore.getState().yearPlan.northStar).toBe("Analytics-led assurance");
       expect(usePlanningStore.getState().monthlyPlans.find((plan) => plan.month === "2026-10")?.outcomes).toHaveLength(1);
     });
 
-    it("fills year and month defaults for older stored snapshots", () => {
+    it("migrates a v1 Academy snapshot into the engagement-era schema", () => {
+      const academyWeeklyPlan = {
+        weekOf: "2026-09-21",
+        theme: "KBAC sprint and Academy capture",
+        focusCapacity: 10,
+        contingencyCapacity: 4,
+        deliveryWin: "Pass the Academy General Test with calm, concept-led preparation.",
+        masteryWin: "",
+        leverageWin: "",
+        behaviourFocus: "",
+        feedbackRequest: "",
+        risks: "",
+        reviewNotes: "",
+      };
+      const v1Snapshot = {
+        version: 1,
+        selectedDate: "2026-09-23",
+        goals: [
+          {
+            id: "goal-kbac",
+            title: "Pass the Academy General Test",
+            type: "Exam",
+            targetDate: "2026-09-24",
+            definitionOfDone: "",
+            whyItMatters: "",
+            successMetric: "",
+            sponsor: "Self",
+            dimensions: ["What you do"],
+            status: "Active",
+          },
+        ],
+        tasks: [makeTask({ id: "task-kbac-diagnostic", title: "Run the KBAC diagnostic", category: "Study" })],
+        dailyPlans: [],
+        weeklyPlan: academyWeeklyPlan,
+        monthlyPlans: [
+          { month: "2026-09", theme: "Academy sprint and firm foundations", habit: "", outcomes: [], reviewNotes: "" },
+        ],
+        studyTopics: [{ id: "accounting-equation", title: "Accounting equation", status: "Test-ready" }],
+      };
+
+      expect(usePlanningStore.getState().importSnapshot(v1Snapshot)).toBe(true);
+
+      const state = usePlanningStore.getState();
+      const kbacTrack = state.studyTracks.find((track) => track.id === "track-kbac");
+      const kbacGoal = state.goals.find((goal) => goal.id === "goal-kbac");
+
+      expect(state.version).toBe(2);
+      expect(kbacTrack?.status).toBe("Archived");
+      expect(kbacTrack?.topics).toHaveLength(1);
+      expect(kbacTrack?.topics[0]).toMatchObject({ id: "accounting-equation", status: "Test-ready" });
+      expect(kbacGoal?.status).toBe("Complete");
+      expect(state.goals.some((goal) => goal.id === "goal-engagement")).toBe(true);
+      expect(state.tasks.some((task) => task.id === "task-kbac-diagnostic")).toBe(false);
+      expect(state.weeklyPlan.theme).toBe("Engagement mode: learn the method");
+      expect(state.monthlyPlans[0].theme).toBe("Engagement delivery foundations");
+    });
+
+    it("fills v2 defaults for a bare v1 snapshot", () => {
       const restored = usePlanningStore.getState().importSnapshot({ version: 1, selectedDate: "2026-09-22" });
 
       expect(restored).toBe(true);
       expect(usePlanningStore.getState().yearPlan.northStar).toBeTruthy();
+      expect(usePlanningStore.getState().studyTracks.some((track) => track.id === "track-itgc")).toBe(true);
       expect(usePlanningStore.getState().monthlyPlans.length).toBeGreaterThan(0);
     });
 
     it("rejects invalid snapshots", () => {
       expect(usePlanningStore.getState().importSnapshot(null)).toBe(false);
-      expect(usePlanningStore.getState().importSnapshot({ version: 2, selectedDate: "2026-09-22" })).toBe(false);
+      expect(usePlanningStore.getState().importSnapshot({ version: 3, selectedDate: "2026-09-22" })).toBe(false);
+      expect(usePlanningStore.getState().importSnapshot({ version: 2 })).toBe(false);
     });
   });
 });

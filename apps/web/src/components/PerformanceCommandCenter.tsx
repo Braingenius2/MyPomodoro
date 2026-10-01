@@ -6,6 +6,7 @@ import {
   ArrowRight,
   BookOpenCheck,
   Brain,
+  Briefcase,
   CalendarDays,
   Check,
   CheckCircle2,
@@ -34,14 +35,15 @@ import {
   AutomationCandidate,
   AutomationStage,
   DailyPlan,
+  EngagementRecord,
+  EngagementRequest,
   EvidenceRecord,
   Goal,
-  KBAC_MODULES,
-  KBAC_QUIZ,
   MonthlyPlan,
   PerformanceDimension,
   PlannedTask,
   PlanningSnapshot,
+  StudyTrack,
   TaskCategory,
   TaskPriority,
   TaskStatus,
@@ -51,12 +53,13 @@ import {
   YearlyPlan,
 } from "@/store/planningStore";
 
-type TabId = "command" | "horizons" | "kbac" | "evidence" | "automation" | "roadmap";
+type TabId = "command" | "horizons" | "study" | "engagements" | "evidence" | "automation" | "roadmap";
 
 const tabs: Array<{ id: TabId; label: string; icon: typeof Target }> = [
   { id: "command", label: "Command", icon: Target },
   { id: "horizons", label: "Horizons", icon: CalendarDays },
-  { id: "kbac", label: "KBAC sprint", icon: BookOpenCheck },
+  { id: "study", label: "Study", icon: BookOpenCheck },
+  { id: "engagements", label: "Engagements", icon: Briefcase },
   { id: "evidence", label: "Rating evidence", icon: Trophy },
   { id: "automation", label: "Automation", icon: Zap },
   { id: "roadmap", label: "Roadmap", icon: GoalIcon },
@@ -71,7 +74,7 @@ const performanceDimensions: PerformanceDimension[] = [
   "Peer contribution",
 ];
 
-const taskCategories: TaskCategory[] = ["Delivery", "KBAC", "Technical mastery", "Automation", "Career", "Admin"];
+const taskCategories: TaskCategory[] = ["Delivery", "Study", "Technical mastery", "Automation", "Career", "Admin"];
 const taskPriorities: TaskPriority[] = ["Must", "Should", "Could"];
 const masteryOptions: TopicMastery[] = ["Not started", "Learning", "Can explain", "Test-ready"];
 const automationStages: AutomationStage[] = [
@@ -116,23 +119,13 @@ function defaultPlan(date: string): DailyPlan {
 function categoryClass(category: TaskCategory): string {
   const palette: Record<TaskCategory, string> = {
     Delivery: "bg-blue-500/15 text-blue-200 border-blue-400/30",
-    KBAC: "bg-amber-400/15 text-amber-100 border-amber-300/30",
+    Study: "bg-amber-400/15 text-amber-100 border-amber-300/30",
     "Technical mastery": "bg-violet-500/15 text-violet-200 border-violet-300/30",
     Automation: "bg-cyan-400/15 text-cyan-100 border-cyan-300/30",
     Career: "bg-emerald-400/15 text-emerald-100 border-emerald-300/30",
     Admin: "bg-slate-400/15 text-slate-200 border-slate-300/25",
   };
   return palette[category];
-}
-
-function statusClass(status: TopicMastery): string {
-  const palette: Record<TopicMastery, string> = {
-    "Not started": "text-slate-400",
-    Learning: "text-amber-200",
-    "Can explain": "text-cyan-200",
-    "Test-ready": "text-emerald-200",
-  };
-  return palette[status];
 }
 
 function IconMetric({ label, value, icon: Icon, note }: { label: string; value: string | number; icon: typeof Target; note: string }) {
@@ -180,7 +173,8 @@ export function PerformanceCommandCenter() {
   const weeklyPlan = usePlanningStore((state) => state.weeklyPlan);
   const yearPlan = usePlanningStore((state) => state.yearPlan);
   const monthlyPlans = usePlanningStore((state) => state.monthlyPlans);
-  const studyTopics = usePlanningStore((state) => state.studyTopics);
+  const studyTracks = usePlanningStore((state) => state.studyTracks);
+  const engagements = usePlanningStore((state) => state.engagements);
   const evidenceRecords = usePlanningStore((state) => state.evidenceRecords);
   const automationCandidates = usePlanningStore((state) => state.automationCandidates);
   const updateDailyPlan = usePlanningStore((state) => state.updateDailyPlan);
@@ -192,11 +186,17 @@ export function PerformanceCommandCenter() {
   const addMonthlyOutcome = usePlanningStore((state) => state.addMonthlyOutcome);
   const toggleMonthlyOutcome = usePlanningStore((state) => state.toggleMonthlyOutcome);
   const removeMonthlyOutcome = usePlanningStore((state) => state.removeMonthlyOutcome);
+  const setTrackTopicStatus = usePlanningStore((state) => state.setTrackTopicStatus);
+  const addEngagement = usePlanningStore((state) => state.addEngagement);
+  const updateEngagement = usePlanningStore((state) => state.updateEngagement);
+  const removeEngagement = usePlanningStore((state) => state.removeEngagement);
+  const addEngagementRequest = usePlanningStore((state) => state.addEngagementRequest);
+  const updateEngagementRequest = usePlanningStore((state) => state.updateEngagementRequest);
+  const removeEngagementRequest = usePlanningStore((state) => state.removeEngagementRequest);
   const addTask = usePlanningStore((state) => state.addTask);
   const setTaskStatus = usePlanningStore((state) => state.setTaskStatus);
   const deferTask = usePlanningStore((state) => state.deferTask);
   const rehashTomorrow = usePlanningStore((state) => state.rehashTomorrow);
-  const setTopicStatus = usePlanningStore((state) => state.setTopicStatus);
   const addEvidence = usePlanningStore((state) => state.addEvidence);
   const addAutomationCandidate = usePlanningStore((state) => state.addAutomationCandidate);
   const updateAutomationCandidate = usePlanningStore((state) => state.updateAutomationCandidate);
@@ -216,7 +216,16 @@ export function PerformanceCommandCenter() {
     return priorityOrder[a.priority] - priorityOrder[b.priority];
   });
   const completedTaskCount = selectedTasks.filter((task) => task.status === "Done").length;
-  const studyReadyCount = studyTopics.filter((topic) => topic.status === "Can explain" || topic.status === "Test-ready").length;
+  const activeTrackTopics = studyTracks
+    .filter((track) => track.status !== "Archived")
+    .flatMap((track) => track.topics);
+  const studyReadyCount = activeTrackTopics.filter(
+    (topic) => topic.status === "Can explain" || topic.status === "Test-ready"
+  ).length;
+  const openEngagementRequests = engagements.reduce(
+    (total, engagement) => total + engagement.requests.filter((request) => request.status !== "Received").length,
+    0
+  );
   const plannedPomodoros = selectedTasks.filter((task) => task.status !== "Done").reduce((total, task) => total + task.estimatedPomodoros, 0);
 
   if (!initialized) {
@@ -263,8 +272,9 @@ export function PerformanceCommandCenter() {
           completedTaskCount={completedTaskCount}
           plannedPomodoros={plannedPomodoros}
           studyReadyCount={studyReadyCount}
+          studyTopicCount={activeTrackTopics.length}
+          openRequestCount={openEngagementRequests}
           evidenceCount={evidenceRecords.length}
-          automationCount={automationCandidates.length}
           weeklyCapacity={weeklyPlan.focusCapacity}
           updateDailyPlan={updateDailyPlan}
           updateWeeklyPlan={updateWeeklyPlan}
@@ -293,7 +303,18 @@ export function PerformanceCommandCenter() {
           onOpenCommand={() => setActiveTab("command")}
         />
       )}
-      {activeTab === "kbac" && <KbacView studyTopics={studyTopics} setTopicStatus={setTopicStatus} />}
+      {activeTab === "study" && <StudyView studyTracks={studyTracks} setTrackTopicStatus={setTrackTopicStatus} />}
+      {activeTab === "engagements" && (
+        <EngagementView
+          engagements={engagements}
+          addEngagement={addEngagement}
+          updateEngagement={updateEngagement}
+          removeEngagement={removeEngagement}
+          addEngagementRequest={addEngagementRequest}
+          updateEngagementRequest={updateEngagementRequest}
+          removeEngagementRequest={removeEngagementRequest}
+        />
+      )}
       {activeTab === "evidence" && <EvidenceView evidenceRecords={evidenceRecords} addEvidence={addEvidence} />}
       {activeTab === "automation" && (
         <AutomationView
@@ -323,8 +344,9 @@ function CommandView({
   completedTaskCount,
   plannedPomodoros,
   studyReadyCount,
+  studyTopicCount,
+  openRequestCount,
   evidenceCount,
-  automationCount,
   weeklyCapacity,
   updateDailyPlan,
   updateWeeklyPlan,
@@ -342,8 +364,9 @@ function CommandView({
   completedTaskCount: number;
   plannedPomodoros: number;
   studyReadyCount: number;
+  studyTopicCount: number;
+  openRequestCount: number;
   evidenceCount: number;
-  automationCount: number;
   weeklyCapacity: number;
   updateDailyPlan: (date: string, patch: Partial<Omit<DailyPlan, "date">>) => void;
   updateWeeklyPlan: (patch: Partial<import("@/store/planningStore").WeeklyPlan>) => void;
@@ -379,9 +402,9 @@ function CommandView({
       <section className="command-score-line">
         <IconMetric label="Daily completion" value={`${completedTaskCount}/${selectedTasks.length}`} icon={CheckCircle2} note="Outcomes closed" />
         <IconMetric label="Focus load" value={`${plannedPomodoros}/${weeklyCapacity}`} icon={Clock3} note="Pomodoros planned" />
-        <IconMetric label="KBAC ready" value={`${studyReadyCount}/9`} icon={Brain} note="Can explain or test-ready" />
+        <IconMetric label="Study readiness" value={`${studyReadyCount}/${studyTopicCount}`} icon={Brain} note="Active tracks: can explain or test-ready" />
         <IconMetric label="Evidence ledger" value={evidenceCount} icon={Trophy} note="Dated proof entries" />
-        <IconMetric label="Automation pipeline" value={automationCount} icon={Zap} note="Generic candidates only" />
+        <IconMetric label="Open requests" value={openRequestCount} icon={Briefcase} note="Engagement items to chase" />
       </section>
 
       <section className="command-primary-grid">
@@ -699,106 +722,236 @@ function HorizonsView({
   );
 }
 
-function KbacView({ studyTopics, setTopicStatus }: { studyTopics: Array<{ id: string; title: string; status: TopicMastery }>; setTopicStatus: (id: string, status: TopicMastery) => void }) {
-  const [openModule, setOpenModule] = useState(KBAC_MODULES[0].id);
-  const [answers, setAnswers] = useState<Record<string, number>>({});
-  const [showResult, setShowResult] = useState(false);
-  const score = KBAC_QUIZ.reduce((total, question) => total + (answers[question.id] === question.answer ? 1 : 0), 0);
-  const readyCount = studyTopics.filter((topic) => topic.status === "Can explain" || topic.status === "Test-ready").length;
+function StudyView({
+  studyTracks,
+  setTrackTopicStatus,
+}: {
+  studyTracks: StudyTrack[];
+  setTrackTopicStatus: (trackId: string, topicId: string, status: TopicMastery) => void;
+}) {
+  const [activeTrackId, setActiveTrackId] = useState(studyTracks[0]?.id ?? "");
+  const activeTrack = studyTracks.find((track) => track.id === activeTrackId) ?? studyTracks[0];
 
-  const resetQuiz = () => {
-    setAnswers({});
-    setShowResult(false);
+  if (!activeTrack) {
+    return (
+      <div className="command-page command-enter">
+        <section className="command-page-intro">
+          <p className="command-eyebrow">Learning tracks</p>
+          <h2>No study tracks yet.</h2>
+          <p>Reload the app to restore the default tracks.</p>
+        </section>
+      </div>
+    );
+  }
+
+  const readyCount = activeTrack.topics.filter(
+    (topic) => topic.status === "Can explain" || topic.status === "Test-ready"
+  ).length;
+  const progress = activeTrack.topics.length ? (readyCount / activeTrack.topics.length) * 100 : 0;
+
+  return (
+    <div className="command-page command-enter">
+      <section className="command-page-intro">
+        <p className="command-eyebrow">Learning tracks</p>
+        <h2>Study what the next engagement needs.</h2>
+        <p>Tracks stay generic: ITGC and engagement readiness now, CISA domains from December, and the passed Academy material kept for reference. The command view counts active tracks only.</p>
+      </section>
+
+      <div className="btnrow" style={{ marginBottom: 16 }}>
+        {studyTracks.map((track) => (
+          <button
+            key={track.id}
+            type="button"
+            className={track.id === activeTrack.id ? "command-primary-button" : "command-quiet-button"}
+            onClick={() => setActiveTrackId(track.id)}
+          >
+            {track.name} <small style={{ opacity: 0.72 }}>| {track.status}</small>
+          </button>
+        ))}
+      </div>
+
+      <section className="command-panel" style={{ marginBottom: 16 }}>
+        <div className="command-progress-heading">
+          <span>{activeTrack.description}</span>
+          <strong>
+            {readyCount} of {activeTrack.topics.length} can be explained or are test-ready
+          </strong>
+        </div>
+        <div className="command-progress-track">
+          <span style={{ width: `${progress}%` }} />
+        </div>
+        {activeTrack.guideUrl && (
+          <p className="command-muted" style={{ marginTop: 12 }}>
+            Full interactive guide:{" "}
+            <a className="command-inline-link" href={activeTrack.guideUrl} target="_blank" rel="noreferrer">
+              {activeTrack.name} guide
+            </a>
+          </p>
+        )}
+      </section>
+
+      <section className="command-panel">
+        <SectionHeading eyebrow="Topics" title={activeTrack.name} />
+        <div className="command-milestones">
+          {activeTrack.topics.map((topic) => (
+            <div key={topic.id} className="command-milestone" style={{ gridTemplateColumns: "minmax(0, 1fr) 170px" }}>
+              <div>
+                <span>Topic</span>
+                <p>{topic.title}</p>
+              </div>
+              <select
+                value={topic.status}
+                onChange={(event) => setTrackTopicStatus(activeTrack.id, topic.id, event.target.value as TopicMastery)}
+                aria-label={`${topic.title} mastery`}
+              >
+                {masteryOptions.map((option) => (
+                  <option key={option}>{option}</option>
+                ))}
+              </select>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <SafetyNote />
+    </div>
+  );
+}
+
+function EngagementView({
+  engagements,
+  addEngagement,
+  updateEngagement,
+  removeEngagement,
+  addEngagementRequest,
+  updateEngagementRequest,
+  removeEngagementRequest,
+}: {
+  engagements: EngagementRecord[];
+  addEngagement: (record: Omit<EngagementRecord, "id" | "requests">) => void;
+  updateEngagement: (engagementId: string, patch: Partial<Omit<EngagementRecord, "id" | "requests">>) => void;
+  removeEngagement: (engagementId: string) => void;
+  addEngagementRequest: (engagementId: string, title: string, due: string) => void;
+  updateEngagementRequest: (
+    engagementId: string,
+    requestId: string,
+    patch: Partial<{ title: string; status: EngagementRequest["status"]; due: string }>
+  ) => void;
+  removeEngagementRequest: (engagementId: string, requestId: string) => void;
+}) {
+  const [form, setForm] = useState({ alias: "", workstream: "", role: "", startDate: "", endDate: "" });
+  const [requestTitle, setRequestTitle] = useState("");
+  const [requestDue, setRequestDue] = useState("");
+
+  const submitEngagement = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!form.alias.trim()) return;
+    addEngagement({
+      alias: form.alias.trim(),
+      workstream: form.workstream.trim(),
+      role: form.role.trim(),
+      startDate: form.startDate,
+      endDate: form.endDate,
+      reviewNotes: "",
+      lessons: "",
+    });
+    setForm({ alias: "", workstream: "", role: "", startDate: "", endDate: "" });
+  };
+
+  const submitRequest = (event: FormEvent<HTMLFormElement>, engagementId: string) => {
+    event.preventDefault();
+    if (!requestTitle.trim()) return;
+    addEngagementRequest(engagementId, requestTitle, requestDue);
+    setRequestTitle("");
+    setRequestDue("");
   };
 
   return (
     <div className="command-page command-enter">
       <section className="command-page-intro">
-        <p className="command-eyebrow">Academy General Test sprint</p>
-        <h2>KBAC study material, built for recall under pressure.</h2>
-        <p>The Academy agenda confirms the taught topics and a General Test on 24 September. It does not confirm the KBAC question count, pass mark, weighting, or exact question bank. This is a tailored concept guide and self-test, not an official exam blueprint.</p>
-        <p className="command-muted">Want the full interactive version? <a className="command-inline-link" href="kbac_study_guide.html" target="_blank" rel="noreferrer">Open the KBAC Elite Study System</a> for 16 slide-aligned modules, two solved class exercises, 52 flashcards, a 98-question bank, and a 30-minute paced mock exam.</p>
+        <p className="command-eyebrow">Engagement log</p>
+        <h2>Track the work without leaking the work.</h2>
+        <p>Alias-only by design: no client names, no document contents, no confidential detail. Capture your role, the workstream, review notes received, lessons learned, and the requests you are chasing.</p>
       </section>
+      <SafetyNote />
+      <section className="command-evidence-layout" style={{ marginTop: 16 }}>
+        <form className="command-panel command-evidence-form" onSubmit={submitEngagement}>
+          <SectionHeading eyebrow="Add an engagement" title="One clean record per workstream." />
+          <div className="command-form-grid">
+            <label><span>Generic alias</span><input value={form.alias} onChange={(event) => setForm({ ...form, alias: event.target.value })} placeholder="e.g., Financial-services access review" /></label>
+            <label><span>Workstream</span><input value={form.workstream} onChange={(event) => setForm({ ...form, workstream: event.target.value })} placeholder="e.g., ITGC access testing" /></label>
+            <label><span>Your role</span><input value={form.role} onChange={(event) => setForm({ ...form, role: event.target.value })} placeholder="e.g., Analyst, execution support" /></label>
+            <label><span>Start date</span><input type="date" value={form.startDate} onChange={(event) => setForm({ ...form, startDate: event.target.value })} /></label>
+            <label><span>End date</span><input type="date" value={form.endDate} onChange={(event) => setForm({ ...form, endDate: event.target.value })} /></label>
+          </div>
+          <button type="submit" className="command-primary-button" style={{ marginTop: 14 }}>
+            <Briefcase className="h-4 w-4" /> Add engagement
+          </button>
+        </form>
 
-      <section className="command-kbac-timeline">
-        <div><span>21 Sep</span><strong>Diagnostic</strong><p>Accounting equation and debits / credits.</p></div>
-        <div><span>22 Sep</span><strong>Double entry</strong><p>Finance function and tax concepts.</p></div>
-        <div><span>23 Sep</span><strong>Integration</strong><p>Statements, IFRS, processes, regulators.</p></div>
-        <div><span>24 Sep</span><strong>Test day</strong><p>Recall only. Arrive rested.</p></div>
-      </section>
-
-      <section className="command-progress-bar-section command-panel">
-        <div className="command-progress-heading"><span>Mastery signal</span><strong>{readyCount} of {KBAC_MODULES.length} modules can be explained or are test-ready</strong></div>
-        <div className="command-progress-track"><span style={{ width: `${(readyCount / KBAC_MODULES.length) * 100}%` }} /></div>
-      </section>
-
-      <section className="command-study-layout">
-        <div className="command-module-list">
-          {KBAC_MODULES.map((module) => {
-            const topic = studyTopics.find((item) => item.id === module.id);
-            return (
-              <button type="button" key={module.id} onClick={() => setOpenModule(module.id)} className={openModule === module.id ? "is-selected" : ""}>
-                <span>{module.title}</span>
-                <small className={statusClass(topic?.status ?? "Not started")}>{topic?.status ?? "Not started"}</small>
-              </button>
-            );
-          })}
-        </div>
-        {KBAC_MODULES.filter((module) => module.id === openModule).map((module) => {
-          const topic = studyTopics.find((item) => item.id === module.id);
-          return (
-            <article className="command-panel command-study-module" key={module.id}>
-              <div className="command-study-topline">
-                <div><p className="command-eyebrow">{module.academyScope}</p><h2>{module.title}</h2></div>
-                <select value={topic?.status ?? "Not started"} onChange={(event) => setTopicStatus(module.id, event.target.value as TopicMastery)}>{masteryOptions.map((item) => <option key={item}>{item}</option>)}</select>
-              </div>
-              <div className="command-study-block"><span>Plain-English rule</span><p>{module.plainRule}</p></div>
-              <div className="command-study-block"><span>Worked example</span><p>{module.example}</p></div>
-              <div className="command-study-block is-trap"><span>Common trap</span><p>{module.trap}</p></div>
-              <div className="command-recall"><span>Close the notes. Answer these.</span><ol>{module.recall.map((question) => <li key={question}>{question}</li>)}</ol></div>
-              <div className="command-tech-link"><ShieldCheck className="h-4 w-4" /><p><strong>Technology Risk link:</strong> {module.techRiskLink}</p></div>
-            </article>
-          );
-        })}
-      </section>
-
-      <section className="command-panel command-quiz">
-        <SectionHeading eyebrow="Self-test only" title="10 questions. Zero bluffing." action={<button type="button" className="command-quiet-button" onClick={resetQuiz}><RotateCcw className="h-4 w-4" /> Reset</button>} />
-        <p className="command-muted">Use this to expose gaps. It is not an official KPMG test or a predictor of your score.</p>
-        <div className="command-quiz-list">
-          {KBAC_QUIZ.map((question, index) => {
-            const answered = Object.prototype.hasOwnProperty.call(answers, question.id);
-            return (
-              <div className="command-quiz-question" key={question.id}>
-                <p><span>{index + 1}</span>{question.prompt}</p>
-                <div className="command-answer-options">
-                  {question.choices.map((choice, choiceIndex) => {
-                    const selected = answers[question.id] === choiceIndex;
-                    const correct = showResult && choiceIndex === question.answer;
-                    const incorrect = showResult && selected && choiceIndex !== question.answer;
-                    return (
-                      <button type="button" key={choice} onClick={() => !showResult && setAnswers((current) => ({ ...current, [question.id]: choiceIndex }))} className={`${selected ? "is-selected" : ""} ${correct ? "is-correct" : ""} ${incorrect ? "is-incorrect" : ""}`}>
-                        {choice}
-                      </button>
-                    );
-                  })}
+        <div className="command-evidence-list">
+          {engagements.length === 0 ? (
+            <div className="command-empty-state command-panel">
+              <Briefcase className="h-5 w-5" /> No engagements logged yet. Start with your current workstream, generically described.
+            </div>
+          ) : (
+            engagements.map((engagement) => (
+              <article className="command-panel command-automation-card" key={engagement.id}>
+                <div className="command-automation-card-top">
+                  <div>
+                    <p className="command-eyebrow">{engagement.workstream || "Workstream not set"}</p>
+                    <h3>{engagement.alias}</h3>
+                  </div>
+                  <button type="button" className="command-quiet-button" onClick={() => removeEngagement(engagement.id)}>Remove</button>
                 </div>
-                {showResult && <p className="command-answer-explanation"><strong>{answers[question.id] === question.answer ? "Correct." : "Repair this."}</strong> {question.explanation}</p>}
-                {!answered && showResult && <p className="command-answer-explanation"><strong>Unanswered.</strong> {question.explanation}</p>}
-              </div>
-            );
-          })}
-        </div>
-        {!showResult ? (
-          <button type="button" disabled={Object.keys(answers).length !== KBAC_QUIZ.length} onClick={() => setShowResult(true)} className="command-primary-button">Mark my diagnostic <ArrowRight className="h-4 w-4" /></button>
-        ) : (
-          <div className="command-quiz-result"><Trophy className="h-5 w-5" /><strong>{score}/{KBAC_QUIZ.length}</strong><span>{score >= 8 ? "Strong foundation. Repair every miss anyway." : "Useful signal. Repair the misses, then repeat the recall prompts."}</span></div>
-        )}
-      </section>
+                <p>
+                  <strong>Role:</strong> {engagement.role || "Not set"} | <strong>Dates:</strong>{" "}
+                  {engagement.startDate || "?"} to {engagement.endDate || "ongoing"}
+                </p>
+                <label>
+                  <span>Review notes received</span>
+                  <textarea rows={2} value={engagement.reviewNotes} onChange={(event) => updateEngagement(engagement.id, { reviewNotes: event.target.value })} placeholder="What the reviewer flagged, in generic terms" />
+                </label>
+                <label>
+                  <span>Lessons learned</span>
+                  <textarea rows={2} value={engagement.lessons} onChange={(event) => updateEngagement(engagement.id, { lessons: event.target.value })} placeholder="What you would do differently next time" />
+                </label>
 
-      <section className="command-source-note">
-        <Lightbulb className="h-4 w-4" />
-        <p><strong>Tax and regulatory caution:</strong> use the Academy handouts for exam-specific rates, thresholds, and terminology. Official Nigerian sources should be your tie-breaker when a general note conflicts with current rules.</p>
+                <div className="command-milestones">
+                  {engagement.requests.map((request) => (
+                    <div key={request.id} className="command-milestone" style={{ gridTemplateColumns: "minmax(0, 1fr) 140px 130px auto" }}>
+                      <div>
+                        <span>Request</span>
+                        <p>{request.title}</p>
+                      </div>
+                      <select
+                        value={request.status}
+                        onChange={(event) =>
+                          updateEngagementRequest(engagement.id, request.id, {
+                            status: event.target.value as EngagementRequest["status"],
+                          })
+                        }
+                        aria-label={`${request.title} status`}
+                      >
+                        <option>Open</option>
+                        <option>Received</option>
+                        <option>Blocked</option>
+                      </select>
+                      <input type="date" value={request.due} onChange={(event) => updateEngagementRequest(engagement.id, request.id, { due: event.target.value })} aria-label={`${request.title} due date`} />
+                      <button type="button" className="command-quiet-button" onClick={() => removeEngagementRequest(engagement.id, request.id)}>Remove</button>
+                    </div>
+                  ))}
+                </div>
+
+                <form className="command-inline-form" onSubmit={(event) => submitRequest(event, engagement.id)}>
+                  <input value={requestTitle} onChange={(event) => setRequestTitle(event.target.value)} placeholder="Add a request you are chasing" maxLength={140} />
+                  <input type="date" value={requestDue} onChange={(event) => setRequestDue(event.target.value)} aria-label="Request due date" />
+                  <button type="submit" className="command-primary-button"><Plus className="h-4 w-4" /> Add</button>
+                </form>
+              </article>
+            ))
+          )}
+        </div>
       </section>
     </div>
   );
@@ -999,7 +1152,7 @@ function RoadmapView({ goals, tasks, evidenceRecords, exportSnapshot, importSnap
       <section className="command-panel command-roadmap-table">
         <SectionHeading eyebrow="Sep 2026 to Sep 2027" title="The high-performance route" />
         <div className="command-roadmap-rows">
-          <div><span>21-24 Sep 2026</span><strong>KBAC sprint and Academy capture</strong><p>Pass the General Test, map the firm, start your evidence habit.</p></div>
+          <div><span>Sep-Oct 2026</span><strong>Academy to first engagements</strong><p>Pass the General Test, then learn the method on live workstreams and start your evidence habit.</p></div>
           <div><span>Late Sep-Nov 2026</span><strong>Learn the method and become reviewer-safe</strong><p>Clean workpapers, core ITGC fluency, early escalation, feedback after meaningful tasks.</p></div>
           <div><span>Dec 2026-Mar 2027</span><strong>Own a bounded area and scope the pilot</strong><p>Identify a safe automation opportunity, obtain sponsor and approval before build.</p></div>
           <div><span>Apr-Jun 2027</span><strong>Operate one level higher</strong><p>Make the improvement useful, increase ownership, help peers, and create adoption evidence.</p></div>
