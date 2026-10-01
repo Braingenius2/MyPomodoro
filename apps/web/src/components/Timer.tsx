@@ -57,6 +57,28 @@ export function Timer() {
     return () => clearInterval(interval);
   }, [isRunning]);
 
+  // Resync with the wall clock when the tab wakes up. Browsers throttle timers in
+  // hidden tabs, so the countdown must snap to the deadline on focus, not trust ticks.
+  useEffect(() => {
+    if (!isRunning) return;
+    const resync = () => {
+      if (useTimerStore.getState().isRunning) {
+        useTimerStore.getState().tick();
+      }
+    };
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "visible") resync();
+    };
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    window.addEventListener("focus", resync);
+    window.addEventListener("pageshow", resync);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      window.removeEventListener("focus", resync);
+      window.removeEventListener("pageshow", resync);
+    };
+  }, [isRunning]);
+
   useEffect(() => {
     if (!initialized || !sessionsInitialized || !lastCompletion) {
       return;

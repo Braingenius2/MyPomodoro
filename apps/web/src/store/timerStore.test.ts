@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   DEFAULT_SETTINGS,
   formatTime,
@@ -17,13 +17,20 @@ function resetTimerStore() {
     lastCompletion: null,
     initialTimeLeft: 0,
     focusMode: false,
+    endAt: null,
   });
 }
 
 describe("timerStore", () => {
   beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-10-01T09:00:00.000Z"));
     resetTimerStore();
     localStorage.clear();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   describe("formatTime", () => {
@@ -258,6 +265,116 @@ describe("timerStore", () => {
     });
   });
 
+  describe("background resilience", () => {
+    it("snaps to the wall clock after a long hidden gap instead of trusting ticks", () => {
+      useTimerStore.setState({
+        mode: "work",
+        timeLeft: 1500,
+        isRunning: true,
+        initialTimeLeft: 1500,
+        endAt: Date.now() + 1500 * 1000,
+      });
+
+      vi.advanceTimersByTime(600 * 1000);
+
+      useTimerStore.getState().tick();
+
+      expect(useTimerStore.getState().timeLeft).toBe(900);
+      expect(useTimerStore.getState().isRunning).toBe(true);
+    });
+
+    it("completes exactly once when the deadline passed while hidden", () => {
+      useTimerStore.setState({
+        mode: "work",
+        timeLeft: 60,
+        isRunning: true,
+        initialTimeLeft: 300,
+        endAt: Date.now() + 60 * 1000,
+      });
+
+      vi.advanceTimersByTime(60 * 1000);
+      useTimerStore.getState().tick();
+
+      expect(useTimerStore.getState()).toMatchObject({
+        mode: "shortBreak",
+        sessionsCompleted: 1,
+        isRunning: false,
+        endAt: null,
+      });
+
+      const firstId = useTimerStore.getState().lastCompletion?.id;
+      useTimerStore.getState().tick();
+      expect(useTimerStore.getState().lastCompletion?.id).toBe(firstId);
+      expect(useTimerStore.getState().sessionsCompleted).toBe(1);
+    });
+
+    it("carries the deadline into an auto-started next session", () => {
+      useTimerStore.setState({
+        mode: "work",
+        timeLeft: 1,
+        isRunning: true,
+        initialTimeLeft: 1500,
+        settings: { ...DEFAULT_SETTINGS, autoStartBreaks: true },
+        endAt: Date.now(),
+      });
+
+      useTimerStore.getState().tick();
+
+      const state = useTimerStore.getState();
+      expect(state.mode).toBe("shortBreak");
+      expect(state.isRunning).toBe(true);
+      expect(state.endAt).toBe(Date.now() + 300 * 1000);
+    });
+  });
+
+  describe("recovery after reload", () => {
+    it("restores a running timer with the correct remaining time", () => {
+      localStorage.setItem(
+        "pomodoro-timer",
+        JSON.stringify({
+          mode: "work",
+          timeLeft: 1500,
+          isRunning: true,
+          endAt: Date.now() + 300 * 1000,
+          initialTimeLeft: 1500,
+          sessionsCompleted: 0,
+          settings: DEFAULT_SETTINGS,
+        })
+      );
+
+      useTimerStore.getState().initialize();
+
+      const state = useTimerStore.getState();
+      expect(state.isRunning).toBe(true);
+      expect(state.endAt).toBe(Date.now() + 300 * 1000);
+      expect(state.timeLeft).toBe(300);
+    });
+
+    it("logs the session when the deadline passed before reload", () => {
+      localStorage.setItem(
+        "pomodoro-timer",
+        JSON.stringify({
+          mode: "work",
+          timeLeft: 10,
+          isRunning: true,
+          endAt: Date.now() - 5000,
+          initialTimeLeft: 1500,
+          sessionsCompleted: 2,
+          settings: DEFAULT_SETTINGS,
+        })
+      );
+
+      useTimerStore.getState().initialize();
+
+      expect(useTimerStore.getState()).toMatchObject({
+        mode: "shortBreak",
+        sessionsCompleted: 3,
+        isRunning: false,
+        timeLeft: 300,
+      });
+    });
+  });
+
   describe("actions", () => {
     it("resets the current mode duration and pauses", () => {
       useTimerStore.setState({ mode: "longBreak", timeLeft: 60, isRunning: true });
@@ -333,7 +450,7 @@ describe("timerStore", () => {
 
     it("uses actual duration from quickStart when logging completion", () => {
       useTimerStore.getState().quickStart();
-      useTimerStore.setState({ timeLeft: 1 });
+      useTimerStore.setState({ timeLeft: 1, endAt: Date.now() - 1000 });
 
       useTimerStore.getState().tick();
 

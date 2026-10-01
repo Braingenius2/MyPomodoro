@@ -117,6 +117,49 @@ function getNextCompletionId(lastCompletion: CompletionEvent | null): number {
   return (lastCompletion?.id ?? 0) + 1;
 }
 
+interface CompletionSource {
+  mode: TimerMode;
+  sessionsCompleted: number;
+  settings: Settings;
+  lastCompletion: CompletionEvent | null;
+  initialTimeLeft: number;
+}
+
+function buildCompletionState(source: CompletionSource, now: number) {
+  const completedMode = source.mode;
+  const completedDuration =
+    source.initialTimeLeft > 0
+      ? Math.round(source.initialTimeLeft / 60)
+      : getModeDurationMinutes(completedMode, source.settings);
+  const completedWorkSessions = completedMode === "work" ? source.sessionsCompleted + 1 : source.sessionsCompleted;
+  const nextMode: TimerMode =
+    completedMode === "work"
+      ? completedWorkSessions % source.settings.longBreakInterval === 0
+        ? "longBreak"
+        : "shortBreak"
+      : "work";
+  const autoStarted =
+    completedMode === "work" ? source.settings.autoStartBreaks : source.settings.autoStartPomodoros;
+  const nextDuration = getModeDurationSeconds(nextMode, source.settings);
+
+  return {
+    mode: nextMode,
+    timeLeft: nextDuration,
+    isRunning: autoStarted,
+    alarmActive: !autoStarted,
+    sessionsCompleted: completedWorkSessions,
+    focusMode: autoStarted && nextMode === "work",
+    endAt: autoStarted ? now + nextDuration * 1000 : null,
+    lastCompletion: {
+      id: getNextCompletionId(source.lastCompletion),
+      completedMode,
+      nextMode,
+      duration: completedDuration,
+      autoStarted,
+    },
+  };
+}
+
 interface TimerState {
   mode: TimerMode;
   timeLeft: number;
@@ -128,6 +171,7 @@ interface TimerState {
   lastCompletion: CompletionEvent | null;
   initialTimeLeft: number;
   focusMode: boolean;
+  endAt: number | null;
   start: () => void;
   pause: () => void;
   reset: () => void;
@@ -150,10 +194,17 @@ export const useTimerStore = create<TimerState>((set, get) => ({
   lastCompletion: null,
   initialTimeLeft: 0,
   focusMode: false,
+  endAt: null,
 
   start: () => {
     const { timeLeft } = get();
-    set({ isRunning: true, alarmActive: false, focusMode: true, initialTimeLeft: timeLeft });
+    set({
+      isRunning: true,
+      alarmActive: false,
+      focusMode: true,
+      initialTimeLeft: timeLeft,
+      endAt: Date.now() + timeLeft * 1000,
+    });
   },
 
   quickStart: () => {
@@ -164,10 +215,11 @@ export const useTimerStore = create<TimerState>((set, get) => ({
       alarmActive: false,
       focusMode: true,
       initialTimeLeft: 300,
+      endAt: Date.now() + 300 * 1000,
     });
   },
 
-  pause: () => set({ isRunning: false, focusMode: false }),
+  pause: () => set({ isRunning: false, focusMode: false, endAt: null }),
 
   reset: () => {
     const { mode, settings } = get();
@@ -177,46 +229,32 @@ export const useTimerStore = create<TimerState>((set, get) => ({
       alarmActive: false,
       focusMode: false,
       initialTimeLeft: 0,
+      endAt: null,
     });
   },
 
   tick: () => {
-    const { timeLeft, mode, sessionsCompleted, settings, lastCompletion, initialTimeLeft } = get();
+    const state = get();
+    const { timeLeft, endAt, isRunning } = state;
+
+    if (isRunning && endAt !== null) {
+      const remaining = Math.max(0, Math.ceil((endAt - Date.now()) / 1000));
+      if (remaining > 0) {
+        if (remaining !== timeLeft) {
+          set({ timeLeft: remaining });
+        }
+        return;
+      }
+      set(buildCompletionState(state, Date.now()));
+      return;
+    }
 
     if (timeLeft > 1) {
       set({ timeLeft: timeLeft - 1 });
       return;
     }
 
-    const completedMode = mode;
-    const completedDuration = initialTimeLeft > 0
-      ? Math.round(initialTimeLeft / 60)
-      : getModeDurationMinutes(completedMode, settings);
-    const completedWorkSessions = completedMode === "work" ? sessionsCompleted + 1 : sessionsCompleted;
-    const nextMode: TimerMode =
-      completedMode === "work"
-        ? completedWorkSessions % settings.longBreakInterval === 0
-          ? "longBreak"
-          : "shortBreak"
-        : "work";
-    const autoStarted =
-      completedMode === "work" ? settings.autoStartBreaks : settings.autoStartPomodoros;
-
-    set({
-      mode: nextMode,
-      timeLeft: getModeDurationSeconds(nextMode, settings),
-      isRunning: autoStarted,
-      alarmActive: !autoStarted,
-      sessionsCompleted: completedWorkSessions,
-      focusMode: autoStarted && nextMode === "work",
-      lastCompletion: {
-        id: getNextCompletionId(lastCompletion),
-        completedMode,
-        nextMode,
-        duration: completedDuration,
-        autoStarted,
-      },
-    });
+    set(buildCompletionState(state, Date.now()));
   },
 
   setMode: (mode: TimerMode) => {
@@ -227,6 +265,7 @@ export const useTimerStore = create<TimerState>((set, get) => ({
       isRunning: false,
       alarmActive: false,
       focusMode: false,
+      endAt: null,
     });
   },
 
@@ -238,6 +277,7 @@ export const useTimerStore = create<TimerState>((set, get) => ({
       set({
         settings: updated,
         timeLeft: getModeDurationSeconds(mode, updated),
+        endAt: null,
       });
     } else {
       set({ settings: updated });
@@ -253,6 +293,9 @@ export const useTimerStore = create<TimerState>((set, get) => ({
         const parsed = JSON.parse(saved) as {
           mode?: unknown;
           timeLeft?: unknown;
+          isRunning?: unknown;
+          endAt?: unknown;
+          initialTimeLeft?: unknown;
           sessionsCompleted?: unknown;
           settings?: unknown;
         };
@@ -263,18 +306,61 @@ export const useTimerStore = create<TimerState>((set, get) => ({
           typeof parsed.timeLeft === "number" && Number.isFinite(parsed.timeLeft) && parsed.timeLeft > 0
             ? Math.trunc(parsed.timeLeft)
             : defaultTimeLeft;
+        const savedRunning = parsed.isRunning === true;
+        const savedEndAt =
+          typeof parsed.endAt === "number" && Number.isFinite(parsed.endAt) ? Math.trunc(parsed.endAt) : null;
+        const savedInitialTimeLeft =
+          typeof parsed.initialTimeLeft === "number" && Number.isFinite(parsed.initialTimeLeft)
+            ? Math.max(0, Math.trunc(parsed.initialTimeLeft))
+            : 0;
+        const sessionsCompleted = sanitizeSessionsCompleted(parsed.sessionsCompleted);
+        const now = Date.now();
+
+        if (savedRunning && savedEndAt !== null && savedEndAt > now) {
+          // The timer was running and the deadline is still in the future.
+          const remaining = Math.max(1, Math.ceil((savedEndAt - now) / 1000));
+          set({
+            mode,
+            timeLeft: remaining,
+            isRunning: true,
+            alarmActive: false,
+            sessionsCompleted,
+            settings,
+            initialized: true,
+            lastCompletion: null,
+            focusMode: mode === "work",
+            initialTimeLeft: savedInitialTimeLeft,
+            endAt: savedEndAt,
+          });
+          return;
+        }
+
+        if (savedRunning && savedEndAt !== null) {
+          // The session finished while the tab was closed or discarded. Log it once.
+          const completion = buildCompletionState(
+            { mode, sessionsCompleted, settings, lastCompletion: null, initialTimeLeft: savedInitialTimeLeft },
+            now
+          );
+          set({
+            settings,
+            initialized: true,
+            ...completion,
+          });
+          return;
+        }
 
         set({
           mode,
           timeLeft,
           isRunning: false,
           alarmActive: false,
-          sessionsCompleted: sanitizeSessionsCompleted(parsed.sessionsCompleted),
+          sessionsCompleted,
           settings,
           initialized: true,
           lastCompletion: null,
           focusMode: false,
-          initialTimeLeft: 0,
+          initialTimeLeft: savedInitialTimeLeft,
+          endAt: null,
         });
       } else {
         set({
@@ -288,6 +374,7 @@ export const useTimerStore = create<TimerState>((set, get) => ({
           lastCompletion: null,
           focusMode: false,
           initialTimeLeft: 0,
+          endAt: null,
         });
       }
     } catch {
@@ -302,6 +389,7 @@ export const useTimerStore = create<TimerState>((set, get) => ({
         lastCompletion: null,
         focusMode: false,
         initialTimeLeft: 0,
+        endAt: null,
       });
     }
   },
@@ -316,7 +404,9 @@ if (typeof window !== "undefined") {
         localStorage.setItem("pomodoro-timer", JSON.stringify({
           mode: state.mode,
           timeLeft: state.timeLeft,
-          isRunning: false,
+          isRunning: state.isRunning,
+          endAt: state.endAt,
+          initialTimeLeft: state.initialTimeLeft,
           sessionsCompleted: state.sessionsCompleted,
           settings: state.settings,
         }));
