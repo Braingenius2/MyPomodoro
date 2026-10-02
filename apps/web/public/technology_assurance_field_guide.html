@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Technology Assurance Field Guide</title>
+  <style>
+    :root { color-scheme: light; --navy: #082447; --blue: #1268a8; --cyan: #27b8bb; --ink: #182b40; --muted: #5c6c7c; --line: #d8e1e8; --paper: #f3f6f8; --white: #fff; --gold: #b88525; }
+    * { box-sizing: border-box; }
+    body { margin: 0; color: var(--ink); background: var(--paper); font: 16px/1.58 Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+    .wrap { width: min(1120px, calc(100% - 36px)); margin: 0 auto; }
+    header { padding: 58px 0 46px; color: #fff; background: radial-gradient(circle at 88% 20%, #1c8ca3 0, transparent 33%), linear-gradient(125deg, #071c37, #0d4771); }
+    .eyebrow { margin: 0 0 10px; color: #8ce8e4; font-size: .73rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+    h1, h2, h3 { margin: 0; line-height: 1.13; }
+    h1 { max-width: 800px; font-size: clamp(2.5rem, 7vw, 5.2rem); letter-spacing: -.05em; }
+    header p.deck { max-width: 770px; margin: 17px 0 0; color: #d3e4ef; font-size: 1.05rem; }
+    .notice { max-width: 880px; margin-top: 25px; padding: 13px 16px; border: 1px solid #e7c27880; border-radius: 10px; color: #f9e8c6; background: #d99a301a; font-size: .88rem; }
+    main { padding: 28px 0 70px; }
+    section { margin: 18px 0; padding: 25px; border: 1px solid var(--line); border-radius: 16px; background: var(--white); box-shadow: 0 8px 28px #18384d09; }
+    h2 { margin-bottom: 13px; color: var(--navy); font-size: clamp(1.45rem, 3vw, 2rem); }
+    h3 { margin-bottom: 7px; color: var(--navy); font-size: 1.04rem; }
+    p { margin: 8px 0; }
+    .muted { color: var(--muted); }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .tile { padding: 16px; border-radius: 12px; background: #f1f7fa; }
+    .tile p { margin-bottom: 0; font-size: .92rem; }
+    .tag { display: inline-block; margin-bottom: 7px; color: var(--blue); font-size: .68rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+    .flow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 16px 0; }
+    .flow span { padding: 8px 11px; border: 1px solid #b9d7df; border-radius: 8px; color: #0d4868; background: #eff9fa; font-size: .84rem; font-weight: 700; }
+    .flow b { color: var(--gold); }
+    table { width: 100%; border-collapse: collapse; font-size: .89rem; }
+    th, td { padding: 12px 11px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { color: var(--navy); background: #edf4f7; }
+    .timeline { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+    .week { padding: 15px; border-top: 3px solid var(--cyan); border-radius: 8px; background: #f2f7f9; }
+    .week strong { display: block; margin-bottom: 7px; color: var(--blue); font-size: .76rem; text-transform: uppercase; letter-spacing: .06em; }
+    .week p { margin: 0; font-size: .89rem; }
+    ul { margin: 9px 0 0; padding-left: 21px; }
+    li { margin: 6px 0; }
+    .callout { padding: 15px 17px; border-left: 4px solid var(--cyan); border-radius: 5px; background: #eff8f8; }
+    footer { padding: 22px 0 38px; color: var(--muted); font-size: .8rem; }
+    @media (max-width: 740px) { .grid, .timeline { grid-template-columns: 1fr; } section { padding: 19px; } table { display: block; overflow-x: auto; } header { padding-top: 42px; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <p class="eyebrow">Personal learning reference | Technology Risk</p>
+      <h1>From backend builder to trusted technology assurer.</h1>
+      <p class="deck">A practical bridge into Advisory Technology Risk: keep the control fundamentals, learn where the team's current work sits, and turn your API, Python, and SQL experience into scoped, evidence-led assurance.</p>
+      <div class="notice"><strong>Working hypothesis, not an org chart:</strong> your current read is that financial statement IT audit is becoming clearer within Audit while Advisory Tech Risk is broadening into modern technology controls and client solutions. Confirm the boundary, priorities, and approved methods with the team.</div>
+    </div>
+  </header>
+  <main class="wrap">
+    <section>
+      <p class="eyebrow">The role pivot</p>
+      <h2>ITGC is the floor, not the whole building.</h2>
+      <p>Access, change, operations, IT application controls, evidence quality, and walkthroughs still matter. They help you understand whether technology can be trusted. The broader advisory question is how to design, implement, assess, and improve controls as clients adopt APIs, cloud, AI, data platforms, DevSecOps, and automation.</p>
+      <div class="grid">
+        <div class="tile"><span class="tag">What you do</span><h3>Assess a real risk and control</h3><p>Understand the service, process, ownership, risk, control objective, test, evidence, and exception path.</p></div>
+        <div class="tile"><span class="tag">How you do it</span><h3>Make the work usable</h3><p>Be precise, safe with data, clear about scope, quick to escalate, and practical about what the client can improve.</p></div>
+      </div>
+    </section>
+
+    <section>
+      <p class="eyebrow">API assurance in plain English</p>
+      <h2>Not just “does the endpoint return 200?”</h2>
+      <p>An API is a controlled doorway between systems. Technology assurance asks whether the doorway is known, appropriately protected, changed safely, monitored, and producing reliable outcomes for the business process it supports.</p>
+      <div class="flow" aria-label="Typical business flow">
+        <span>Customer or staff action</span><b>→</b><span>Channel or application</span><b>→</b><span>API gateway</span><b>→</b><span>Service and data</span><b>→</b><span>Settlement, ledger, or report</span>
+      </div>
+      <div class="callout"><strong>Assurance lens:</strong> state the control objective and test boundary first. A scoped control test is not automatically a penetration test, a full code review, or permission to probe a live endpoint.</div>
+    </section>
+
+    <section>
+      <p class="eyebrow">A control map you can use</p>
+      <h2>Turn technical familiarity into testable questions.</h2>
+      <table>
+        <thead><tr><th>Control area</th><th>Assurance question</th><th>Possible evidence or test, if in scope</th></tr></thead>
+        <tbody>
+          <tr><td>Inventory and ownership</td><td>Are APIs, owners, environments, data flows, and critical dependencies known?</td><td>Approved inventory, architecture, ownership records, criticality and data classification.</td></tr>
+          <tr><td>Authentication</td><td>Does the caller prove its identity using the approved pattern?</td><td>Configuration, identity-provider settings, service-account register, scoped negative tests.</td></tr>
+          <tr><td>Authorization</td><td>Can each identity do only what its role permits, including at the object or transaction level?</td><td>Role matrix, policy/configuration, approved test identities, expected allow and deny outcomes.</td></tr>
+          <tr><td>Secrets and certificates</td><td>Are credentials controlled, rotated, and kept out of code and routine logs?</td><td>Secrets-management configuration, rotation evidence, pipeline checks, exception handling.</td></tr>
+          <tr><td>Change and release</td><td>Are API code and configuration changes reviewed, tested, approved, and traceable to deployment?</td><td>Repository permissions, pull-request approvals, test results, release records, deployment logs.</td></tr>
+          <tr><td>Input and transaction handling</td><td>Are invalid, duplicate, out-of-order, or replayed requests handled according to business rules?</td><td>Approved test cases, idempotency design, validation rules, reconciliation and exception records.</td></tr>
+          <tr><td>Logging and monitoring</td><td>Can owners identify failures, suspicious use, and material changes without exposing sensitive data?</td><td>Log configuration, alert ownership, incident samples, retention and restricted access settings.</td></tr>
+          <tr><td>Availability and limits</td><td>Are service limits, timeouts, retries, and recovery designed for the service's business impact?</td><td>Gateway settings, capacity or resilience evidence, incident and recovery records.</td></tr>
+          <tr><td>Third-party and interfaces</td><td>Are dependencies and the completeness and accuracy of data handoffs understood?</td><td>Interface agreements, reconciliation, exception queues, vendor controls, end-to-end tracing.</td></tr>
+        </tbody>
+      </table>
+      <p class="muted">These are prompts, not a universal checklist. Pick tests from the engagement objective, applicable criteria, client architecture, and approved scope.</p>
+    </section>
+
+    <section>
+      <p class="eyebrow">Where your profile helps</p>
+      <h2>Your existing stack is a head start.</h2>
+      <div class="grid">
+        <div class="tile"><h3>Java and Spring Boot</h3><p>You understand routes, middleware, roles, service boundaries, configuration, tests, and release changes. Explain what the design does, then ask what control objective it supports.</p></div>
+        <div class="tile"><h3>Python and Pandas</h3><p>You can help profile populations, find exceptions, compare files, and make repeatable tests. Agree the data source, access, logic, validation, and evidence before using any real data.</p></div>
+        <div class="tile"><h3>SQL</h3><p>You can reason about joins, duplicates, gaps, dates, status changes, and reconciliations. Preserve query logic and tie counts back to an authoritative source.</p></div>
+        <div class="tile"><h3>Power Automate and Fabric</h3><p>Learn the governance around connectors, permissions, approvals, failures, lineage, data access, quality, and monitoring. Confirm which tools and environments are approved.</p></div>
+      </div>
+    </section>
+
+    <section>
+      <p class="eyebrow">Banking and financial reporting context</p>
+      <h2>Connect the technology to the money and the report.</h2>
+      <p><strong>Revenue assurance</strong> may involve checking whether events that should generate income are captured, priced under approved rules, posted, settled, reconciled, and followed up when exceptions occur. The exact product, systems, and tests depend on the engagement.</p>
+      <p><strong>ICFR</strong> means Internal Control over Financial Reporting. Technology can affect reporting through access, program and configuration changes, automated processing, interfaces, reports, and operations. Confirm whether the team's work is financial statement audit support, a standalone control review, implementation assurance, or another scope.</p>
+      <div class="callout"><strong>Useful mental chain:</strong> business event → source system → interface or API → transformation and calculation → ledger or reporting output → reconciliation and review. Ask where completeness, accuracy, authorisation, and traceability could fail.</div>
+    </section>
+
+    <section>
+      <p class="eyebrow">Four-week field plan</p>
+      <h2>Use the assignment to select the specialism.</h2>
+      <div class="timeline">
+        <div class="week"><strong>Week 1 | Listen and clarify</strong><p>Confirm your first deliverable, reviewer, quality bar, team portfolio, Audit boundary, approved tools, and what “API testing” means in current work.</p></div>
+        <div class="week"><strong>Week 2 | Map the work</strong><p>For one assigned process, map objective, technology, risk, control owner, control, test, evidence, and exception route. Keep notes in firm-approved systems.</p></div>
+        <div class="week"><strong>Week 3 | Build a safe bridge</strong><p>Use a toy API or synthetic data to practice a control map, a few expected allow/deny outcomes, and a clean test record. Do not touch a live client endpoint without explicit written scope.</p></div>
+        <div class="week"><strong>Week 4 | Choose one depth</strong><p>Based on team demand, select APIs, AI governance, cloud, DevSecOps, revenue assurance, data and automation governance, or another live need. Ask before building a reusable asset.</p></div>
+      </div>
+    </section>
+
+    <section>
+      <p class="eyebrow">Monday conversation</p>
+      <h2>Five questions that earn clarity quickly.</h2>
+      <ul>
+        <li>What is the first engagement or internal deliverable I will support, and what does a strong first month look like?</li>
+        <li>How does the team divide Advisory Tech Risk work from Audit's financial statement IT audit work?</li>
+        <li>When the team says ICFR or revenue assurance, what processes, systems, and deliverables are in scope?</li>
+        <li>For API testing, are we assessing governance and controls, performing functional validation, doing security testing, or coordinating specialists?</li>
+        <li>Which tools, data environments, templates, and reusable solutions are approved, and who sponsors an improvement idea?</li>
+      </ul>
+    </section>
+
+    <section>
+      <p class="eyebrow">Hard guardrails</p>
+      <h2>Keep your judgement as strong as your tooling.</h2>
+      <ul>
+        <li>No client data, credentials, logs, endpoints, or workpapers in personal apps, GitHub, or unapproved AI tools.</li>
+        <li>No live API testing until the owner, target, methods, window, data rules, and written authorisation are explicit.</li>
+        <li>No automation before a process owner, sponsor, approved platform, control design, exception path, and human accountability are clear.</li>
+        <li>Use synthetic data for practice. Keep the test reproducible, explain the logic, validate the output, and record limitations.</li>
+      </ul>
+    </section>
+  </main>
+  <footer class="wrap">Personal learning aid. Engagement instructions, firm policy, approved methodology, and scope always take precedence.</footer>
+</body>
+</html>

@@ -237,10 +237,11 @@ describe("planningStore", () => {
       expect(kbacTrack?.topics).toHaveLength(1);
       expect(kbacTrack?.topics[0]).toMatchObject({ id: "accounting-equation", status: "Test-ready" });
       expect(kbacGoal?.status).toBe("Complete");
+      expect(kbacGoal?.title).toBe("KBAC study cycle complete");
       expect(state.goals.some((goal) => goal.id === "goal-engagement")).toBe(true);
       expect(state.tasks.some((task) => task.id === "task-kbac-diagnostic")).toBe(false);
       expect(state.weeklyPlan.theme).toBe("Engagement mode: learn the method");
-      expect(state.monthlyPlans[0].theme).toBe("Engagement delivery foundations");
+      expect(state.monthlyPlans[0].theme).toBe("Re-entry, delivery quality, and practice mapping");
     });
 
     it("fills v2 defaults for a bare v1 snapshot", () => {
@@ -250,6 +251,40 @@ describe("planningStore", () => {
       expect(usePlanningStore.getState().yearPlan.northStar).toBeTruthy();
       expect(usePlanningStore.getState().studyTracks.some((track) => track.id === "track-itgc")).toBe(true);
       expect(usePlanningStore.getState().monthlyPlans.length).toBeGreaterThan(0);
+    });
+
+    it("keeps a user-edited weekly plan on later v2 loads", () => {
+      const base = usePlanningStore.getState().exportSnapshot();
+      const edited = {
+        ...base,
+        weeklyPlan: { ...base.weeklyPlan, deliveryWin: "My own delivery win", theme: "Engagement mode: learn the method" },
+      };
+
+      expect(usePlanningStore.getState().importSnapshot(JSON.parse(JSON.stringify(edited)))).toBe(true);
+      expect(usePlanningStore.getState().weeklyPlan.deliveryWin).toBe("My own delivery win");
+    });
+
+    it("adds the newer study tracks when loading an older v2 snapshot", () => {
+      const base = usePlanningStore.getState().exportSnapshot();
+      const older = {
+        ...base,
+        studyTracks: base.studyTracks.filter(
+          (track) => track.id !== "track-modern-assurance" && track.id !== "track-api-automation"
+        ),
+      };
+
+      expect(usePlanningStore.getState().importSnapshot(JSON.parse(JSON.stringify(older)))).toBe(true);
+      const ids = usePlanningStore.getState().studyTracks.map((track) => track.id);
+      expect(ids).toContain("track-modern-assurance");
+      expect(ids).toContain("track-api-automation");
+    });
+
+    it("keeps study guide links relative so they work under the GitHub Pages base path", () => {
+      for (const track of usePlanningStore.getState().studyTracks) {
+        if (track.guideUrl) {
+          expect(track.guideUrl.startsWith("/")).toBe(false);
+        }
+      }
     });
 
     it("rejects invalid snapshots", () => {

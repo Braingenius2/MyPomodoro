@@ -10,7 +10,8 @@ Contents:
 
 - `apps/web` - Next.js static-export app (React 19, Zustand, Tailwind 4, Vitest). The command center, timer, tasks, and session history live here.
 - `packages/utils` - shared utilities.
-- `kbac_academy_general_test_study_guide.html` - standalone, self-contained study guide for the KPMG Academy General Test, served from the app as `kbac_study_guide.html`. Vanilla HTML/CSS/JS, no build step.
+- `kbac_academy_general_test_study_guide.html` - standalone, self-contained study guide for the KPMG Academy General Test, served from the app as `kbac_study_guide.html`. Vanilla HTML/CSS/JS, no build step. Keep the root copy and the `apps/web/public` copy identical.
+- `apps/web/public/technology_assurance_field_guide.html` - standalone field guide for the broader Advisory Technology Risk offer, served from the app and linked from the Modern Technology Assurance study track. Vanilla HTML/CSS, no build step.
 - `context/` - working notes and handover context.
 
 ## Commands
@@ -27,7 +28,7 @@ pnpm lint       # eslint
 ## Architecture notes
 
 - State lives in Zustand stores under `apps/web/src/store`.
-  - `planningStore.ts` owns the year plan, monthly plans, weekly plan, daily plans, tasks, evidence ledger, automation pipeline, study tracks, and engagement log. It persists to `localStorage` under `kpmg-performance-command-center-v1`. Snapshots are versioned (`version: 2`): `readSnapshot` migrates v1 Academy-era data forward (study topics become the archived KBAC track, the Academy goal is marked complete, untouched Academy defaults are replaced with engagement-era defaults) and rejects unknown versions.
+  - `planningStore.ts` owns the year plan, monthly plans, weekly plan, daily plans, tasks, evidence ledger, solutions pipeline, study tracks, and engagement log. It persists to `localStorage` under `kpmg-performance-command-center-v1`. Snapshots are versioned: `readSnapshot` migrates v1 Academy-era data into v2, and a v2 loader ("migrateV2") refreshes untouched default goals, tasks, milestones, weekly and monthly plans while preserving user edits. Follow the pattern: detect untouched defaults by comparing against the previous default strings, never by a value that did not change. Study track `guideUrl` values must stay relative (for example `kbac_study_guide.html`) so they resolve under the GitHub Pages base path.
   - `timerStore.ts` is clock-based: a running session stores `endAt` and every tick recomputes the remaining seconds from `Date.now()`. Never reintroduce counter-only countdowns; browsers throttle hidden tabs and the timer must stay truthful. `Timer.tsx` resyncs on `visibilitychange`, `focus`, and `pageshow`, and sessions that finish while hidden are completed on the next tick. Persisted state includes `isRunning` and `endAt` so a reload recovers correctly.
 - `PerformanceCommandCenter.tsx` is the app shell. Tabs: Command, Horizons, Study, Engagements, Rating evidence, Automation, Roadmap.
 - Styling: Tailwind utilities plus the `command-*` class system in `apps/web/src/app/globals.css`.

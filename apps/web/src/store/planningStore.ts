@@ -173,6 +173,7 @@ function todayISO(): string {
 }
 
 const DEFAULT_DATE = todayISO();
+const REENTRY_DATE = mondayOnOrAfter(DEFAULT_DATE);
 
 function id(prefix: string): string {
   return `${prefix}-${Math.random().toString(36).slice(2, 10)}`;
@@ -184,13 +185,21 @@ function addDays(date: string, amount: number): string {
   return `${result.getFullYear()}-${String(result.getMonth() + 1).padStart(2, "0")}-${String(result.getDate()).padStart(2, "0")}`;
 }
 
+function mondayOnOrAfter(date: string): string {
+  const [year, month, day] = date.split("-").map(Number);
+  const value = new Date(year, month - 1, day);
+  const offset = (8 - value.getDay()) % 7;
+  value.setDate(value.getDate() + offset);
+  return `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, "0")}-${String(value.getDate()).padStart(2, "0")}`;
+}
+
 const defaultGoals: Goal[] = [
   {
     id: "goal-engagement",
-    title: "Deliver clean first-engagement workpapers",
+    title: "Deliver clean first-engagement outputs",
     type: "Capability",
     targetDate: "2027-01-31",
-    definitionOfDone: "Workpaper sections that pass review with minimal notes on the first pass, on at least one live workstream.",
+    definitionOfDone: "Assigned engagement outputs are clear, evidence-led, and pass review with fewer repeated notes across cycles.",
     whyItMatters: "Delivery quality is what earns trust and the freedom to do stretch work later.",
     successMetric: "Review notes declining across cycles and direct senior feedback on progress.",
     sponsor: "Senior / Manager",
@@ -211,22 +220,22 @@ const defaultGoals: Goal[] = [
   },
   {
     id: "goal-automation",
-    title: "Ship one approved automation contribution",
-    type: "Automation",
-    targetDate: "2027-03-14",
-    definitionOfDone: "An approved, tested, documented and repeatable workflow or analytic with a clear owner and evidence of value.",
-    whyItMatters: "It aligns directly with Technology Risk leadership's focus on automation and population-level testing.",
-    successMetric: "One sponsor-approved pilot or adopted improvement, never built with confidential client data in personal tools.",
+    title: "Deliver one approved client-valued assurance improvement",
+    type: "Capability",
+    targetDate: "2027-04-05",
+    definitionOfDone: "One sponsor-approved, tested, documented improvement tied to a real assurance pain point. It may be a control diagnostic, API test approach, data analysis, workflow, reusable assessment, or automation.",
+    whyItMatters: "Modern Technology Risk creates practical, repeatable client value. Automation is one route, not the only route.",
+    successMetric: "A bounded contribution with a named sponsor, approved tools, clear control purpose, validation, and evidence of value.",
     sponsor: "Engagement Manager / Sponsor",
     dimensions: ["Stretch contribution", "Deliver impact", "Inspire trust"],
     status: "Active",
   },
   {
     id: "goal-reviewer-safe",
-    title: "Become reviewer-safe in Technology Risk",
+    title: "Become a trusted delivery analyst across Technology Risk work",
     type: "Capability",
     targetDate: "2026-12-14",
-    definitionOfDone: "Reliable working papers, evidence discipline, core ITGC fluency, early escalation, and feedback that improves between cycles.",
+    definitionOfDone: "Reliable workpapers and evidence, sound core control judgement, early escalation, and the ability to learn the method across assigned assurance work.",
     whyItMatters: "Core quality earns the trust that creates room for stretch work.",
     successMetric: "Cleaner first drafts, fewer repeated review notes, and direct feedback captured after meaningful tasks.",
     sponsor: "Senior / Manager",
@@ -238,14 +247,14 @@ const defaultGoals: Goal[] = [
 const defaultTasks: PlannedTask[] = [
   {
     id: "task-engagement-walkthrough",
-    title: "Complete one ITGC walkthrough on my first workstream",
+    title: "Confirm my first workstream and definition of done",
     category: "Delivery",
     priority: "Must",
-    plannedDate: DEFAULT_DATE,
+    plannedDate: REENTRY_DATE,
     estimatedPomodoros: 2,
-    nextAction: "Ask the senior for the process narrative and the evidence request list.",
-    definitionOfDone: "Walkthrough notes captured and validated with the process owner.",
-    evidenceExpected: "Dated walkthrough notes and the open questions list.",
+    nextAction: "Ask the senior or manager what I own first, who reviews it, and what a clean first delivery looks like.",
+    definitionOfDone: "My first deliverable, reviewer, deadline, and quality bar are clear.",
+    evidenceExpected: "A private generic note of the assignment and agreed success criteria.",
     status: "Open",
     carryCount: 0,
     carryReason: "",
@@ -253,14 +262,14 @@ const defaultTasks: PlannedTask[] = [
   },
   {
     id: "task-engagement-review-note",
-    title: "Turn one review note into a fixed habit",
+    title: "Map one assigned process from objective to evidence",
     category: "Delivery",
     priority: "Must",
-    plannedDate: addDays(DEFAULT_DATE, 1),
+    plannedDate: addDays(REENTRY_DATE, 1),
     estimatedPomodoros: 2,
-    nextAction: "List the review notes received this week and pick the one that repeats.",
-    definitionOfDone: "The fix is applied and the next draft passes that check.",
-    evidenceExpected: "Before and after workpaper section.",
+    nextAction: "For the assigned work, sketch the objective, process, risk, control, test, and evidence chain using approved work systems.",
+    definitionOfDone: "The chain is explained clearly to the senior, with open questions surfaced early.",
+    evidenceExpected: "Generic learning note only. Client evidence stays in approved firm systems.",
     status: "Open",
     carryCount: 0,
     carryReason: "",
@@ -268,14 +277,14 @@ const defaultTasks: PlannedTask[] = [
   },
   {
     id: "task-cisa-diagnostic",
-    title: "Run the CISA diagnostic and set the study rhythm",
-    category: "Technical mastery",
-    priority: "Should",
-    plannedDate: addDays(DEFAULT_DATE, 3),
-    estimatedPomodoros: 2,
-    nextAction: "Take a 20-question CISA domain 1 diagnostic and log the weak areas.",
-    definitionOfDone: "Baseline score recorded and a weekly study slot booked.",
-    evidenceExpected: "Diagnostic score and the study slot in the calendar.",
+    title: "Clarify the team's current assurance portfolio",
+    category: "Career",
+    priority: "Must",
+    plannedDate: addDays(REENTRY_DATE, 2),
+    estimatedPomodoros: 1,
+    nextAction: "Ask how Advisory Tech Risk and Audit divide work, and what ICFR and revenue assurance mean on the current engagements.",
+    definitionOfDone: "I have a practical view of the team's live priorities, my role, and the terms that need deeper study.",
+    evidenceExpected: "A generic practice map with no client names or sensitive details.",
     status: "Open",
     carryCount: 0,
     carryReason: "",
@@ -283,14 +292,29 @@ const defaultTasks: PlannedTask[] = [
   },
   {
     id: "task-automation-candidates",
-    title: "Capture three safe automation candidates from real workflows",
-    category: "Automation",
+    title: "Translate API experience into an assurance question",
+    category: "Technical mastery",
+    priority: "Could",
+    plannedDate: addDays(REENTRY_DATE, 3),
+    estimatedPomodoros: 2,
+    nextAction: "On a local or synthetic API only, map inventory, authentication, authorization, change, logging, and test evidence to control questions.",
+    definitionOfDone: "A one-page generic API assurance map, with no live endpoint testing and no client information.",
+    evidenceExpected: "A personal learning artifact using a toy API or synthetic data.",
+    status: "Open",
+    carryCount: 0,
+    carryReason: "",
+    goalId: "goal-engagement",
+  },
+  {
+    id: "task-improvement-path",
+    title: "Agree how to develop a useful solution contribution",
+    category: "Career",
     priority: "Should",
-    plannedDate: addDays(DEFAULT_DATE, 5),
+    plannedDate: addDays(REENTRY_DATE, 4),
     estimatedPomodoros: 1,
-    nextAction: "Log each candidate with the pain point, control risk, and approved tools only.",
-    definitionOfDone: "Three candidates in the pipeline with a named process owner.",
-    evidenceExpected: "Automation pipeline entries, generic and non-confidential.",
+    nextAction: "Ask which approved tools, reusable assets, and sponsor path the team uses before proposing a build.",
+    definitionOfDone: "One next learning priority and a safe route to contribute are agreed, or parked pending a real assignment.",
+    evidenceExpected: "Generic notes on the next step, never client data or workpapers.",
     status: "Open",
     carryCount: 0,
     carryReason: "",
@@ -300,28 +324,28 @@ const defaultTasks: PlannedTask[] = [
 
 const defaultDailyPlans: DailyPlan[] = [
   {
-    date: DEFAULT_DATE,
+    date: REENTRY_DATE,
     energy: "Normal",
-    winCondition: "By close of day, I will have moved one delivery result, one capability result, and one leverage result forward.",
-    firstFocusBlock: "Review yesterday's review notes, then start the highest-value workpaper section.",
+    winCondition: "By close of day, I know today's delivery, the quality bar, and the next action. No assumptions about the workstream.",
+    firstFocusBlock: "Reconnect with the team, confirm today's priority and how the senior wants the output returned.",
     fixedCommitments: "Engagement calls, deadlines, and firm training.",
     reflection: "",
     evidenceNote: "",
-    tomorrowFirstFocusBlock: "Choose the next physical action before you close the laptop.",
+    tomorrowFirstFocusBlock: "Write one concrete next action from today's assignment before closing the laptop.",
   },
 ];
 
 const defaultWeeklyPlan: WeeklyPlan = {
-  weekOf: DEFAULT_DATE,
+  weekOf: REENTRY_DATE,
   theme: "Engagement mode: learn the method",
   focusCapacity: 10,
   contingencyCapacity: 4,
-  deliveryWin: "Produce one review-ready workpaper section.",
-  masteryWin: "Explain the ITGC walkthrough end to end without notes.",
-  leverageWin: "Capture one safe automation candidate from a real workflow.",
-  behaviourFocus: "Ask early, document clearly, and make the reviewer's life easy.",
-  feedbackRequest: "Ask the senior what one thing would make the next draft cleaner.",
-  risks: "No client data, names, or working papers in this tool. Escalate blockers early instead of absorbing them.",
+  deliveryWin: "Confirm my first deliverable, quality bar, deadline, and reviewer, then move the assigned work forward.",
+  masteryWin: "Map one assigned assurance process from objective and risk through control, test, and evidence.",
+  leverageWin: "Identify one relevant modern assurance learning thread, then validate it with the team before building anything.",
+  behaviourFocus: "Listen first, clarify ownership, surface blockers early, and close the loop.",
+  feedbackRequest: "Ask my senior what would make my next deliverable easier to review.",
+  risks: "Team portfolio and tool choices are working hypotheses until confirmed. No client data, names, live endpoint tests, or working papers in this tool.",
   reviewNotes: "",
 };
 
@@ -329,26 +353,26 @@ const defaultYearPlan: YearlyPlan = {
   year: 2026,
   northStar: "Rating 1 evidence readiness by September 2027",
   definitionOfWinning:
-    "A dated body of evidence: strong delivery, one approved automation contribution, reviewer-safe working papers, and feedback that improves every cycle.",
+    "A dated body of evidence: strong assigned delivery, quality and trust, a sponsor-approved client-valued improvement, visible learning, and meaningful contribution to peers.",
   nonNegotiables:
     "Protect client data. Escalate early. Sleep is a control activity. Ask for feedback instead of waiting for it.",
   milestones: [
-    { id: "ms-q4-2026", quarter: "Q4 2026", title: "Reviewer-safe: clean workpapers, ITGC fluency, early escalation", done: false },
-    { id: "ms-q1-2027", quarter: "Q1 2027", title: "CISA study rhythm running and one automation candidate approved", done: false },
-    { id: "ms-q2-2027", quarter: "Q2 2027", title: "Own a bounded area and produce adoption evidence for the automation", done: false },
-    { id: "ms-q3-2027", quarter: "Q3 2027", title: "Package the Rating 1 case with no year-end surprises", done: false },
+    { id: "ms-q4-2026", quarter: "Q4 2026", title: "Re-enter, confirm the live portfolio, and deliver cleanly on assigned work", done: false },
+    { id: "ms-q1-2027", quarter: "Q1 2027", title: "Build depth in a team-prioritised assurance domain and agree a bounded contribution", done: false },
+    { id: "ms-q2-2027", quarter: "Q2 2027", title: "Deliver one approved client-valued improvement by 5 April, then show adoption or reuse", done: false },
+    { id: "ms-q3-2027", quarter: "Q3 2027", title: "Operate above analyst baseline and review Rating 1 evidence with the counsellor", done: false },
   ],
 };
 
 const defaultMonthlyPlans: MonthlyPlan[] = [
   {
     month: DEFAULT_DATE.slice(0, 7),
-    theme: "Engagement delivery foundations",
-    habit: "Log one evidence record every working day.",
+    theme: "Re-entry, delivery quality, and practice mapping",
+    habit: "At close of each workday, capture one generic proof point, one lesson, and tomorrow's first action.",
     outcomes: [
-      { id: "mo-workpaper", title: "Own one workstream area with review-ready workpapers", done: false },
-      { id: "mo-cisa", title: "Run the CISA diagnostic and set the December study rhythm", done: false },
-      { id: "mo-evidence", title: "Keep the evidence ledger current every week", done: false },
+      { id: "mo-workpaper", title: "Deliver assigned work to the agreed quality bar and capture review lessons", done: false },
+      { id: "mo-cisa", title: "Confirm the team's live priorities and choose one bounded learning thread", done: false },
+      { id: "mo-evidence", title: "Maintain a weekly generic evidence ledger and request specific feedback", done: false },
     ],
     reviewNotes: "",
   },
@@ -358,7 +382,7 @@ const defaultStudyTracks: StudyTrack[] = [
   {
     id: "track-itgc",
     name: "ITGC and engagement readiness",
-    description: "The working knowledge for live engagements: ITGC categories, application controls, evidence, and client walkthroughs.",
+    description: "The assurance foundation: ITGCs, IT application controls, evidence quality, walkthroughs, and Nigerian banking context. Important, but not the whole Advisory Tech Risk practice.",
     status: "Active",
     guideUrl: "",
     topics: [
@@ -389,7 +413,7 @@ const defaultStudyTracks: StudyTrack[] = [
   {
     id: "track-kbac",
     name: "KBAC Academy (archived)",
-    description: "Passed on 24 September 2026. Kept for reference, with the full interactive guide still available.",
+    description: "KBAC study cycle closed. Test result is not recorded in this tracker. Kept as an archived reference.",
     status: "Archived",
     guideUrl: "kbac_study_guide.html",
     topics: [
@@ -402,6 +426,39 @@ const defaultStudyTracks: StudyTrack[] = [
       { id: "business-processes", title: "Key business processes", status: "Not started" },
       { id: "nigerian-tax", title: "Nigerian tax system", status: "Not started" },
       { id: "regulators", title: "Nigerian financial-system regulators", status: "Not started" },
+    ],
+  },
+  {
+    id: "track-modern-assurance",
+    name: "Modern Technology Assurance",
+    description: "A practical map of the broader Advisory offer. Validate current service boundaries and priorities with the team before going deep.",
+    status: "Active",
+    guideUrl: "technology_assurance_field_guide.html",
+    topics: [
+      { id: "modern-ai", title: "AI governance, implementation risks, and control evidence", status: "Not started" },
+      { id: "modern-api", title: "API and microservices governance, lifecycle, and assurance", status: "Not started" },
+      { id: "modern-cloud", title: "Cloud governance and control responsibilities", status: "Not started" },
+      { id: "modern-devsecops", title: "DevSecOps and controls observability", status: "Not started" },
+      { id: "modern-transformation", title: "Digital transformation and implementation assurance", status: "Not started" },
+      { id: "modern-attestation", title: "Compliance certification and attestation work", status: "Not started" },
+      { id: "modern-revenue-icfr", title: "Revenue assurance and ICFR context, scope to confirm", status: "Not started" },
+      { id: "modern-emerging-esg", title: "Emerging technology and technology ESG governance", status: "Not started" },
+    ],
+  },
+  {
+    id: "track-api-automation",
+    name: "API, Data, and Intelligent Workflows",
+    description: "A skill bridge from backend engineering into control design, assurance testing, and approved automation. Use only synthetic or approved data and environments.",
+    status: "Planned",
+    guideUrl: "technology_assurance_field_guide.html",
+    topics: [
+      { id: "api-control-map", title: "Map API inventory, authentication, authorization, secrets, change, and logs to controls", status: "Not started" },
+      { id: "api-test-design", title: "Design scoped API control tests and distinguish assurance from functional or security testing", status: "Not started" },
+      { id: "api-evidence", title: "Capture repeatable test steps, expected results, exceptions, and evidence", status: "Not started" },
+      { id: "workflow-governance", title: "Power Automate permissions, connectors, approvals, exceptions, and monitoring", status: "Not started" },
+      { id: "fabric-governance", title: "Microsoft Fabric data access, lineage, quality, and controlled analytics", status: "Not started" },
+      { id: "population-testing", title: "Use Python, SQL, or approved platforms for repeatable population testing", status: "Not started" },
+      { id: "solution-productisation", title: "Turn a repeated client pain point into a governed, reusable solution", status: "Not started" },
     ],
   },
 ];
@@ -456,7 +513,7 @@ interface PlanningState extends PlanningSnapshot {
 function defaultSnapshot(): PlanningSnapshot {
   return {
     version: 2,
-    selectedDate: DEFAULT_DATE,
+    selectedDate: REENTRY_DATE,
     goals: defaultGoals,
     tasks: defaultTasks,
     dailyPlans: defaultDailyPlans,
@@ -495,7 +552,16 @@ const ACADEMY_DAILY_PREFIX = "By close of day, I will understand the KBAC format
 
 function migrateV1(old: V1Snapshot): PlanningSnapshot {
   const goals = safeArray(old.goals, defaultGoals).map((goal) =>
-    goal.id === "goal-kbac" ? { ...goal, status: "Complete" as GoalStatus } : goal
+    goal.id === "goal-kbac"
+      ? {
+          ...goal,
+          title: "KBAC study cycle complete",
+          type: "Capability" as GoalType,
+          status: "Complete" as GoalStatus,
+          definitionOfDone: "The KBAC study cycle is closed. This entry records completion of the learning system, not an exam result.",
+          whyItMatters: "Keep the completed Academy material available as a reference without leaving it on the active study queue.",
+        }
+      : goal
   );
   const hasEngagementGoal = goals.some((goal) => goal.id === "goal-engagement");
   const nextGoals = hasEngagementGoal ? goals : [defaultGoals[0], ...goals];
@@ -526,7 +592,7 @@ function migrateV1(old: V1Snapshot): PlanningSnapshot {
 
   return {
     version: 2,
-    selectedDate: old.selectedDate,
+    selectedDate: old.selectedDate < REENTRY_DATE ? REENTRY_DATE : old.selectedDate,
     goals: nextGoals,
     tasks: nextTasks,
     dailyPlans: dailyPlans.length > 0 ? dailyPlans : defaultDailyPlans,
@@ -540,6 +606,104 @@ function migrateV1(old: V1Snapshot): PlanningSnapshot {
   };
 }
 
+function migrateV2(old: Partial<PlanningSnapshot> & { selectedDate: string }): PlanningSnapshot {
+  const previousGoalTitles: Record<string, string> = {
+    "goal-engagement": "Deliver clean first-engagement workpapers",
+    "goal-automation": "Ship one approved automation contribution",
+    "goal-reviewer-safe": "Become reviewer-safe in Technology Risk",
+  };
+  const goals = safeArray(old.goals, defaultGoals).map((goal) => {
+    const fresh = defaultGoals.find((item) => item.id === goal.id);
+    return fresh && previousGoalTitles[goal.id] === goal.title ? { ...fresh, status: goal.status } : goal;
+  });
+  for (const goal of defaultGoals) if (!goals.some((item) => item.id === goal.id)) goals.push(goal);
+
+  const previousTaskTitles: Record<string, string> = {
+    "task-engagement-walkthrough": "Complete one ITGC walkthrough on my first workstream",
+    "task-engagement-review-note": "Turn one review note into a fixed habit",
+    "task-cisa-diagnostic": "Run the CISA diagnostic and set the study rhythm",
+    "task-automation-candidates": "Capture three safe automation candidates from real workflows",
+  };
+  const tasks = safeArray(old.tasks, defaultTasks).map((task) => {
+    const fresh = defaultTasks.find((item) => item.id === task.id);
+    if (!fresh || task.status === "Done" || previousTaskTitles[task.id] !== task.title) return task;
+    return { ...fresh, status: task.status, carryCount: task.carryCount, carryReason: task.carryReason };
+  });
+  for (const task of defaultTasks) if (!tasks.some((item) => item.id === task.id)) tasks.push(task);
+
+  const savedWeekly = old.weeklyPlan && typeof old.weeklyPlan === "object" ? old.weeklyPlan : defaultWeeklyPlan;
+  const previousWeeklyDeliveryWin = "Produce one review-ready workpaper section.";
+  const weeklyPlan =
+    savedWeekly.deliveryWin === previousWeeklyDeliveryWin
+      ? { ...defaultWeeklyPlan, reviewNotes: savedWeekly.reviewNotes }
+      : savedWeekly;
+
+  const savedYear = old.yearPlan && typeof old.yearPlan === "object" ? old.yearPlan : defaultYearPlan;
+  const previousMilestones: Record<string, string> = {
+    "ms-q4-2026": "Reviewer-safe: clean workpapers, ITGC fluency, early escalation",
+    "ms-q1-2027": "CISA study rhythm running and one automation candidate approved",
+    "ms-q2-2027": "Own a bounded area and produce adoption evidence for the automation",
+    "ms-q3-2027": "Package the Rating 1 case with no year-end surprises",
+  };
+  const milestones = savedYear.milestones.map((milestone) => {
+    const fresh = defaultYearPlan.milestones.find((item) => item.id === milestone.id);
+    return fresh && previousMilestones[milestone.id] === milestone.title ? { ...fresh, done: milestone.done } : milestone;
+  });
+  for (const milestone of defaultYearPlan.milestones) if (!milestones.some((item) => item.id === milestone.id)) milestones.push(milestone);
+  const yearPlan = {
+    ...savedYear,
+    northStar: savedYear.northStar === "Rating 1 evidence readiness by September 2027" ? defaultYearPlan.northStar : savedYear.northStar,
+    definitionOfWinning: savedYear.definitionOfWinning.startsWith("A dated body of evidence: strong delivery, one approved automation contribution")
+      ? defaultYearPlan.definitionOfWinning
+      : savedYear.definitionOfWinning,
+    milestones,
+  };
+
+  const monthlyPlans = safeArray<MonthlyPlan>(old.monthlyPlans, []).map((plan) => {
+    if (plan.month !== REENTRY_DATE.slice(0, 7) || plan.theme !== "Engagement delivery foundations") return plan;
+    const fresh = defaultMonthlyPlans[0];
+    return { ...fresh, month: plan.month, outcomes: fresh.outcomes.map((outcome) => ({ ...outcome, done: plan.outcomes.find((item) => item.id === outcome.id)?.done ?? false })), reviewNotes: plan.reviewNotes };
+  });
+  if (!monthlyPlans.some((plan) => plan.month === REENTRY_DATE.slice(0, 7))) monthlyPlans.push(defaultMonthlyPlans[0]);
+
+  const oldTracks = safeArray<StudyTrack>(old.studyTracks, []);
+  const studyTracks = oldTracks.map((track) => {
+    if (track.id === "track-kbac") {
+      return {
+        ...track,
+        status: "Archived" as const,
+        description: track.description.startsWith("Passed on 24 September 2026")
+          ? defaultStudyTracks.find((item) => item.id === "track-kbac")!.description
+          : track.description,
+        guideUrl: "kbac_study_guide.html",
+      };
+    }
+    if (track.id === "track-itgc" && track.description === "The working knowledge for live engagements: ITGC categories, application controls, evidence, and client walkthroughs.") {
+      return { ...track, description: defaultStudyTracks.find((item) => item.id === "track-itgc")!.description };
+    }
+    return track;
+  });
+  for (const track of defaultStudyTracks) if (!studyTracks.some((item) => item.id === track.id)) studyTracks.push(track);
+
+  const dailyPlans = safeArray(old.dailyPlans, defaultDailyPlans).map((plan) => plan);
+  if (!dailyPlans.some((plan) => plan.date === REENTRY_DATE)) dailyPlans.push(defaultDailyPlans[0]);
+
+  return {
+    version: 2,
+    selectedDate: old.selectedDate < REENTRY_DATE ? REENTRY_DATE : old.selectedDate,
+    goals,
+    tasks,
+    dailyPlans,
+    weeklyPlan,
+    yearPlan,
+    monthlyPlans,
+    evidenceRecords: safeArray(old.evidenceRecords, []),
+    automationCandidates: safeArray(old.automationCandidates, []),
+    studyTracks,
+    engagements: safeArray(old.engagements, []),
+  };
+}
+
 function readSnapshot(input: unknown): PlanningSnapshot | null {
   if (!input || typeof input !== "object") return null;
   const candidate = input as { version?: unknown; selectedDate?: unknown };
@@ -547,24 +711,11 @@ function readSnapshot(input: unknown): PlanningSnapshot | null {
 
   if (candidate.version === 2) {
     const stored = candidate as unknown as Partial<PlanningSnapshot>;
-    return {
-      version: 2,
-      selectedDate: candidate.selectedDate,
-      goals: safeArray(stored.goals, defaultGoals),
-      tasks: safeArray(stored.tasks, defaultTasks),
-      dailyPlans: safeArray(stored.dailyPlans, defaultDailyPlans),
-      weeklyPlan: stored.weeklyPlan && typeof stored.weeklyPlan === "object" ? stored.weeklyPlan : defaultWeeklyPlan,
-      yearPlan: stored.yearPlan && typeof stored.yearPlan === "object" ? stored.yearPlan : defaultYearPlan,
-      monthlyPlans: safeArray(stored.monthlyPlans, defaultMonthlyPlans),
-      evidenceRecords: safeArray(stored.evidenceRecords, []),
-      automationCandidates: safeArray(stored.automationCandidates, []),
-      studyTracks: safeArray(stored.studyTracks, defaultStudyTracks),
-      engagements: safeArray(stored.engagements, []),
-    };
+    return migrateV2({ ...stored, selectedDate: candidate.selectedDate });
   }
 
   if (candidate.version === 1) {
-    return migrateV1(input as V1Snapshot);
+    return migrateV2(migrateV1(input as V1Snapshot));
   }
 
   return null;

@@ -61,7 +61,7 @@ const tabs: Array<{ id: TabId; label: string; icon: typeof Target }> = [
   { id: "study", label: "Study", icon: BookOpenCheck },
   { id: "engagements", label: "Engagements", icon: Briefcase },
   { id: "evidence", label: "Rating evidence", icon: Trophy },
-  { id: "automation", label: "Automation", icon: Zap },
+  { id: "automation", label: "Solutions", icon: Lightbulb },
   { id: "roadmap", label: "Roadmap", icon: GoalIcon },
 ];
 
@@ -217,7 +217,7 @@ export function PerformanceCommandCenter() {
   });
   const completedTaskCount = selectedTasks.filter((task) => task.status === "Done").length;
   const activeTrackTopics = studyTracks
-    .filter((track) => track.status !== "Archived")
+    .filter((track) => track.status === "Active")
     .flatMap((track) => track.topics);
   const studyReadyCount = activeTrackTopics.filter(
     (topic) => topic.status === "Can explain" || topic.status === "Test-ready"
@@ -754,7 +754,7 @@ function StudyView({
       <section className="command-page-intro">
         <p className="command-eyebrow">Learning tracks</p>
         <h2>Study what the next engagement needs.</h2>
-        <p>Tracks stay generic: ITGC and engagement readiness now, CISA domains from December, and the passed Academy material kept for reference. The command view counts active tracks only.</p>
+        <p>KBAC is off the active queue. Keep core controls sharp, then deepen the modern assurance thread your team actually needs. Your backend, Python, and SQL experience gives you a natural bridge into API assurance and controlled analytics.</p>
       </section>
 
       <div className="btnrow" style={{ marginBottom: 16 }}>
@@ -1067,16 +1067,16 @@ function AutomationView({ candidates, addCandidate, updateCandidate }: { candida
   return (
     <div className="command-page command-enter">
       <section className="command-page-intro">
-        <p className="command-eyebrow">Responsible automation pipeline</p>
-        <h2>Do not build a bot. Remove a real pain without weakening the audit trail.</h2>
-        <p>Your six-month differentiator is not noisy AI talk. It is a manager-approved improvement that is safe, validated, useful, documented, and repeatable.</p>
+        <p className="command-eyebrow">Responsible client solutions pipeline</p>
+        <h2>Solve a real assurance problem before reaching for a tool.</h2>
+        <p>Your six-month differentiator is a sponsor-approved improvement tied to real risk. It may use AI, APIs, data, workflow, or automation, but it must be safe, validated, useful, documented, and repeatable.</p>
       </section>
       <section className="command-pipeline"><span>Observed pain</span><ArrowRight /><span>Candidate</span><ArrowRight /><span>Sponsor</span><ArrowRight /><span>Approval</span><ArrowRight /><span>Build</span><ArrowRight /><span>Validate</span><ArrowRight /><span>Pilot</span><ArrowRight /><span>Adopt</span></section>
       <section className="command-panel command-automation-warning"><LockKeyhole className="h-5 w-5" /><div><h3>Non-negotiable data rule</h3><p>Never put client data, screenshots, working papers, credentials, client names, or sensitive KPMG information into this app, personal GitHub, a public AI tool, or an unapproved bot. Capture generic workflow observations only.</p></div></section>
       <section className="command-automation-layout">
         <form className="command-panel command-automation-form" onSubmit={submit}>
           <SectionHeading eyebrow="Opportunity capture" title="One pain point at a time" />
-          <p className="command-muted">Start with the manual work. A good candidate has a named owner, a control rationale, and approved tools before it has code.</p>
+          <p className="command-muted">Start with the business or assurance problem. A good candidate has an owner, a control rationale, an approved method, and a way to validate value before it has code.</p>
           <div className="command-form-grid">
             <label className="command-form-full"><span>Workflow</span><input required value={form.workflow} onChange={(event) => setForm({ ...form, workflow: event.target.value })} placeholder="e.g., Evidence request tracking or access-review population analysis" /></label>
             <label className="command-form-full"><span>Manual pain point</span><textarea required rows={3} value={form.painPoint} onChange={(event) => setForm({ ...form, painPoint: event.target.value })} placeholder="What repeats, delays review, or creates avoidable error risk?" /></label>
@@ -1150,13 +1150,22 @@ function RoadmapView({ goals, tasks, evidenceRecords, exportSnapshot, importSnap
         {goals.map((goal) => <GoalCard key={goal.id} goal={goal} />)}
       </section>
       <section className="command-panel command-roadmap-table">
-        <SectionHeading eyebrow="Sep 2026 to Sep 2027" title="The high-performance route" />
+        <SectionHeading eyebrow="Oct 2026 to Sep 2027" title="The high-performance route" />
         <div className="command-roadmap-rows">
-          <div><span>Sep-Oct 2026</span><strong>Academy to first engagements</strong><p>Pass the General Test, then learn the method on live workstreams and start your evidence habit.</p></div>
-          <div><span>Late Sep-Nov 2026</span><strong>Learn the method and become reviewer-safe</strong><p>Clean workpapers, core ITGC fluency, early escalation, feedback after meaningful tasks.</p></div>
-          <div><span>Dec 2026-Mar 2027</span><strong>Own a bounded area and scope the pilot</strong><p>Identify a safe automation opportunity, obtain sponsor and approval before build.</p></div>
-          <div><span>Apr-Jun 2027</span><strong>Operate one level higher</strong><p>Make the improvement useful, increase ownership, help peers, and create adoption evidence.</p></div>
-          <div><span>Jul-Sep 2027</span><strong>Close gaps and package credible proof</strong><p>Ask directly what still needs to be true for a Rating 1 case. No surprise self-rating.</p></div>
+          <div><span>Oct 5-16, 2026</span><strong>Re-enter and confirm the real brief</strong><p>Get clear on your first assignment, quality bar, Advisory and Audit boundaries, current work, and approved tools. Treat ICFR scope and team intelligence as questions until confirmed.</p></div>
+          <div><span>Oct-Nov 2026</span><strong>Deliver cleanly and map the practice</strong><p>Build trust on assigned work. Keep ITGC and ITAC judgement strong, while learning how revenue assurance, ICFR, and implementation assurance show up in actual engagements.</p></div>
+          <div><span>Dec 2026-Feb 2027</span><strong>Choose one modern assurance depth</strong><p>Based on team demand, go deeper in APIs, AI governance, cloud, DevSecOps, data and automation governance, or another live priority. CISA can run alongside this if workload allows.</p></div>
+          <div><span>By Apr 5, 2027</span><strong>Deliver one approved value contribution</strong><p>With a sponsor and approved environment, improve a real assurance workflow through a test, analysis, diagnostic, reusable assessment, or automation. Show validation and value.</p></div>
+          <div><span>Apr-Sep 2027</span><strong>Operate above analyst baseline and prove it</strong><p>Take more ownership, help peers, show reuse or impact, and review Rating 1 evidence with your counsellor before year-end.</p></div>
+        </div>
+      </section>
+      <section className="command-panel command-roadmap-table">
+        <SectionHeading eyebrow="Practice map" title="Foundations stay. The offer gets broader." />
+        <div className="command-roadmap-rows">
+          <div><span>Assurance foundation</span><strong>ITGC, ITAC, governance, attestation</strong><p>Keep control design, implementation, evidence, and operating effectiveness clear. These skills transfer into modern technology work.</p></div>
+          <div><span>Modernisation</span><strong>AI, APIs, cloud, DevSecOps, transformation</strong><p>Ask what is being governed, which risks matter, who owns each control, and what evidence proves it works.</p></div>
+          <div><span>Client solutions</span><strong>Revenue assurance, ICFR, data, workflow automation</strong><p>ICFR usually means Internal Control over Financial Reporting. Confirm the team&apos;s exact scope, client context, and your role before treating it as an assigned specialty.</p></div>
+          <div><span>Monday questions</span><strong>Find the work before choosing the course</strong><p>Which engagements and deliverables need help now? What sits with Advisory versus Audit? Which tools and reusable assets are approved? What does API testing mean on this team?</p></div>
         </div>
       </section>
       <section className="command-two-up">
