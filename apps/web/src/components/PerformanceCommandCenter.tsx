@@ -248,9 +248,14 @@ export function PerformanceCommandCenter() {
             <h1>Performance Command Center</h1>
           </div>
         </div>
-        <div className="command-north-star">
-          <Target className="h-4 w-4" />
-          <span>{yearPlan.northStar || "Rating 1 evidence readiness by Sep 2027"}</span>
+        <div className="command-header-actions">
+          <div className="command-north-star">
+            <Target className="h-4 w-4" />
+            <span>{yearPlan.northStar || "Rating 1 evidence readiness by Sep 2027"}</span>
+          </div>
+          <button type="button" className="command-quiet-button" onClick={() => setActiveTab("study")}>
+            <BookOpenCheck className="h-4 w-4" /> Guides
+          </button>
         </div>
       </header>
 
@@ -755,6 +760,19 @@ function StudyView({
         <p className="command-eyebrow">Learning tracks</p>
         <h2>Study what the next engagement needs.</h2>
         <p>KBAC is off the active queue. Keep core controls sharp, then deepen the modern assurance thread your team actually needs. Your backend, Python, and SQL experience gives you a natural bridge into API assurance and controlled analytics.</p>
+      </section>
+
+      <section className="command-panel" style={{ marginBottom: 16 }}>
+        <SectionHeading eyebrow="Guides and materials" title="The full references, always one click away" />
+        <div className="btnrow">
+          <a className="command-primary-button" href="kbac_study_guide.html" target="_blank" rel="noreferrer">
+            <BookOpenCheck className="h-4 w-4" /> KBAC Elite Study System
+          </a>
+          <a className="command-primary-button" href="technology_assurance_field_guide.html" target="_blank" rel="noreferrer">
+            <ShieldCheck className="h-4 w-4" /> Technology Assurance Field Guide
+          </a>
+        </div>
+        <p className="command-muted" style={{ marginTop: 12 }}>Both open as standalone pages in a new tab. Bookmark them if you use them often.</p>
       </section>
 
       <div className="btnrow" style={{ marginBottom: 16 }}>

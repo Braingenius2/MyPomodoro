@@ -194,6 +194,13 @@ body::after {
   white-space: nowrap;
 }
 
+.command-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 .command-north-star svg { color: var(--command-gold); }
 
 .command-tabs {
