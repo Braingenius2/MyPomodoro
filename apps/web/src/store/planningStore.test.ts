@@ -253,6 +253,25 @@ describe("planningStore", () => {
       expect(usePlanningStore.getState().monthlyPlans.length).toBeGreaterThan(0);
     });
 
+    it("keeps the selected date inside the current week on load", () => {
+      const fmt = (d: Date) =>
+        `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+      const today = fmt(new Date());
+      const farFuture = fmt(new Date(Date.now() + 30 * 86400000));
+
+      usePlanningStore.setState({
+        tasks: [makeTask({ id: "keep", title: "Keep me", plannedDate: farFuture })],
+      });
+      const future = { ...usePlanningStore.getState().exportSnapshot(), selectedDate: farFuture };
+      expect(usePlanningStore.getState().importSnapshot(JSON.parse(JSON.stringify(future)))).toBe(true);
+      expect(usePlanningStore.getState().selectedDate).toBe(today);
+      expect(usePlanningStore.getState().tasks.some((task) => task.id === "keep")).toBe(true);
+
+      const past = { ...usePlanningStore.getState().exportSnapshot(), selectedDate: "2020-01-01" };
+      expect(usePlanningStore.getState().importSnapshot(JSON.parse(JSON.stringify(past)))).toBe(true);
+      expect(usePlanningStore.getState().selectedDate).toBe(today);
+    });
+
     it("keeps a user-edited weekly plan on later v2 loads", () => {
       const base = usePlanningStore.getState().exportSnapshot();
       const edited = {

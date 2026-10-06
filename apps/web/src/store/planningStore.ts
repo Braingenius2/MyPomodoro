@@ -720,9 +720,13 @@ function migrateV2(old: Partial<PlanningSnapshot> & { selectedDate: string }): P
   const dailyPlans = safeArray(old.dailyPlans, defaultDailyPlans).map((plan) => plan);
   if (!dailyPlans.some((plan) => plan.date === REENTRY_DATE)) dailyPlans.push(defaultDailyPlans[0]);
 
+  const weekEnd = addDays(REENTRY_DATE, 6);
+  const selectedDate =
+    old.selectedDate < REENTRY_DATE || old.selectedDate > weekEnd ? REENTRY_DATE : old.selectedDate;
+
   return {
     version: 2,
-    selectedDate: old.selectedDate < REENTRY_DATE ? REENTRY_DATE : old.selectedDate,
+    selectedDate,
     goals,
     tasks,
     dailyPlans,

@@ -579,6 +579,7 @@ body::after {
 .command-state-list span { display: block; color: var(--command-muted); font-size: 0.63rem; line-height: 1.2; }
 .command-state-list strong { display: block; color: white; font-family: Georgia, serif; font-size: 1.2rem; margin-top: 5px; }
 .command-backup-actions { display: flex; gap: 9px; flex-wrap: wrap; }
+.btnrow { display: flex; gap: 9px; flex-wrap: wrap; }
 
 .command-cascade {
   display: grid;
