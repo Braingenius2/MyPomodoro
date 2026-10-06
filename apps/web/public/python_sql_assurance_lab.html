@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Python and SQL Assurance Lab</title>
+  <style>
+    :root { color-scheme: light; --navy: #082447; --blue: #1268a8; --cyan: #27b8bb; --ink: #182b40; --muted: #5c6c7c; --line: #d8e1e8; --paper: #f3f6f8; --white: #fff; --gold: #b88525; --ok: #0f7a4b; --bad: #9b2c2c; }
+    * { box-sizing: border-box; }
+    body { margin: 0; color: var(--ink); background: var(--paper); font: 16px/1.58 Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+    .wrap { width: min(1120px, calc(100% - 36px)); margin: 0 auto; }
+    header { padding: 52px 0 42px; color: #fff; background: radial-gradient(circle at 12% 20%, #1c8ca3 0, transparent 32%), linear-gradient(125deg, #071c37, #0d4771); }
+    .eyebrow { margin: 0 0 10px; color: #8ce8e4; font-size: .73rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+    h1, h2, h3 { margin: 0; line-height: 1.15; }
+    h1 { max-width: 900px; font-size: clamp(2.2rem, 6vw, 4.3rem); letter-spacing: -.045em; }
+    header p.deck { max-width: 780px; margin: 16px 0 0; color: #d3e4ef; }
+    .notice { max-width: 880px; margin-top: 22px; padding: 13px 16px; border: 1px solid #e7c27880; border-radius: 10px; color: #f9e8c6; background: #d99a301a; font-size: .9rem; }
+    main { padding: 28px 0 70px; }
+    section { margin: 18px 0; padding: 25px; border: 1px solid var(--line); border-radius: 16px; background: var(--white); box-shadow: 0 8px 28px #18384d09; }
+    h2 { margin-bottom: 12px; color: var(--navy); font-size: clamp(1.35rem, 3vw, 1.85rem); }
+    h3 { margin: 0 0 6px; color: var(--navy); font-size: 1.02rem; }
+    p { margin: 8px 0; }
+    a { color: var(--blue); font-weight: 700; }
+    .muted { color: var(--muted); }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .tile { padding: 16px; border-radius: 12px; background: #f1f7fa; }
+    .tile p { margin-bottom: 0; font-size: .92rem; }
+    .tag { display: inline-block; margin-bottom: 7px; color: var(--blue); font-size: .68rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+    table { width: 100%; border-collapse: collapse; font-size: .86rem; margin: 10px 0; }
+    th, td { padding: 8px 10px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { color: var(--navy); background: #edf4f7; }
+    .num { text-align: right; font-variant-numeric: tabular-nums; }
+    pre { overflow: auto; padding: 14px; border-radius: 10px; background: #0d2138; color: #e7f2f4; font: 13px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    button, .btn { font: inherit; cursor: pointer; border-radius: 8px; border: 1px solid #b9d7df; background: #eff9fa; color: #0d4868; font-weight: 700; padding: 8px 12px; text-decoration: none; display: inline-flex; align-items: center; }
+    button.primary { background: var(--navy); color: #fff; border-color: var(--navy); }
+    .btnrow { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+    .drill { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line); }
+    label { font-size: .86rem; font-weight: 700; color: var(--navy); }
+    input[type="number"], input[type="text"] { font: inherit; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; width: min(220px, 100%); }
+    .feedback { margin-top: 8px; font-weight: 700; }
+    .feedback.ok { color: var(--ok); }
+    .feedback.bad { color: var(--bad); }
+    .hidden { display: none; }
+    .callout { padding: 15px 17px; border-left: 4px solid var(--cyan); border-radius: 5px; background: #eff8f8; }
+    .warn { padding: 15px 17px; border-left: 4px solid var(--gold); border-radius: 5px; background: #fbf6ea; }
+    ul { margin: 8px 0 0; padding-left: 21px; }
+    li { margin: 6px 0; }
+    footer { padding: 8px 0 36px; color: var(--muted); font-size: .8rem; }
+    @media (max-width: 800px) { .grid { grid-template-columns: 1fr; } section { padding: 18px; } table { display: block; overflow-x: auto; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <p class="eyebrow">Personal practice | Synthetic data only</p>
+      <h1>Revive Python and SQL on a tie-out, not a tutorial.</h1>
+      <p class="deck">Sample Bank is fictional. Ten loan rows, three GL balances, six users, four journals. The skills are the ones a Technology Risk analyst actually uses: duplicates, missing keys, a control total, stale access, and segregation of duties.</p>
+      <div class="notice"><strong>Hard rule:</strong> do not replace this data with a client extract. Do not paste firm files into this page, a personal notebook, or an unapproved tool. If a real population test is later approved, it happens in the approved environment, with the query logic preserved and the counts tied back to source.</div>
+    </div>
+  </header>
+  <main class="wrap">
+    <section>
+      <p class="eyebrow">Why this week</p>
+      <h2>Rust is not lack of talent. It is lack of a recent rep.</h2>
+      <p>You already have Python, Pandas, PostgreSQL, joins, and schema work from the data track. What fades is speed and assurance judgement: which join hides the exception, whether you summed before you deduped, and whether you can explain the result to a senior in one sentence.</p>
+      <div class="grid">
+        <div class="tile"><span class="tag">Control objective first</span><h3>Then the query</h3><p>Every drill starts with the risk. If you cannot say what would be wrong with the financial statements, the query is just code.</p></div>
+        <div class="tile"><span class="tag">Predict, then run</span><h3>Recognition is not recall</h3><p>Type the count before you reveal the rows. Then rewrite the SQL or pandas from memory in a local file. The page is the answer key, not the practice.</p></div>
+      </div>
+      <p>If you want the reporting context first, use the <a href="banking_icfr_primer.html">Banking ICFR primer</a>. Tomorrow's order is primer, then this lab.</p>
+    </section>
+
+    <section>
+      <p class="eyebrow">Sample Bank | fictional | as at 7 October 2026</p>
+      <h2>The population.</h2>
+      <p>Loans subledger. LN-1004 is duplicated on purpose. Two GL codes on the subledger do not exist on the GL. One GL balance does not match the deduped subledger.</p>
+      <div id="loans-table"></div>
+      <p>General ledger balances for the loan codes that exist.</p>
+      <div id="gl-table"></div>
+      <div class="btnrow">
+        <button type="button" id="download-csv" class="primary">Download the four CSVs</button>
+        <button type="button" id="download-py">Download sample_bank_lab.py</button>
+      </div>
+      <p class="muted">Local setup, if pandas is rusty: <code>python --version</code> then <code>pip install pandas</code>. You do not need a database for the first rep. The in-browser drills use the same rows.</p>
+    </section>
+
+    <section>
+      <p class="eyebrow">Drills</p>
+      <h2>Six predictions. Then look.</h2>
+      <p class="feedback" id="lab-score">Predictions correct: 0 of 6</p>
+
+      <article class="drill" id="d1">
+        <span class="tag">Completeness</span>
+        <h3>1. Loans whose GL code is not on the GL</h3>
+        <p>Risk: a loan is in the subledger and not in the ledger, so loans and advances may be incomplete in the financial statements. An inner join hides this. Use an anti-join.</p>
+        <label for="p1">How many loan rows have a gl_code that is absent from the GL?</label>
+        <div class="btnrow"><input id="p1" type="number" min="0" step="1"><button type="button" data-predict="1" data-answer="2">Check</button><button type="button" data-show="r1">Show rows</button></div>
+        <div class="feedback" id="f1"></div>
+        <div class="hidden" id="r1"></div>
+      </article>
+
+      <article class="drill" id="d2">
+        <span class="tag">Duplicates</span>
+        <h3>2. The same account twice</h3>
+        <p>Risk: summing the raw extract double-counts a loan. Deduplicate on the business key before you tie to a control total. Here the duplicated amount is identical, so a careless sum is quietly wrong by 1,500,000.</p>
+        <label for="p2">How many loan accounts appear more than once?</label>
+        <div class="btnrow"><input id="p2" type="number" min="0" step="1"><button type="button" data-predict="2" data-answer="1">Check</button><button type="button" data-show="r2">Show rows</button></div>
+        <div class="feedback" id="f2"></div>
+        <div class="hidden" id="r2"></div>
+      </article>
+
+      <article class="drill" id="d3">
+        <span class="tag">Accuracy</span>
+        <h3>3. Deduped subledger versus GL</h3>
+        <p>Risk: the population ties in count and still fails in amount. Drop the duplicate first, sum principal by gl_code, then compare to the GL balance. Outer join, so missing codes stay visible.</p>
+        <label for="p3">How many GL codes have a non-zero difference after deduping?</label>
+        <div class="btnrow"><input id="p3" type="number" min="0" step="1"><button type="button" data-predict="3" data-answer="3">Check</button><button type="button" data-show="r3">Show tie-out</button></div>
+        <p class="muted">Count a code if the deduped principal does not equal the GL balance, including codes that exist on only one side.</p>
+        <div class="feedback" id="f3"></div>
+        <div class="hidden" id="r3"></div>
+      </article>
+
+      <article class="drill" id="d4">
+        <span class="tag">Accuracy</span>
+        <h3>4. The overdraft difference</h3>
+        <p>One matched code is simply the wrong amount. State the difference as subledger minus GL, after deduping.</p>
+        <label for="p4">Difference on GL 1202, in naira</label>
+        <div class="btnrow"><input id="p4" type="number" step="1"><button type="button" data-predict="4" data-answer="500000">Check</button></div>
+        <div class="feedback" id="f4"></div>
+      </article>
+
+      <article class="drill" id="d5">
+        <span class="tag">Access</span>
+        <h3>5. Privileged access exceptions</h3>
+        <p>Rule, stated so you do not argue with the date: privileged roles are System admin and Finance poster. Flag a user if the role is privileged and either they are inactive or their last login is before 9 July 2026 (90 days before 7 October 2026). Read-only stale access is not in this exception. It may still be a housekeeping issue. It is not this test.</p>
+        <div id="access-table"></div>
+        <label for="p5">How many users fail the rule?</label>
+        <div class="btnrow"><input id="p5" type="number" min="0" step="1"><button type="button" data-predict="5" data-answer="3">Check</button><button type="button" data-show="r5">Show users</button></div>
+        <div class="feedback" id="f5"></div>
+        <div class="hidden" id="r5"></div>
+      </article>
+
+      <article class="drill" id="d6">
+        <span class="tag">Segregation of duties</span>
+        <h3>6. Preparer approves their own journal</h3>
+        <p>Risk: a manual journal reaches the ledger without an independent review. This is a close-process control. The system should prevent it. If it does not, the detective control is the query you are about to write.</p>
+        <div id="journal-table"></div>
+        <label for="p6">How many journals have preparer equal to approver?</label>
+        <div class="btnrow"><input id="p6" type="number" min="0" step="1"><button type="button" data-predict="6" data-answer="2">Check</button><button type="button" data-show="r6">Show journals</button></div>
+        <div class="feedback" id="f6"></div>
+        <div class="hidden" id="r6"></div>
+      </article>
+    </section>
+
+    <section>
+      <p class="eyebrow">Answer key</p>
+      <h2>SQL, then pandas. Read once. Rewrite from memory.</h2>
+      <div class="btnrow">
+        <button type="button" id="toggle-sql" class="primary">Show SQL</button>
+        <button type="button" id="toggle-py">Show pandas</button>
+      </div>
+      <div class="hidden" id="sql-block">
+        <p>Illustrative SQL. Table names match the CSVs: loans, gl, access_list, journals. Dates are ISO text, so the comparison is safe in SQLite.</p>
+        <pre id="sql-pre"></pre>
+      </div>
+      <div class="hidden" id="py-block">
+        <p>Same logic in pandas. Run the downloaded script rather than retyping the rows.</p>
+        <pre id="py-pre"></pre>
+      </div>
+      <div class="warn"><strong>Mistakes this lab is built to catch:</strong> summing before deduping, using an inner join and calling the missing loans "out of scope", filtering to active users and missing the leaver who still has a posting role, and treating a signed report as proof the report is complete.</div>
+    </section>
+
+    <section>
+      <p class="eyebrow">After the page</p>
+      <h2>The rep that sticks is the one without the answer open.</h2>
+      <ul>
+        <li>Create a local folder named practice-lab. Put only the downloaded files in it.</li>
+        <li>Run the script. Confirm you get 2 missing-GL rows, 1 duplicated account, 3 tie-out breaks, a 500,000 overdraft difference, 3 access exceptions, and 2 self-approved journals.</li>
+        <li>Close the page. Rewrite the tie-out query from memory. If it fails, look at the error, not the answer, for ten minutes.</li>
+        <li>Write one sentence a senior could read: what the exception is, why it matters to the number, and what you would ask for next if this were approved work.</li>
+        <li>Thursday: same script, but add a cutoff. Exclude loans with a fictional booking date after the period, once you have added a booking_date column yourself. That is the next rep, not a new course.</li>
+      </ul>
+      <div class="callout"><strong>When real work arrives:</strong> stop. Confirm the source, the key, the period, the approver, and where the output must be saved. A query that cannot be rerun and tied to source is not evidence.</div>
+    </section>
+  </main>
+  <footer class="wrap">Fictional Sample Bank. Personal practice only. Firm methodology and engagement instructions take precedence on live work.</footer>
+  <script>
+    const loans = [
+      { account: "LN-1001", product: "Term", principal: 5000000, status: "Performing", gl_code: "1201" },
+      { account: "LN-1002", product: "Overdraft", principal: 2500000, status: "Performing", gl_code: "1202" },
+      { account: "LN-1003", product: "Term", principal: 8000000, status: "Watchlist", gl_code: "1201" },
+      { account: "LN-1004", product: "Term", principal: 1500000, status: "Performing", gl_code: "1201" },
+      { account: "LN-1004", product: "Term", principal: 1500000, status: "Performing", gl_code: "1201" },
+      { account: "LN-1005", product: "Mortgage", principal: 12000000, status: "Performing", gl_code: "1203" },
+      { account: "LN-1006", product: "Term", principal: 900000, status: "Substandard", gl_code: "1201" },
+      { account: "LN-1007", product: "Overdraft", principal: 3000000, status: "Performing", gl_code: "1299" },
+      { account: "LN-1008", product: "Term", principal: 4200000, status: "Performing", gl_code: "1201" },
+      { account: "LN-1009", product: "Staff", principal: 600000, status: "Performing", gl_code: "1204" }
+    ];
+    const gl = [
+      { gl_code: "1201", name: "Term loans", balance: 19600000 },
+      { gl_code: "1202", name: "Overdrafts", balance: 2000000 },
+      { gl_code: "1203", name: "Mortgages", balance: 12000000 }
+    ];
+    const access = [
+      { user: "ada", role: "Loan officer", active: "Yes", last_login: "2026-10-01" },
+      { user: "bola", role: "Finance poster", active: "Yes", last_login: "2026-09-20" },
+      { user: "chidi", role: "System admin", active: "Yes", last_login: "2026-04-02" },
+      { user: "dayo", role: "Finance poster", active: "Yes", last_login: "2026-01-15" },
+      { user: "efe", role: "Finance poster", active: "No", last_login: "2026-10-02" },
+      { user: "funke", role: "Read only", active: "Yes", last_login: "2026-02-01" }
+    ];
+    const journals = [
+      { id: "J1", amount: 250000, preparer: "ada", approver: "bola" },
+      { id: "J2", amount: 1800000, preparer: "chidi", approver: "chidi" },
+      { id: "J3", amount: 400000, preparer: "dayo", approver: "ada" },
+      { id: "J4", amount: 750000, preparer: "bola", approver: "bola" }
+    ];
+    const privileged = new Set(["System admin", "Finance poster"]);
+    const staleBefore = "2026-07-09";
+    const naira = (value) => "₦" + Number(value).toLocaleString("en-NG");
+
+    function table(rows, columns) {
+      const head = "<tr>" + columns.map((col) => "<th>" + col.label + "</th>").join("") + "</tr>";
+      const body = rows.map((row) => "<tr>" + columns.map((col) => {
+        const raw = row[col.key];
+        const text = col.money ? naira(raw) : raw;
+        return "<td class=\"" + (col.money ? "num" : "") + "\">" + text + "</td>";
+      }).join("") + "</tr>").join("");
+      return "<table><thead>" + head + "</thead><tbody>" + body + "</tbody></table>";
+    }
+
+    const loanCols = [
+      { key: "account", label: "Account" },
+      { key: "product", label: "Product" },
+      { key: "principal", label: "Principal", money: true },
+      { key: "status", label: "Status" },
+      { key: "gl_code", label: "GL code" }
+    ];
+    document.getElementById("loans-table").innerHTML = table(loans, loanCols);
+    document.getElementById("gl-table").innerHTML = table(gl, [
+      { key: "gl_code", label: "GL code" },
+      { key: "name", label: "Name" },
+      { key: "balance", label: "Balance", money: true }
+    ]);
+    document.getElementById("access-table").innerHTML = table(access, [
+      { key: "user", label: "User" },
+      { key: "role", label: "Role" },
+      { key: "active", label: "Active" },
+      { key: "last_login", label: "Last login" }
+    ]);
+    document.getElementById("journal-table").innerHTML = table(journals, [
+      { key: "id", label: "Journal" },
+      { key: "amount", label: "Amount", money: true },
+      { key: "preparer", label: "Preparer" },
+      { key: "approver", label: "Approver" }
+    ]);
+
+    const glCodes = new Set(gl.map((row) => row.gl_code));
+    const missing = loans.filter((row) => !glCodes.has(row.gl_code));
+    const counts = loans.reduce((map, row) => map.set(row.account, (map.get(row.account) || 0) + 1), new Map());
+    const duplicateRows = loans.filter((row) => counts.get(row.account) > 1);
+    const seen = new Set();
+    const deduped = loans.filter((row) => {
+      if (seen.has(row.account)) return false;
+      seen.add(row.account);
+      return true;
+    });
+    const sums = new Map();
+    deduped.forEach((row) => sums.set(row.gl_code, (sums.get(row.gl_code) || 0) + row.principal));
+    const codes = new Set([...sums.keys(), ...gl.map((row) => row.gl_code)]);
+    const tie = [...codes].sort().map((code) => {
+      const principal = sums.get(code) || 0;
+      const balance = (gl.find((row) => row.gl_code === code) || {}).balance || 0;
+      return { gl_code: code, subledger: principal, gl_balance: balance, difference: principal - balance };
+    });
+    const breaks = tie.filter((row) => row.difference !== 0);
+    const accessHits = access.filter((row) => privileged.has(row.role) && (row.active === "No" || row.last_login < staleBefore));
+    const sod = journals.filter((row) => row.preparer === row.approver);
+
+    document.getElementById("r1").innerHTML = table(missing, loanCols);
+    document.getElementById("r2").innerHTML = table(duplicateRows, loanCols);
+    document.getElementById("r3").innerHTML = table(breaks, [
+      { key: "gl_code", label: "GL code" },
+      { key: "subledger", label: "Deduped subledger", money: true },
+      { key: "gl_balance", label: "GL balance", money: true },
+      { key: "difference", label: "Difference", money: true }
+    ]);
+    document.getElementById("r5").innerHTML = table(accessHits, [
+      { key: "user", label: "User" },
+      { key: "role", label: "Role" },
+      { key: "active", label: "Active" },
+      { key: "last_login", label: "Last login" }
+    ]);
+    document.getElementById("r6").innerHTML = table(sod, [
+      { key: "id", label: "Journal" },
+      { key: "amount", label: "Amount", money: true },
+      { key: "preparer", label: "Preparer" },
+      { key: "approver", label: "Approver" }
+    ]);
+
+    const answered = new Set();
+    let correct = 0;
+    document.querySelectorAll("[data-predict]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const id = button.dataset.predict;
+        const input = document.getElementById("p" + id);
+        const feedback = document.getElementById("f" + id);
+        const got = Number(input.value);
+        const expected = Number(button.dataset.answer);
+        if (input.value === "") {
+          feedback.className = "feedback bad";
+          feedback.textContent = "Type a number first.";
+          return;
+        }
+        const ok = got === expected;
+        feedback.className = "feedback " + (ok ? "ok" : "bad");
+        feedback.textContent = ok ? "Correct." : "Not yet. Look at the population again before you reveal the rows.";
+        if (ok && !answered.has(id)) {
+          answered.add(id);
+          correct += 1;
+          document.getElementById("lab-score").textContent = "Predictions correct: " + correct + " of 6";
+        }
+      });
+    });
+    document.querySelectorAll("[data-show]").forEach((button) => {
+      button.addEventListener("click", () => {
+        document.getElementById(button.dataset.show).classList.remove("hidden");
+      });
+    });
+    document.getElementById("toggle-sql").addEventListener("click", () => document.getElementById("sql-block").classList.toggle("hidden"));
+    document.getElementById("toggle-py").addEventListener("click", () => document.getElementById("py-block").classList.toggle("hidden"));
+
+    const sql = `-- Completeness: anti-join. An inner join would hide these rows.
+SELECT l.*
+FROM loans l
+LEFT JOIN gl g ON g.gl_code = l.gl_code
+WHERE g.gl_code IS NULL;
+
+-- Duplicates on the business key.
+SELECT account, COUNT(*) AS row_count
+FROM loans
+GROUP BY account
+HAVING COUNT(*) > 1;
+
+-- Accuracy: dedupe, sum, then keep both sides. SQLite has no FULL OUTER JOIN.
+WITH deduped AS (
+  SELECT account, MIN(gl_code) AS gl_code, MIN(principal) AS principal
+  FROM loans
+  GROUP BY account
+),
+sums AS (
+  SELECT gl_code, SUM(principal) AS principal
+  FROM deduped
+  GROUP BY gl_code
+)
+SELECT
+  s.gl_code,
+  s.principal AS subledger,
+  COALESCE(g.balance, 0) AS gl_balance,
+  s.principal - COALESCE(g.balance, 0) AS difference
+FROM sums s
+LEFT JOIN gl g ON g.gl_code = s.gl_code
+WHERE s.principal <> COALESCE(g.balance, 0)
+UNION
+SELECT
+  g.gl_code,
+  0,
+  g.balance,
+  0 - g.balance
+FROM gl g
+LEFT JOIN sums s ON s.gl_code = g.gl_code
+WHERE s.gl_code IS NULL;
+
+-- Privileged access. Cutoff is explicit: before 9 July 2026.
+SELECT *
+FROM access_list
+WHERE role IN ('System admin', 'Finance poster')
+  AND (active = 'No' OR last_login < '2026-07-09');
+
+-- Journals the preparer also approved.
+SELECT *
+FROM journals
+WHERE preparer = approver;`;
+    document.getElementById("sql-pre").textContent = sql;
+
+    const py = `"""Sample Bank assurance lab. Fictional data. Do not point this at a client extract."""
+import pandas as pd
+
+loans = pd.DataFrame(${JSON.stringify(loans, null, 4)})
+gl = pd.DataFrame(${JSON.stringify(gl, null, 4)})
+access = pd.DataFrame(${JSON.stringify(access, null, 4)})
+journals = pd.DataFrame(${JSON.stringify(journals, null, 4)})
+
+missing = loans[~loans.gl_code.isin(gl.gl_code)]
+duplicate_accounts = loans[loans.duplicated("account", keep=False)]
+deduped = loans.drop_duplicates("account")
+by_code = deduped.groupby("gl_code", as_index=False).principal.sum()
+tie = by_code.merge(gl, on="gl_code", how="outer", indicator=True)
+tie["subledger"] = tie.principal.fillna(0)
+tie["gl_balance"] = tie.balance.fillna(0)
+tie["difference"] = tie.subledger - tie.gl_balance
+breaks = tie[tie.difference != 0]
+
+privileged = {"System admin", "Finance poster"}
+access_hits = access[
+    access.role.isin(privileged)
+    & ((access.active == "No") | (access.last_login < "2026-07-09"))
+]
+self_approved = journals[journals.preparer == journals.approver]
+
+print("missing GL rows", len(missing))
+print("duplicated accounts", duplicate_accounts.account.nunique())
+print("tie-out breaks", len(breaks))
+print(breaks[["gl_code", "subledger", "gl_balance", "difference"]])
+print("access exceptions", len(access_hits))
+print("self-approved journals", len(self_approved))
+`;
+    document.getElementById("py-pre").textContent = py;
+
+    function download(name, content, type) {
+      const blob = new Blob([content], { type });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = name;
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+    function toCsv(rows) {
+      const keys = Object.keys(rows[0]);
+      const lines = [keys.join(",")].concat(rows.map((row) => keys.map((key) => row[key]).join(",")));
+      return lines.join(String.fromCharCode(10));
+    }
+    document.getElementById("download-py").addEventListener("click", () => {
+      download("sample_bank_lab.py", py, "text/x-python");
+    });
+    document.getElementById("download-csv").addEventListener("click", () => {
+      [
+        ["loans.csv", loans],
+        ["gl.csv", gl],
+        ["access_list.csv", access],
+        ["journals.csv", journals],
+      ].forEach(([name, rows], index) => {
+        setTimeout(() => download(name, toCsv(rows), "text/csv"), index * 250);
+      });
+    });
+  </script>
+</body>
+</html>

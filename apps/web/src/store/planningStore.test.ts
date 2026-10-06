@@ -240,7 +240,7 @@ describe("planningStore", () => {
       expect(kbacGoal?.title).toBe("KBAC study cycle complete");
       expect(state.goals.some((goal) => goal.id === "goal-engagement")).toBe(true);
       expect(state.tasks.some((task) => task.id === "task-kbac-diagnostic")).toBe(false);
-      expect(state.weeklyPlan.theme).toBe("Engagement mode: learn the method");
+      expect(state.weeklyPlan.theme).toBe("Skill revival: Python, SQL, and banking ICFR readiness");
       expect(state.monthlyPlans[0].theme).toBe("Re-entry, delivery quality, and practice mapping");
     });
 
@@ -285,6 +285,38 @@ describe("planningStore", () => {
           expect(track.guideUrl.startsWith("/")).toBe(false);
         }
       }
+    });
+
+    it("ships the banking ICFR and Python/SQL tracks with their guides", () => {
+      const tracks = usePlanningStore.getState().studyTracks;
+      expect(tracks.find((track) => track.id === "track-banking-icfr")).toMatchObject({
+        status: "Active",
+        guideUrl: "banking_icfr_primer.html",
+      });
+      expect(tracks.find((track) => track.id === "track-python-sql")).toMatchObject({
+        status: "Active",
+        guideUrl: "python_sql_assurance_lab.html",
+      });
+    });
+
+    it("refreshes untouched skill-week tasks without touching user edits", () => {
+      usePlanningStore.setState({
+        tasks: [
+          makeTask({
+            id: "task-engagement-walkthrough",
+            title: "Confirm my first workstream and definition of done",
+          }),
+          makeTask({ id: "task-improvement-path", title: "My own edited title" }),
+        ],
+      });
+      const older = usePlanningStore.getState().exportSnapshot();
+
+      expect(usePlanningStore.getState().importSnapshot(JSON.parse(JSON.stringify(older)))).toBe(true);
+      const tasks = usePlanningStore.getState().tasks;
+      expect(tasks.find((task) => task.id === "task-engagement-walkthrough")?.title).toBe(
+        "Work through the banking ICFR primer"
+      );
+      expect(tasks.find((task) => task.id === "task-improvement-path")?.title).toBe("My own edited title");
     });
 
     it("rejects invalid snapshots", () => {

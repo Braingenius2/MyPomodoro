@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Banking ICFR Primer</title>
+  <style>
+    :root { color-scheme: light; --navy: #082447; --blue: #1268a8; --cyan: #27b8bb; --ink: #182b40; --muted: #5c6c7c; --line: #d8e1e8; --paper: #f3f6f8; --white: #fff; --gold: #b88525; --ok: #0f7a4b; --bad: #9b2c2c; }
+    * { box-sizing: border-box; }
+    body { margin: 0; color: var(--ink); background: var(--paper); font: 16px/1.58 Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+    .wrap { width: min(1120px, calc(100% - 36px)); margin: 0 auto; }
+    header { padding: 52px 0 42px; color: #fff; background: radial-gradient(circle at 88% 18%, #1c8ca3 0, transparent 34%), linear-gradient(125deg, #071c37, #0d4771); }
+    .eyebrow { margin: 0 0 10px; color: #8ce8e4; font-size: .73rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+    h1, h2, h3 { margin: 0; line-height: 1.15; }
+    h1 { max-width: 860px; font-size: clamp(2.2rem, 6vw, 4.4rem); letter-spacing: -.045em; }
+    header p.deck { max-width: 780px; margin: 16px 0 0; color: #d3e4ef; font-size: 1.05rem; }
+    .notice { max-width: 880px; margin-top: 22px; padding: 13px 16px; border: 1px solid #e7c27880; border-radius: 10px; color: #f9e8c6; background: #d99a301a; font-size: .9rem; }
+    nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+    nav.toc a { color: #e8f6f6; text-decoration: none; font-size: .78rem; font-weight: 700; padding: 6px 10px; border: 1px solid #ffffff33; border-radius: 999px; }
+    main { padding: 28px 0 70px; }
+    section { margin: 18px 0; padding: 25px; border: 1px solid var(--line); border-radius: 16px; background: var(--white); box-shadow: 0 8px 28px #18384d09; }
+    h2 { margin-bottom: 12px; color: var(--navy); font-size: clamp(1.4rem, 3vw, 1.9rem); }
+    h3 { margin: 0 0 6px; color: var(--navy); font-size: 1.02rem; }
+    p { margin: 8px 0; }
+    a { color: var(--blue); font-weight: 700; }
+    .muted { color: var(--muted); }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .tile { padding: 16px; border-radius: 12px; background: #f1f7fa; }
+    .tile p { margin-bottom: 0; font-size: .92rem; }
+    .tag { display: inline-block; margin-bottom: 7px; color: var(--blue); font-size: .68rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+    .flow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 14px 0; }
+    .flow span { padding: 8px 11px; border: 1px solid #b9d7df; border-radius: 8px; color: #0d4868; background: #eff9fa; font-size: .84rem; font-weight: 700; }
+    .flow b { color: var(--gold); }
+    table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+    th, td { padding: 11px 10px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { color: var(--navy); background: #edf4f7; }
+    ul, ol { margin: 8px 0 0; padding-left: 21px; }
+    li { margin: 6px 0; }
+    .callout { padding: 15px 17px; border-left: 4px solid var(--cyan); border-radius: 5px; background: #eff8f8; }
+    .warn { padding: 15px 17px; border-left: 4px solid var(--gold); border-radius: 5px; background: #fbf6ea; }
+    .day { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+    .day strong { color: var(--blue); font-size: .82rem; }
+    button.reveal, button.check, button.choice { font: inherit; cursor: pointer; border-radius: 8px; border: 1px solid #b9d7df; background: #eff9fa; color: #0d4868; font-weight: 700; padding: 8px 12px; }
+    button.choice { display: block; width: 100%; text-align: left; margin: 6px 0; background: #fff; }
+    button.choice.is-right { border-color: var(--ok); background: #e8f6ee; color: var(--ok); }
+    button.choice.is-wrong { border-color: var(--bad); background: #fdecec; color: var(--bad); }
+    .answer { display: none; margin-top: 10px; padding: 12px 14px; border-radius: 8px; background: #f4f7f8; }
+    .answer.open { display: block; }
+    .q { margin: 14px 0; padding-top: 8px; border-top: 1px solid var(--line); }
+    .score { font-weight: 800; color: var(--navy); }
+    footer { padding: 8px 0 36px; color: var(--muted); font-size: .8rem; }
+    @media (max-width: 800px) { .grid, .grid-3, .day { grid-template-columns: 1fr; } section { padding: 18px; } table { display: block; overflow-x: auto; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <p class="eyebrow">Personal learning reference | Banking ICFR</p>
+      <h1>Learn the map before the cycle starts.</h1>
+      <p class="deck">A practical primer on internal control over financial reporting in a Nigerian bank. Use it while no task has been assigned. When the cycle starts, the team's scope replaces this page.</p>
+      <div class="notice"><strong>Not a client file.</strong> No bank name, extract, workpaper, or firm methodology belongs here. This is public-framework literacy plus the questions a Technology Risk analyst should be able to ask on day one. Confirm the guideline, systems, and your role with the team before you treat any of this as the engagement approach.</div>
+      <nav class="toc" aria-label="Primer sections">
+        <a href="#tomorrow">Tomorrow</a>
+        <a href="#what">What ICFR is</a>
+        <a href="#nigeria">Nigeria</a>
+        <a href="#types">Control types</a>
+        <a href="#bank">Why a bank</a>
+        <a href="#processes">Process map</a>
+        <a href="#tech">Your lane</a>
+        <a href="#before">Before kickoff</a>
+        <a href="#check">Self-check</a>
+      </nav>
+    </div>
+  </header>
+  <main class="wrap">
+    <section id="tomorrow">
+      <p class="eyebrow">Wednesday 7 October</p>
+      <h2>An open day is a designed day, or it disappears.</h2>
+      <p>No task has been assigned. The banking ICFR cycle has not started. That is the work: become fluent enough that kickoff is not your first encounter with the words.</p>
+      <div class="day"><strong>08:30 to 11:30</strong><div>This primer, through the process map. Stop when you can draw the chain from memory: business event, system, control, report, general ledger, review. Do the self-check before lunch.</div></div>
+      <div class="day"><strong>11:30 to 12:30</strong><div>Break. Do not "just check the team channel" for 40 minutes. A two-minute look is enough. If a real task has arrived, it displaces the afternoon.</div></div>
+      <div class="day"><strong>12:30 to 15:00</strong><div><a href="python_sql_assurance_lab.html">Python and SQL lab</a>, Python block. Synthetic loan subledger only. Produce an exception list and explain every row.</div></div>
+      <div class="day"><strong>15:15 to 17:00</strong><div>Same lab, SQL block. Write the subledger-to-GL tie-out once with the answer visible, then again from memory.</div></div>
+      <div class="day"><strong>17:00 to 17:20</strong><div>Eight kickoff questions in a private note. No client name. Tomorrow's first block is rewriting the tie-out before you open the answer.</div></div>
+      <div class="callout"><strong>Done looks like this:</strong> you can explain ICFR without the page, and you have one Python exception file plus one SQL tie-out on synthetic data. Reading both guides is not the win.</div>
+    </section>
+
+    <section id="what">
+      <p class="eyebrow">Definition</p>
+      <h2>ICFR is about the numbers, not every control in the bank.</h2>
+      <p>Internal control over financial reporting is the set of people, systems, and processes that gives reasonable assurance about the reliability of financial reporting and the preparation of financial statements for external use. In Nigeria those statements are prepared under IFRS.</p>
+      <div class="grid">
+        <div class="tile"><span class="tag">In scope</span><h3>What can misstate the financial statements</h3><p>How loans, deposits, interest, fees, treasury positions, and manual journals are captured, calculated, interfaced, reviewed, and reported. Includes the information systems that do that work.</p></div>
+        <div class="tile"><span class="tag">Out of scope unless it hits the numbers</span><h3>Not a general IT audit</h3><p>A firewall finding, a branch cash procedure, or a cyber incident matters here only if it can cause a material misstatement, a failed control over reporting, or a fraud involving someone with a significant reporting role.</p></div>
+      </div>
+      <div class="flow" aria-label="ICFR chain">
+        <span>Business event</span><b>→</b><span>Source system</span><b>→</b><span>Interface or batch</span><b>→</b><span>Calculation</span><b>→</b><span>General ledger</span><b>→</b><span>Report and review</span>
+      </div>
+      <p>Assertions you will hear, in bank language:</p>
+      <ul>
+        <li><strong>Completeness:</strong> every loan, deposit, fee, and deal that happened is in the number.</li>
+        <li><strong>Existence or occurrence:</strong> what is in the number actually happened and the asset or liability is real.</li>
+        <li><strong>Accuracy and valuation:</strong> interest, fees, fair value, and expected credit loss are calculated on the right rules.</li>
+        <li><strong>Cutoff:</strong> the event is in the right period.</li>
+        <li><strong>Presentation and disclosure:</strong> classification, notes, and regulatory versus IFRS differences are not hiding a misstatement.</li>
+        <li><strong>Rights and obligations:</strong> the bank actually owns the asset or owes the liability.</li>
+      </ul>
+    </section>
+
+    <section id="nigeria">
+      <p class="eyebrow">Nigeria, at the level you can say out loud</p>
+      <h2>Management owns the conclusion. A material weakness blocks it.</h2>
+      <p>Public interest entities in Nigeria are expected to maintain internal control over financial reporting and to report on its effectiveness. The Financial Reporting Council cites section 7(2)(f) of the FRC Act 2011 as the statutory hook: management reports on internal control, including information systems controls, and an independent practitioner attests.</p>
+      <div class="grid">
+        <div class="tile"><span class="tag">Listed entities</span><h3>SEC guideline on ICFR</h3><p>Listed companies, which includes listed banks, are directed to the SEC guideline rather than the FRC management-report guidance. The board is responsible for the integrity of financial controls and reporting. Do not quote the wrong document in a meeting.</p></div>
+        <div class="tile"><span class="tag">Other public interest entities</span><h3>FRC management guidance</h3><p>The FRC guidance describes a top-down, risk-based evaluation and says a suitable framework such as COSO is used. It applies to public interest entities that are not in the SEC-listed bucket, with stated exceptions such as unit microfinance banks and insurance brokers.</p></div>
+      </div>
+      <div class="warn"><strong>One line that matters:</strong> if one or more material weaknesses exist, management cannot conclude that ICFR is effective. A material weakness is a deficiency severe enough that there is a reasonable possibility a material misstatement will not be prevented or detected on a timely basis. Your job is not to declare one. Your job is to understand what evidence would support, or fail to support, a control that protects a number.</div>
+      <p>Two other Nigerian facts, kept general:</p>
+      <ul>
+        <li>Banks report under IFRS. CBN prudential rules sit beside that. A loan can look performing in a product system and still need a different classification or provision for regulatory or financial reporting. Learn which system produces which number. Do not guess a circular number.</li>
+        <li>CEO and CFO certification language in published bank annual reports typically covers design of controls, evaluation of effectiveness, significant deficiencies, and fraud involving people with a significant ICFR role. That is why access to posting, rate changes, and model changes is not an IT side topic.</li>
+      </ul>
+      <p class="muted">Confirm the exact guideline, framework, and period the team is using. This page is not that guideline, and it is not firm methodology.</p>
+    </section>
+
+    <section id="types">
+      <p class="eyebrow">COSO, translated</p>
+      <h2>Five components. You will mostly live in two of them.</h2>
+      <div class="grid-3">
+        <div class="tile"><h3>Control environment</h3><p>Tone, competence, authority, and whether people can actually override the process. Entity level. You note it. You rarely test it alone in week one.</p></div>
+        <div class="tile"><h3>Risk assessment</h3><p>Which accounts and assertions can be materially wrong, including fraud risk. This is why loans and deposits usually outrank the stationery account.</p></div>
+        <div class="tile"><h3>Control activities</h3><p>Approvals, reconciliations, automated edits, segregation of duties. This is where most analyst testing sits.</p></div>
+        <div class="tile"><h3>Information and communication</h3><p>Systems, interfaces, reports, and whether the person reviewing a report can rely on it. Information systems controls live here and in control activities.</p></div>
+        <div class="tile"><h3>Monitoring</h3><p>Internal audit, control self-review, exception trend review. A monitoring control can be in scope if management relies on it for the ICFR conclusion.</p></div>
+      </div>
+      <table>
+        <thead><tr><th>Type</th><th>Bank example</th><th>What you are really testing</th></tr></thead>
+        <tbody>
+          <tr><td>Entity-level</td><td>Board audit committee reviews ICFR status. Code of conduct. Whistleblowing.</td><td>Whether the environment makes process controls believable. Usually not your first file.</td></tr>
+          <tr><td>Manual process control</td><td>A credit officer signs a disbursement outside the system.</td><td>Did the right person review the right evidence, at the right time, and is the evidence still there.</td></tr>
+          <tr><td>IT-dependent manual</td><td>Finance reviews a system exception report of loans that failed to interface, then signs it.</td><td>The review, and whether the report itself is complete and accurate. A signature on a bad report is not a control.</td></tr>
+          <tr><td>Automated application control</td><td>Core banking rejects a disbursement above the approved limit, or blocks a journal the preparer tries to approve.</td><td>Configuration, and whether ITGCs let you rely on that configuration not changing unnoticed.</td></tr>
+          <tr><td>IT general control</td><td>Access to the GL, change approval for interest logic, batch monitoring, privileged access reviews.</td><td>Whether the automated controls and reports can be trusted for the period.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="bank">
+      <p class="eyebrow">Sector difference</p>
+      <h2>In a bank, the balance sheet is the product.</h2>
+      <p>A manufacturer's ICFR worry is often inventory, revenue cutoff, and payables. A bank's worry is that the product systems are the books. Deposits are liabilities. Loans are assets. Interest is accrued by a job, not typed by a clerk. Fees are priced by a table. A failed interface is a financial reporting problem, not an IT ticket.</p>
+      <div class="grid">
+        <div class="tile"><h3>Volume makes sampling a weak default</h3><p>Millions of transactions. If you are allowed a full population and the logic is clear, a reconciliation or exception query beats a sample of 25. That is why Python and SQL are engagement skills, not hobbies. You still need permission, an authoritative source, and a way to prove the query.</p></div>
+        <div class="tile"><h3>Two rulebooks, one customer</h3><p>IFRS 9 expected credit loss and CBN prudential classification can both touch the same loan. Management may have a bridge between them. If you do not know which report feeds the financial statements and which feeds the regulator, you will test the wrong number.</p></div>
+      </div>
+    </section>
+
+    <section id="processes">
+      <p class="eyebrow">Generic process map</p>
+      <h2>Six places a banking cycle usually looks. Scope may be narrower.</h2>
+      <p class="muted">These are typical risk areas for a deposit-taking bank, not a list of what your team has been asked to do. When kickoff happens, replace this table with the in-scope processes only, and keep that list in firm systems.</p>
+      <table>
+        <thead><tr><th>Process</th><th>What can go wrong</th><th>Control you should be able to name</th><th>Technology dependency</th></tr></thead>
+        <tbody>
+          <tr><td>Loans and advances</td><td>Loan omitted, disbursed but not recorded, wrong principal, wrong classification, provision model changed quietly.</td><td>Origination approval, system limit, subledger-to-GL reconciliation, independent classification review, change control on the model.</td><td>Core banking or loan system, IFRS 9 engine, GL interface, exception report.</td></tr>
+          <tr><td>Deposits</td><td>Liability understated, dormant balances misused, interest expense wrong, suspense accounts that never clear.</td><td>Account opening controls, interest parameter approval, deposit subledger-to-GL tie-out, suspense ageing review.</td><td>Core banking, interest engine, GL, dormant-account report.</td></tr>
+          <tr><td>Interest income and expense</td><td>Wrong rate, wrong day count, manual rate override, accrual job failed and nobody noticed.</td><td>Rate-table change approval, automated accrual, exception report on failed accruals, independent review of yield reasonableness.</td><td>Parameter tables, batch jobs, job scheduler logs, GL.</td></tr>
+          <tr><td>Fees and commissions</td><td>Fee waived without authority, fee event not priced, income recorded in the wrong period.</td><td>Approved tariff, system pricing, waiver approval above a threshold, fee report reconciled to GL.</td><td>Tariff tables, channel or core banking, GL mapping.</td></tr>
+          <tr><td>Treasury and investments</td><td>Deal not captured, valuation wrong, position exists in the dealer sheet but not in the books.</td><td>Deal confirmation, independent valuation, position reconciliation, access restriction on dealing versus booking.</td><td>Treasury system, market-data feed, GL, confirmation matching.</td></tr>
+          <tr><td>Financial close</td><td>Manual journal posted by the preparer, mapping hides a balance, management review is a signature with no evidence.</td><td>Journal segregation of duties, supporting evidence, mapping review, fluctuation analysis, hard close calendar.</td><td>GL, consolidation tool, close checklist, user access to posting roles.</td></tr>
+        </tbody>
+      </table>
+      <div class="callout"><strong>The sentence to practise:</strong> "The risk is that the loan subledger is incomplete or does not agree to the GL, which would misstate loans and advances. The control is a periodic reconciliation by someone who cannot change the source data, using a report whose completeness we can support, with differences cleared before close."</div>
+    </section>
+
+    <section id="tech">
+      <p class="eyebrow">Technology Risk on an ICFR cycle</p>
+      <h2>You are there because the number is produced by a system.</h2>
+      <p>A process auditor can describe the reconciliation. You should be able to say whether the reconciliation can be trusted. That usually means four questions.</p>
+      <div class="grid">
+        <div class="tile"><span class="tag">ITGC</span><h3>Can we rely on the automated piece for the period?</h3><p>Access to programs and data, change management, computer operations, and program development. In a bank: who can post to the GL, who can change an interest parameter, who can migrate a model, did the interface batch finish, and was the failure reviewed.</p></div>
+        <div class="tile"><span class="tag">ITAC</span><h3>Does the system enforce the rule?</h3><p>Limit checks, duplicate blocking, segregation the system will not let one user break, automated calculations. Test the configuration and the outcome, not a screenshot of a menu.</p></div>
+        <div class="tile"><span class="tag">IPE</span><h3>Is the report complete and accurate?</h3><p>Information produced by the entity. If someone reviews a report, you care how the report is generated, what it includes and excludes, whether parameters can be changed, and whether you can tie it back to the source.</p></div>
+        <div class="tile"><span class="tag">Interfaces</span><h3>What happens to a record that does not cross?</h3><p>Core banking to GL, channels to core, loan system to the provision engine. Completeness fails in the gap. Ask for the exception queue, not only the success log.</p></div>
+      </div>
+      <p>ITGC areas, in the words you will use:</p>
+      <ul>
+        <li><strong>Access:</strong> joiners, movers, leavers, privileged users, generic IDs, and whether a poster can approve their own journal.</li>
+        <li><strong>Change:</strong> who can change calculation logic, rate tables, report definitions, and mappings, and whether that change was tested and approved.</li>
+        <li><strong>Operations:</strong> batch completion, interface failures, backups only where they protect the reporting process, incident handling for jobs that feed the close.</li>
+        <li><strong>Development:</strong> new products and new reports that create a new path into the financial statements.</li>
+      </ul>
+    </section>
+
+    <section id="before">
+      <p class="eyebrow">While the cycle has not started</p>
+      <h2>Prepare judgement. Do not prepare a client file.</h2>
+      <div class="grid">
+        <div class="tile"><span class="tag">Do</span><h3>Build fluency on synthetic data</h3><p>Finish this primer. Run the <a href="python_sql_assurance_lab.html">Python and SQL lab</a>. Write the chain in your own words. Draft kickoff questions. Watch the team channel for a start date, not for files to download.</p></div>
+        <div class="tile"><span class="tag">Do not</span><h3>Get ahead of the team with their data</h3><p>Do not pull extracts into a personal laptop, this app, GitHub, or an unapproved AI tool. Do not invent the scope. Do not message the client. Do not log the bank name in the planning app. Alias only, and only once there is something real to log.</p></div>
+      </div>
+      <h3 style="margin-top: 16px;">Eight questions for kickoff</h3>
+      <ol>
+        <li>Which processes and accounts are in scope this cycle, and which are explicitly out?</li>
+        <li>Is this management's ICFR assessment support, external audit support, or something else? Which guideline applies?</li>
+        <li>Which systems produce the in-scope numbers, and which reports does management actually rely on?</li>
+        <li>Am I on ITGC, application controls, IPE, interfaces, or process support? Who reviews my work?</li>
+        <li>What does a clean first deliverable look like, and where must the evidence live?</li>
+        <li>Which tools and data environments are approved if a population test is needed?</li>
+        <li>Where did last cycle's findings sit: access, change, reconciliation, or report logic?</li>
+        <li>What would make my first week easier to review?</li>
+      </ol>
+      <div class="warn"><strong>If the channel goes quiet:</strong> that is not permission to freelance. Skill work is the assignment until a person gives you one. When they do, stop the lab and confirm the definition of done before you open a file.</div>
+    </section>
+
+    <section id="check">
+      <p class="eyebrow">Self-check</p>
+      <h2>Eight questions. No notes.</h2>
+      <p class="score" id="scoreline">Score: 0 of 8</p>
+      <div id="quiz"></div>
+      <p class="muted" id="quiz-note"></p>
+    </section>
+
+    <section>
+      <p class="eyebrow">Next</p>
+      <h2>Then make the skills do the work.</h2>
+      <p>The primer is the map. The <a href="python_sql_assurance_lab.html">Python and SQL assurance lab</a> is the repetition: duplicates, missing GL codes, a tie-out, stale privileged access, and a journal the preparer approved. All of it is fictional. None of it is a client.</p>
+      <p>Related, broader, and not a substitute for this page: <a href="technology_assurance_field_guide.html">Technology Assurance Field Guide</a>.</p>
+    </section>
+  </main>
+  <footer class="wrap">Personal learning aid. Engagement instructions, the applicable SEC or FRC guideline, firm policy, and the team's scope always take precedence.</footer>
+  <script>
+    const questions = [
+      {
+        q: "ICFR is the bank's entire internal control system, including every operational and cyber control.",
+        choices: ["True", "False"],
+        answer: 1,
+        why: "False. ICFR is control over financial reporting, including the information systems that affect it. A control matters here when it can prevent or detect a misstatement."
+      },
+      {
+        q: "Management can conclude that ICFR is effective even if a material weakness exists, as long as the board has been told.",
+        choices: ["True", "False"],
+        answer: 1,
+        why: "False. Under the FRC guidance, one or more material weaknesses means ICFR cannot be considered effective. Informing the board does not remove the weakness."
+      },
+      {
+        q: "For a listed bank, which document should you confirm before quoting an ICFR requirement in a meeting?",
+        choices: ["The SEC guideline on ICFR", "Whatever blog summarised COSO last week", "A personal note in this app"],
+        answer: 0,
+        why: "Listed entities are directed to the SEC guideline. Other public interest entities generally use the FRC management guidance. Confirm which one the engagement is actually using."
+      },
+      {
+        q: "Finance signed the exception report. What else has to be true before that review is evidence?",
+        choices: ["The signature is enough", "The report has to be complete and accurate for the period, and you should know how it is produced", "The report only matters if Internal Audit prepared it"],
+        answer: 1,
+        why: "This is IPE. A review of a report that drops failed interfaces is a review of the wrong population."
+      },
+      {
+        q: "Why do IT general controls show up on an ICFR cycle?",
+        choices: ["Because every IT finding is an ICFR finding", "Because they affect whether automated controls, calculations, and reports can be relied on for the period", "Because cybersecurity is the same engagement"],
+        answer: 1,
+        why: "Access, change, and operations matter when they protect the systems that produce or report the numbers. A cyber finding is not automatically an ICFR finding."
+      },
+      {
+        q: "A loan subledger that does not tie to the general ledger is:",
+        choices: ["An IT ticket with no reporting implication", "A possible completeness or accuracy problem over loans and advances", "Only a problem if the difference is under one naira"],
+        answer: 1,
+        why: "Loans are a financial statement line. The tie-out is how management shows the subledger and the ledger are the same population."
+      },
+      {
+        q: "The cycle has not started. What is a good use of the gap?",
+        choices: ["Download whatever is in the team channel into a personal folder so you can practise", "Learn the map and revive Python and SQL on synthetic data", "Message the client to ask for a data dump"],
+        answer: 1,
+        why: "Skill work is the assignment until a person gives you one. Client data stays in approved firm systems."
+      },
+      {
+        q: "Which question is the most useful on day one?",
+        choices: ["Which systems produce the in-scope numbers, and which reports does management rely on?", "Can I redesign the control matrix this week?", "What is the client's core banking vendor, so I can study their marketing site?"],
+        answer: 0,
+        why: "Systems, reports, your role, and the reviewer. Vendor trivia can wait until the scope says it matters."
+      }
+    ];
+
+    const quiz = document.getElementById("quiz");
+    const scoreline = document.getElementById("scoreline");
+    const note = document.getElementById("quiz-note");
+    let score = 0;
+    let answered = 0;
+
+    questions.forEach((item, index) => {
+      const block = document.createElement("div");
+      block.className = "q";
+      const title = document.createElement("p");
+      title.innerHTML = "<strong>" + (index + 1) + ".</strong> " + item.q;
+      block.appendChild(title);
+      item.choices.forEach((choice, choiceIndex) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "choice";
+        button.textContent = choice;
+        button.addEventListener("click", () => {
+          if (block.dataset.locked) return;
+          block.dataset.locked = "1";
+          answered += 1;
+          const right = choiceIndex === item.answer;
+          button.classList.add(right ? "is-right" : "is-wrong");
+          if (!right) block.querySelectorAll("button")[item.answer].classList.add("is-right");
+          if (right) score += 1;
+          const why = document.createElement("div");
+          why.className = "answer open";
+          why.textContent = item.why;
+          block.appendChild(why);
+          scoreline.textContent = "Score: " + score + " of 8";
+          if (answered === 8) {
+            note.textContent = score >= 7
+              ? "Good. Close the page and draw the chain on paper. If you cannot, you were recognising answers, not learning them."
+              : "Below 7. Reread the process map and the four technology questions, then retake after a break. Do not start Python on a shaky map.";
+          }
+        });
+        block.appendChild(button);
+      });
+      quiz.appendChild(block);
+    });
+  </script>
+</body>
+</html>

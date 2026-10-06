@@ -771,8 +771,14 @@ function StudyView({
           <a className="command-primary-button" href="technology_assurance_field_guide.html" target="_blank" rel="noreferrer">
             <ShieldCheck className="h-4 w-4" /> Technology Assurance Field Guide
           </a>
+          <a className="command-primary-button" href="banking_icfr_primer.html" target="_blank" rel="noreferrer">
+            <ClipboardCheck className="h-4 w-4" /> Banking ICFR Primer
+          </a>
+          <a className="command-primary-button" href="python_sql_assurance_lab.html" target="_blank" rel="noreferrer">
+            <Zap className="h-4 w-4" /> Python and SQL Assurance Lab
+          </a>
         </div>
-        <p className="command-muted" style={{ marginTop: 12 }}>Both open as standalone pages in a new tab. Bookmark them if you use them often.</p>
+        <p className="command-muted" style={{ marginTop: 12 }}>Each opens as a standalone page in a new tab. Bookmark the ones you use often.</p>
       </section>
 
       <div className="btnrow" style={{ marginBottom: 16 }}>

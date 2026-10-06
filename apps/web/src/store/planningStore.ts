@@ -173,7 +173,8 @@ function todayISO(): string {
 }
 
 const DEFAULT_DATE = todayISO();
-const REENTRY_DATE = mondayOnOrAfter(DEFAULT_DATE);
+const REENTRY_DATE = DEFAULT_DATE;
+const WEEK_START = mondayOnOrBefore(DEFAULT_DATE);
 
 function id(prefix: string): string {
   return `${prefix}-${Math.random().toString(36).slice(2, 10)}`;
@@ -185,11 +186,11 @@ function addDays(date: string, amount: number): string {
   return `${result.getFullYear()}-${String(result.getMonth() + 1).padStart(2, "0")}-${String(result.getDate()).padStart(2, "0")}`;
 }
 
-function mondayOnOrAfter(date: string): string {
+function mondayOnOrBefore(date: string): string {
   const [year, month, day] = date.split("-").map(Number);
   const value = new Date(year, month - 1, day);
-  const offset = (8 - value.getDay()) % 7;
-  value.setDate(value.getDate() + offset);
+  const offset = (value.getDay() + 6) % 7;
+  value.setDate(value.getDate() - offset);
   return `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, "0")}-${String(value.getDate()).padStart(2, "0")}`;
 }
 
@@ -247,29 +248,29 @@ const defaultGoals: Goal[] = [
 const defaultTasks: PlannedTask[] = [
   {
     id: "task-engagement-walkthrough",
-    title: "Confirm my first workstream and definition of done",
-    category: "Delivery",
+    title: "Work through the banking ICFR primer",
+    category: "Study",
     priority: "Must",
-    plannedDate: REENTRY_DATE,
-    estimatedPomodoros: 2,
-    nextAction: "Ask the senior or manager what I own first, who reviews it, and what a clean first delivery looks like.",
-    definitionOfDone: "My first deliverable, reviewer, deadline, and quality bar are clear.",
-    evidenceExpected: "A private generic note of the assignment and agreed success criteria.",
+    plannedDate: addDays(REENTRY_DATE, 1),
+    estimatedPomodoros: 3,
+    nextAction: "Open the Banking ICFR Primer from the Study tab and read through the process map, then take the self-check.",
+    definitionOfDone: "I can draw the ICFR chain from memory and score at least 7 of 8 on the self-check.",
+    evidenceExpected: "A private generic note of the chain and the score. No client detail.",
     status: "Open",
     carryCount: 0,
     carryReason: "",
-    goalId: "goal-engagement",
+    goalId: "goal-reviewer-safe",
   },
   {
     id: "task-engagement-review-note",
-    title: "Map one assigned process from objective to evidence",
-    category: "Delivery",
+    title: "Run the Python block of the assurance lab",
+    category: "Technical mastery",
     priority: "Must",
     plannedDate: addDays(REENTRY_DATE, 1),
-    estimatedPomodoros: 2,
-    nextAction: "For the assigned work, sketch the objective, process, risk, control, test, and evidence chain using approved work systems.",
-    definitionOfDone: "The chain is explained clearly to the senior, with open questions surfaced early.",
-    evidenceExpected: "Generic learning note only. Client evidence stays in approved firm systems.",
+    estimatedPomodoros: 3,
+    nextAction: "Download the synthetic CSVs and script from the lab page, run them locally, and explain every exception row in one sentence each.",
+    definitionOfDone: "Python output matches the page: 2 missing-GL rows, 1 duplicated account, 3 tie-out breaks, 3 access exceptions, 2 self-approved journals.",
+    evidenceExpected: "Local practice files only, plus a generic learning note.",
     status: "Open",
     carryCount: 0,
     carryReason: "",
@@ -277,29 +278,29 @@ const defaultTasks: PlannedTask[] = [
   },
   {
     id: "task-cisa-diagnostic",
-    title: "Clarify the team's current assurance portfolio",
-    category: "Career",
+    title: "Rewrite the SQL tie-out from memory",
+    category: "Technical mastery",
     priority: "Must",
     plannedDate: addDays(REENTRY_DATE, 2),
-    estimatedPomodoros: 1,
-    nextAction: "Ask how Advisory Tech Risk and Audit divide work, and what ICFR and revenue assurance mean on the current engagements.",
-    definitionOfDone: "I have a practical view of the team's live priorities, my role, and the terms that need deeper study.",
-    evidenceExpected: "A generic practice map with no client names or sensitive details.",
+    estimatedPomodoros: 2,
+    nextAction: "Write the dedupe, sum, and outer-join tie-out without the answer open, then fix from the error message before comparing.",
+    definitionOfDone: "The tie-out runs clean from memory and the 500,000 overdraft difference is stated as subledger minus GL.",
+    evidenceExpected: "A local .sql file and a one-line explanation a senior could read.",
     status: "Open",
     carryCount: 0,
     carryReason: "",
-    goalId: "goal-engagement",
+    goalId: "goal-reviewer-safe",
   },
   {
     id: "task-automation-candidates",
-    title: "Translate API experience into an assurance question",
-    category: "Technical mastery",
-    priority: "Could",
+    title: "Draft kickoff questions for the ICFR cycle",
+    category: "Career",
+    priority: "Should",
     plannedDate: addDays(REENTRY_DATE, 3),
-    estimatedPomodoros: 2,
-    nextAction: "On a local or synthetic API only, map inventory, authentication, authorization, change, logging, and test evidence to control questions.",
-    definitionOfDone: "A one-page generic API assurance map, with no live endpoint testing and no client information.",
-    evidenceExpected: "A personal learning artifact using a toy API or synthetic data.",
+    estimatedPomodoros: 1,
+    nextAction: "Adapt the primer's eight questions to what I still do not know about scope, systems, role, and reviewer.",
+    definitionOfDone: "Eight questions in a private note, ready to ask, with no client name in this tool.",
+    evidenceExpected: "Generic question list only.",
     status: "Open",
     carryCount: 0,
     carryReason: "",
@@ -307,18 +308,18 @@ const defaultTasks: PlannedTask[] = [
   },
   {
     id: "task-improvement-path",
-    title: "Agree how to develop a useful solution contribution",
-    category: "Career",
+    title: "Confirm scope and approved tools before touching live data",
+    category: "Delivery",
     priority: "Should",
     plannedDate: addDays(REENTRY_DATE, 4),
     estimatedPomodoros: 1,
-    nextAction: "Ask which approved tools, reusable assets, and sponsor path the team uses before proposing a build.",
-    definitionOfDone: "One next learning priority and a safe route to contribute are agreed, or parked pending a real assignment.",
-    evidenceExpected: "Generic notes on the next step, never client data or workpapers.",
+    nextAction: "Ask which systems, reports, tools, and evidence locations are approved if a population test is ever needed.",
+    definitionOfDone: "Approved tools and evidence rules are noted, or the question is parked until the cycle starts.",
+    evidenceExpected: "Generic notes only, never client data or workpapers.",
     status: "Open",
     carryCount: 0,
     carryReason: "",
-    goalId: "goal-automation",
+    goalId: "goal-engagement",
   },
 ];
 
@@ -326,26 +327,26 @@ const defaultDailyPlans: DailyPlan[] = [
   {
     date: REENTRY_DATE,
     energy: "Normal",
-    winCondition: "By close of day, I know today's delivery, the quality bar, and the next action. No assumptions about the workstream.",
-    firstFocusBlock: "Reconnect with the team, confirm today's priority and how the senior wants the output returned.",
+    winCondition: "By close of day, tomorrow's learning day is designed, and any real assignment has displaced it cleanly.",
+    firstFocusBlock: "Check the team channel for a start date or task. If nothing real arrives, run one primer section plus one lab drill.",
     fixedCommitments: "Engagement calls, deadlines, and firm training.",
     reflection: "",
     evidenceNote: "",
-    tomorrowFirstFocusBlock: "Write one concrete next action from today's assignment before closing the laptop.",
+    tomorrowFirstFocusBlock: "Open the Banking ICFR Primer and read through the process map before touching Python.",
   },
 ];
 
 const defaultWeeklyPlan: WeeklyPlan = {
-  weekOf: REENTRY_DATE,
-  theme: "Engagement mode: learn the method",
+  weekOf: WEEK_START,
+  theme: "Skill revival: Python, SQL, and banking ICFR readiness",
   focusCapacity: 10,
   contingencyCapacity: 4,
-  deliveryWin: "Confirm my first deliverable, quality bar, deadline, and reviewer, then move the assigned work forward.",
-  masteryWin: "Map one assigned assurance process from objective and risk through control, test, and evidence.",
-  leverageWin: "Identify one relevant modern assurance learning thread, then validate it with the team before building anything.",
-  behaviourFocus: "Listen first, clarify ownership, surface blockers early, and close the loop.",
-  feedbackRequest: "Ask my senior what would make my next deliverable easier to review.",
-  risks: "Team portfolio and tool choices are working hypotheses until confirmed. No client data, names, live endpoint tests, or working papers in this tool.",
+  deliveryWin: "Stay ready for the cycle: watch the team channel, and let any real task displace lab work.",
+  masteryWin: "Revive Python and SQL on synthetic data and complete the banking ICFR primer self-check.",
+  leverageWin: "Draft kickoff questions so day one of the cycle starts with clarity, not orientation.",
+  behaviourFocus: "Predict before revealing. Write the query from memory. Explain each exception in one sentence.",
+  feedbackRequest: "Ask my senior what good looks like for a first ICFR deliverable on this team.",
+  risks: "No client name, extract, workpaper, or live data in this tool. The cycle has not started, so scope stays generic until confirmed.",
   reviewNotes: "",
 };
 
@@ -394,6 +395,36 @@ const defaultStudyTracks: StudyTrack[] = [
       { id: "evidence-workpapers", title: "Evidence, working papers, and review notes", status: "Not started" },
       { id: "walkthrough-craft", title: "Client walkthroughs and process narratives", status: "Not started" },
       { id: "cbn-context", title: "CBN IT standards and the Nigerian banking context", status: "Not started" },
+    ],
+  },
+  {
+    id: "track-banking-icfr",
+    name: "Banking ICFR readiness",
+    description: "The map before the cycle starts: what ICFR covers in a bank, the Nigerian guideline landscape, control types, and kickoff questions. Generic until the team confirms scope.",
+    status: "Active",
+    guideUrl: "banking_icfr_primer.html",
+    topics: [
+      { id: "icfr-scope", title: "What ICFR covers and what it excludes", status: "Not started" },
+      { id: "icfr-nigeria", title: "Nigerian ICFR landscape: FRC, SEC, board, and management reporting", status: "Not started" },
+      { id: "icfr-coso", title: "Control types: entity-level, manual, IT-dependent, automated, ITGC", status: "Not started" },
+      { id: "icfr-bank-processes", title: "Banking processes: loans, deposits, interest, fees, treasury, close", status: "Not started" },
+      { id: "icfr-tech-lane", title: "The Technology Risk lane: ITGC, ITAC, IPE, interfaces", status: "Not started" },
+      { id: "icfr-kickoff", title: "Kickoff questions and pre-cycle guardrails", status: "Not started" },
+    ],
+  },
+  {
+    id: "track-python-sql",
+    name: "Python and SQL assurance reps",
+    description: "Revive population testing on synthetic data: duplicates, missing keys, tie-outs, stale access, and segregation of duties. No client extracts, ever.",
+    status: "Active",
+    guideUrl: "python_sql_assurance_lab.html",
+    topics: [
+      { id: "py-duplicates", title: "Duplicates and business keys before control totals", status: "Not started" },
+      { id: "py-completeness", title: "Completeness with anti-joins, not inner joins", status: "Not started" },
+      { id: "py-tieout", title: "Subledger to GL tie-out, written from memory", status: "Not started" },
+      { id: "py-access", title: "Privileged access exceptions with an explicit cutoff", status: "Not started" },
+      { id: "py-sod", title: "Segregation of duties over manual journals", status: "Not started" },
+      { id: "py-evidence", title: "Explain the exception in one senior-ready sentence", status: "Not started" },
     ],
   },
   {
@@ -619,10 +650,11 @@ function migrateV2(old: Partial<PlanningSnapshot> & { selectedDate: string }): P
   for (const goal of defaultGoals) if (!goals.some((item) => item.id === goal.id)) goals.push(goal);
 
   const previousTaskTitles: Record<string, string> = {
-    "task-engagement-walkthrough": "Complete one ITGC walkthrough on my first workstream",
-    "task-engagement-review-note": "Turn one review note into a fixed habit",
-    "task-cisa-diagnostic": "Run the CISA diagnostic and set the study rhythm",
-    "task-automation-candidates": "Capture three safe automation candidates from real workflows",
+    "task-engagement-walkthrough": "Confirm my first workstream and definition of done",
+    "task-engagement-review-note": "Map one assigned process from objective to evidence",
+    "task-cisa-diagnostic": "Clarify the team's current assurance portfolio",
+    "task-automation-candidates": "Translate API experience into an assurance question",
+    "task-improvement-path": "Agree how to develop a useful solution contribution",
   };
   const tasks = safeArray(old.tasks, defaultTasks).map((task) => {
     const fresh = defaultTasks.find((item) => item.id === task.id);
@@ -632,7 +664,7 @@ function migrateV2(old: Partial<PlanningSnapshot> & { selectedDate: string }): P
   for (const task of defaultTasks) if (!tasks.some((item) => item.id === task.id)) tasks.push(task);
 
   const savedWeekly = old.weeklyPlan && typeof old.weeklyPlan === "object" ? old.weeklyPlan : defaultWeeklyPlan;
-  const previousWeeklyDeliveryWin = "Produce one review-ready workpaper section.";
+  const previousWeeklyDeliveryWin = "Confirm my first deliverable, quality bar, deadline, and reviewer, then move the assigned work forward.";
   const weeklyPlan =
     savedWeekly.deliveryWin === previousWeeklyDeliveryWin
       ? { ...defaultWeeklyPlan, reviewNotes: savedWeekly.reviewNotes }

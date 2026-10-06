@@ -7,12 +7,14 @@ A personal performance system for a Technology Risk analyst: plan from the year 
 - **Performance Command Center** (`apps/web`) - the main app.
   - **Command**: daily win condition (one delivery, one capability, one leverage result), task runway with pomodoro estimates, focus timer, weekly control room, and a 10-minute closeout with a "rehash tomorrow" action.
   - **Horizons**: the full cascade. Yearly north star and quarterly milestones, monthly theme and outcomes, then the weekly and daily layers.
-  - **Study**: generic learning tracks. ITGC and engagement readiness (active), Modern Technology Assurance (active), API, Data and Intelligent Workflows (planned), CISA domains (planned), and the passed KBAC Academy material (archived, with the full interactive guide still available).
+  - **Study**: generic learning tracks. ITGC and engagement readiness (active), Banking ICFR readiness (active), Python and SQL assurance reps (active), Modern Technology Assurance (active), API, Data and Intelligent Workflows (planned), CISA domains (planned), and the passed KBAC Academy material (archived, with the full interactive guide still available).
   - **Engagements**: an alias-only log of workstreams, roles, review notes received, lessons learned, and the requests you are chasing.
   - **Rating evidence**: a dated ledger of contributions mapped to performance dimensions.
   - **Solutions**: a responsible pipeline for turning real assurance pain points into approved, validated improvements.
   - **Roadmap**: goals, the 12-month route, practice map, and local backup export/import.
 - **Technology Assurance Field Guide** (`apps/web/public/technology_assurance_field_guide.html`) - a standalone reference for the broader Advisory Tech Risk offer: API assurance control map, ICFR and revenue assurance context, a four-week field plan, and hard guardrails. Linked from the Modern Technology Assurance track.
+- **Banking ICFR Primer** (`apps/web/public/banking_icfr_primer.html`) - what ICFR covers in a bank, the Nigerian guideline landscape in plain terms, control types, a generic process map, the Technology Risk lane, kickoff questions, and a self-check. Linked from the Banking ICFR readiness track.
+- **Python and SQL Assurance Lab** (`apps/web/public/python_sql_assurance_lab.html`) - synthetic-data drills (duplicates, missing keys, tie-out, stale access, segregation of duties) with downloadable CSVs and a script. Linked from the Python and SQL assurance reps track.
 - **KBAC Elite Study System** (`kbac_academy_general_test_study_guide.html`, served as `kbac_study_guide.html`) - the archived interactive study guide for the Academy General Test: 16 modules, a journal entry drill, two solved class exercises, 58 flashcards, a 98-question bank, a paced mock exam, and a printable cheat sheet.
 - **Pomodoro engine** - the timer, tasks, and session history that power focus blocks.
 
